@@ -1,14 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Approve people - Feedback')
+@section('title', 'Users - Feedback')
 
 @section('content')
 <main class="container py-5">
     <div class="row justify-content-center">
         <section class="col-12 col-lg-9" aria-labelledby="approval-title">
             <p class="text-success small fw-semibold text-uppercase mb-2">Account management</p>
+            <h1 class="h2 fw-bold mb-4">Users</h1>
             <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
-                <h1 class="h2 fw-bold mb-0" id="approval-title">Approve people</h1>
+                <h2 class="h3 fw-bold mb-0" id="approval-title">Approve people</h2>
                 <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">{{ $users->count() }} pending</span>
             </div>
             <p class="text-body-secondary mb-4">Review new registrations before granting access.</p>
@@ -42,7 +43,7 @@
                                 <div class="modal-dialog modal-dialog-centered">
                                     <form class="modal-content"
                                         method="POST"
-                                        action="{{ route('approve.update', $user) }}">
+                                        action="{{ route('users.update', $user) }}">
                                         @csrf
                                         @method('PATCH')
 
@@ -83,7 +84,7 @@
                                     </form>
                                 </div>
                             </div>
-                            <form method="POST" action="{{ route('approve.destroy', $user) }}"
+                            <form method="POST" action="{{ route('users.destroy', $user) }}"
                                 onsubmit="return confirm('Permanently delete this pending registration?')">
                                 @csrf
                                 @method('DELETE')

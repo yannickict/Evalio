@@ -12,9 +12,9 @@
                    @class(['nav-link rounded-pill px-3 fw-semibold', 'active bg-success text-white' => request()->routeIs('overview'), 'link-success' => ! request()->routeIs('overview')])
                    @if (request()->routeIs('overview')) aria-current="page" @endif>Overview</a>
                 @if (auth()->user()->role?->name === 'admin')
-                    <a href="{{ route('approve') }}"
-                       @class(['nav-link rounded-pill px-3 fw-semibold', 'active bg-success text-white' => request()->routeIs('approve*'), 'link-success' => ! request()->routeIs('approve*')])
-                       @if (request()->routeIs('approve*')) aria-current="page" @endif>Approve people</a>
+                    <a href="{{ route('users') }}"
+                       @class(['nav-link rounded-pill px-3 fw-semibold', 'active bg-success text-white' => request()->routeIs('users*'), 'link-success' => ! request()->routeIs('users*')])
+                       @if (request()->routeIs('users*')) aria-current="page" @endif>Users</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf

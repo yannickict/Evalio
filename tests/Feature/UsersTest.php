@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
-class ApprovalTest extends TestCase
+class UsersTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -29,9 +29,9 @@ class ApprovalTest extends TestCase
     {
         $pending = User::factory()->create();
 
-        $this->get(route('approve'))->assertRedirect(route('login'));
-        $this->patch(route('approve.update', $pending))->assertRedirect(route('login'));
-        $this->delete(route('approve.destroy', $pending))->assertRedirect(route('login'));
+        $this->get(route('users'))->assertRedirect(route('login'));
+        $this->patch(route('users.update', $pending))->assertRedirect(route('login'));
+        $this->delete(route('users.destroy', $pending))->assertRedirect(route('login'));
         $this->assertDatabaseHas('users', ['id' => $pending->id, 'is_approved' => false]);
     }
 
@@ -43,11 +43,11 @@ class ApprovalTest extends TestCase
             $actor = User::factory()->approved()->create([
                 'role_id' => Role::where('name', $role)->firstOrFail()->id,
             ]);
-            $this->actingAs($actor)->get(route('approve'))->assertForbidden();
-            $this->patch(route('approve.update', $pending), [
+            $this->actingAs($actor)->get(route('users'))->assertForbidden();
+            $this->patch(route('users.update', $pending), [
                 'role_id' => Role::where('name', 'admin')->firstOrFail()->id,
             ])->assertForbidden();
-            $this->delete(route('approve.destroy', $pending))->assertForbidden();
+            $this->delete(route('users.destroy', $pending))->assertForbidden();
         }
 
         $this->assertDatabaseHas('users', ['id' => $pending->id, 'is_approved' => false]);
@@ -59,18 +59,21 @@ class ApprovalTest extends TestCase
         $older = User::factory()->create(['created_at' => now()->subDay()]);
         $approved = User::factory()->approved()->create();
 
-        $this->actingAs($this->admin())->get(route('approve'))
+        $this->actingAs($this->admin())->get(route('users'))
             ->assertOk()
+            ->assertViewIs('users')
+            ->assertSee('<title>Users - Feedback</title>', false)
+            ->assertSeeInOrder(['Users', 'Approve people'])
             ->assertSeeInOrder([$older->email, $newer->email])
             ->assertDontSee($approved->email)
-            ->assertSee(route('approve.update', $older), false)
+            ->assertSee(route('users.update', $older), false)
             ->assertSee('name="_method" value="PATCH"', false)
             ->assertSee('name="_method" value="DELETE"', false);
     }
 
     public function test_admin_sees_empty_state(): void
     {
-        $this->actingAs($this->admin())->get(route('approve'))
+        $this->actingAs($this->admin())->get(route('users'))
             ->assertOk()->assertSee('No users waiting for approval.');
     }
 
@@ -80,14 +83,14 @@ class ApprovalTest extends TestCase
         $pending = User::factory()->create();
         $role = Role::where('name', $roleName)->firstOrFail();
 
-        $this->actingAs($this->admin())->patch(route('approve.update', $pending), ['role_id' => $role->id])
-            ->assertRedirect(route('approve'))->assertSessionHasNoErrors()->assertSessionHas('status');
+        $this->actingAs($this->admin())->patch(route('users.update', $pending), ['role_id' => $role->id])
+            ->assertRedirect(route('users'))->assertSessionHasNoErrors()->assertSessionHas('status');
         $this->assertDatabaseHas('users', [
             'id' => $pending->id,
             'is_approved' => true,
             'role_id' => $role->id,
         ]);
-        $this->get(route('approve'))->assertDontSee($pending->email);
+        $this->get(route('users'))->assertDontSee($pending->email);
 
         $this->post(route('logout'));
         $this->post(route('login.store'), ['email' => $pending->email, 'password' => 'password'])
@@ -122,9 +125,9 @@ class ApprovalTest extends TestCase
     {
         $pending = User::factory()->create();
 
-        $this->actingAs($this->admin())->from(route('approve'))
-            ->patch(route('approve.update', $pending), $data)
-            ->assertRedirect(route('approve'))->assertSessionHasErrors('role_id');
+        $this->actingAs($this->admin())->from(route('users'))
+            ->patch(route('users.update', $pending), $data)
+            ->assertRedirect(route('users'))->assertSessionHasErrors('role_id');
 
         $this->assertDatabaseHas('users', [
             'id' => $pending->id,
@@ -136,7 +139,7 @@ class ApprovalTest extends TestCase
     public function test_each_pending_user_has_a_matching_modal_and_role_form(): void
     {
         $pending = User::factory()->count(2)->create();
-        $response = $this->actingAs($this->admin())->get(route('approve'))->assertOk();
+        $response = $this->actingAs($this->admin())->get(route('users'))->assertOk();
         $document = new \DOMDocument;
         @$document->loadHTML($response->getContent());
         $xpath = new \DOMXPath($document);
@@ -147,7 +150,7 @@ class ApprovalTest extends TestCase
             $this->assertCount(1, $xpath->query('//*[@id="'.$id.'"]'));
             $form = $xpath->query('//*[@id="'.$id.'"]//form')->item(0);
             $this->assertNotNull($form);
-            $this->assertSame(route('approve.update', $user), $form->getAttribute('action'));
+            $this->assertSame(route('users.update', $user), $form->getAttribute('action'));
             $this->assertSame('POST', $form->getAttribute('method'));
             $this->assertCount(1, $xpath->query('.//input[@name="_method" and @value="PATCH"]', $form));
             $this->assertCount(1, $xpath->query('.//input[@name="_token"]', $form));
@@ -168,8 +171,8 @@ class ApprovalTest extends TestCase
     {
         $pending = User::factory()->create();
 
-        $this->actingAs($this->admin())->delete(route('approve.destroy', $pending))
-            ->assertRedirect(route('approve'))->assertSessionHas('status');
+        $this->actingAs($this->admin())->delete(route('users.destroy', $pending))
+            ->assertRedirect(route('users'))->assertSessionHas('status');
         $this->assertDatabaseMissing('users', ['id' => $pending->id]);
     }
 
@@ -180,10 +183,10 @@ class ApprovalTest extends TestCase
         $this->actingAs($admin);
 
         foreach ([$admin, $approved] as $user) {
-            $this->patch(route('approve.update', $user), [
+            $this->patch(route('users.update', $user), [
                 'role_id' => Role::where('name', 'editor')->firstOrFail()->id,
             ])->assertForbidden();
-            $this->delete(route('approve.destroy', $user))->assertForbidden();
+            $this->delete(route('users.destroy', $user))->assertForbidden();
             $this->assertDatabaseHas('users', ['id' => $user->id, 'is_approved' => true, 'role_id' => $user->role_id]);
         }
     }
@@ -191,15 +194,15 @@ class ApprovalTest extends TestCase
     public function test_missing_users_return_not_found(): void
     {
         $this->actingAs($this->admin());
-        $this->patch(route('approve.update', 999999))->assertNotFound();
-        $this->delete(route('approve.destroy', 999999))->assertNotFound();
+        $this->patch(route('users.update', 999999))->assertNotFound();
+        $this->delete(route('users.destroy', 999999))->assertNotFound();
     }
 
     public function test_get_requests_cannot_approve_or_delete_users(): void
     {
         $pending = User::factory()->create();
-        $this->actingAs($this->admin())->get('/approve/'.$pending->id)->assertStatus(405);
-        $this->post('/approve/'.$pending->id)->assertStatus(405);
+        $this->actingAs($this->admin())->get('/users/'.$pending->id)->assertStatus(405);
+        $this->post('/users/'.$pending->id)->assertStatus(405);
         $this->assertDatabaseHas('users', ['id' => $pending->id, 'is_approved' => false]);
     }
 }

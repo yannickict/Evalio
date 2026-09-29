@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-class ApprovalController extends Controller
+class UserController extends Controller
 {
     public function index(): View
     {
@@ -19,7 +19,7 @@ class ApprovalController extends Controller
             ->orderBy('created_at')
             ->get();
 
-        return view('approve', [
+        return view('users', [
             'users' => $users,
             'roles' => Role::orderBy('name')->get(),
         ]);
@@ -38,7 +38,7 @@ class ApprovalController extends Controller
         $user->is_approved = true;
         $user->save();
 
-        return redirect()->route('approve')
+        return redirect()->route('users')
             ->with('status', 'User approved and role assigned.');
     }
 
@@ -49,6 +49,6 @@ class ApprovalController extends Controller
 
         $user->delete();
 
-        return redirect()->route('approve')->with('status', 'Pending registration deleted.');
+        return redirect()->route('users')->with('status', 'Pending registration deleted.');
     }
 }

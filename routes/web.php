@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OverviewController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -23,12 +23,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/overview', [OverviewController::class, 'index'])
         ->name('overview');
 
-    Route::get('/approve', [ApprovalController::class, 'index'])
-        ->name('approve');
+    Route::get('/users', [UserController::class, 'index'])
+        ->name('users');
 
-    Route::patch('/approve/{user}', [ApprovalController::class, 'update'])
-        ->name('approve.update');
+    Route::patch('/users/{user}', [UserController::class, 'update'])
+        ->name('users.update');
 
-    Route::delete('/approve/{user}', [ApprovalController::class, 'destroy'])
-        ->name('approve.destroy');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])
+        ->name('users.destroy');
 });
