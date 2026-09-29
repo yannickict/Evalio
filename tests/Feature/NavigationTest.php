@@ -34,7 +34,7 @@ class NavigationTest extends TestCase
                 'role_id' => Role::where('name', $role)->firstOrFail()->id,
             ]);
             $response = $this->actingAs($user)->get(route('home'))->assertOk()
-                ->assertSee('Overview')->assertSee('Log out')->assertDontSee('Approve people');
+                ->assertSee(route('overview'), false)->assertSee('Overview')->assertSee('Log out')->assertDontSee('Approve people');
             $this->assertActiveLink($response->getContent(), route('home'));
         }
     }
@@ -45,7 +45,7 @@ class NavigationTest extends TestCase
             'role_id' => Role::where('name', 'admin')->firstOrFail()->id,
         ]);
 
-        foreach (['home', 'approve'] as $route) {
+        foreach (['home', 'approve', 'overview'] as $route) {
             $response = $this->actingAs($admin)->get(route($route))->assertOk()
                 ->assertSee(route('approve'), false);
             $this->assertActiveLink($response->getContent(), route($route));

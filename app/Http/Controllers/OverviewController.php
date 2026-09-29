@@ -10,7 +10,7 @@ class OverviewController extends Controller
 {
     public function index(): View
     {
-        abort_unless(Auth::user()?->role, 403);
+        abort_unless(Auth::user()?->role !== null, 403);
 
         $course_sessions = CourseSession::where('evaluation_status', 'closed')
             ->with(['course.questionnaireTemplate', 'instructor'])
