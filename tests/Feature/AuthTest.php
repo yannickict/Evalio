@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -98,7 +99,7 @@ class AuthTest extends TestCase
         $this->post('/login', ['email' => $user->email, 'password' => 'password'])
             ->assertRedirect('/')
             ->assertSessionHasNoErrors()
-            ->assertCookieMissing(Auth::guard('web')->getRecallerName());
+            ->assertCookieMissing($this->webGuard()->getRecallerName());
 
         $this->assertAuthenticatedAs($user);
         $this->assertNull($user->fresh()->remember_token);
@@ -149,7 +150,7 @@ class AuthTest extends TestCase
             'password' => 'password',
             'remember' => '1',
         ])->assertSessionHasErrors('email')
-            ->assertCookieMissing(Auth::guard('web')->getRecallerName());
+            ->assertCookieMissing($this->webGuard()->getRecallerName());
 
         $this->assertGuest();
     }
@@ -165,7 +166,7 @@ class AuthTest extends TestCase
     public function test_remember_me_creates_a_token_and_restores_login_without_a_session(): void
     {
         $user = User::factory()->approved()->create(['remember_token' => null]);
-        $cookieName = Auth::guard('web')->getRecallerName();
+        $cookieName = $this->webGuard()->getRecallerName();
 
         $response = $this->post('/login', [
             'email' => $user->email,
@@ -184,7 +185,7 @@ class AuthTest extends TestCase
         $this->withCookie($cookieName, $cookie->getValue())->get('/feedback')->assertOk();
 
         $this->assertAuthenticatedAs($user);
-        $this->assertTrue(Auth::guard('web')->viaRemember());
+        $this->assertTrue($this->webGuard()->viaRemember());
     }
 
     public function test_login_requests_are_throttled(): void
@@ -203,7 +204,7 @@ class AuthTest extends TestCase
     public function test_logout_clears_session_and_invalidates_remember_cookie(): void
     {
         $user = User::factory()->approved()->create();
-        $cookieName = Auth::guard('web')->getRecallerName();
+        $cookieName = $this->webGuard()->getRecallerName();
         $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
@@ -239,6 +240,14 @@ class AuthTest extends TestCase
         $this->actingAs($user)->get('/logout')->assertStatus(405);
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    private function webGuard(): SessionGuard
+    {
+        /** @var SessionGuard $guard */
+        $guard = Auth::guard('web');
+
+        return $guard;
     }
 
     /** @return array<string, string> */
