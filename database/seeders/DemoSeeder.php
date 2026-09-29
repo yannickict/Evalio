@@ -6,15 +6,26 @@ use App\Models\Course;
 use App\Models\CourseSession;
 use App\Models\FeedbackForm;
 use App\Models\QuestionnaireTemplate;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class DemoSeeder extends Seeder
 {
     public function run(): void
     {
         DB::transaction(function () {
+            User::updateOrCreate(['email' => 'admin@example.com'], [
+                'first_name' => 'Demo',
+                'last_name' => 'Admin',
+                'role_id' => Role::where('name', 'admin')->firstOrFail()->id,
+                'is_approved' => true,
+                'email_verified_at' => now(),
+                'password' => Hash::make('password'),
+            ]);
+
             $template = QuestionnaireTemplate::where('name', 'Standard Course Evaluation')->firstOrFail();
             $instructors = User::factory()->count(5)->approved()->create();
 

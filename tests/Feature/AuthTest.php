@@ -107,15 +107,15 @@ class AuthTest extends TestCase
 
     public function test_login_returns_user_to_the_requested_protected_page(): void
     {
-        $user = User::factory()->approved()->create();
+        $user = $this->approvedAdmin();
 
-        $this->get('/feedback')->assertRedirect(route('login'));
+        $this->get(route('approve'))->assertRedirect(route('login'));
 
         $this->post('/login', ['email' => $user->email, 'password' => 'password'])
-            ->assertRedirect('/feedback');
+            ->assertRedirect(route('approve'));
 
         $this->assertAuthenticatedAs($user);
-        $this->get('/feedback')->assertOk();
+        $this->get(route('approve'))->assertOk();
     }
 
     public function test_wrong_password_is_rejected_and_not_flashed_to_session(): void
@@ -165,7 +165,7 @@ class AuthTest extends TestCase
 
     public function test_remember_me_creates_a_token_and_restores_login_without_a_session(): void
     {
-        $user = User::factory()->approved()->create(['remember_token' => null]);
+        $user = $this->approvedAdmin();
         $cookieName = $this->webGuard()->getRecallerName();
 
         $response = $this->post('/login', [
@@ -182,7 +182,7 @@ class AuthTest extends TestCase
         $this->app['session']->flush();
         Auth::forgetGuards();
 
-        $this->withCookie($cookieName, $cookie->getValue())->get('/feedback')->assertOk();
+        $this->withCookie($cookieName, $cookie->getValue())->get(route('approve'))->assertOk();
 
         $this->assertAuthenticatedAs($user);
         $this->assertTrue($this->webGuard()->viaRemember());
@@ -203,7 +203,7 @@ class AuthTest extends TestCase
 
     public function test_logout_clears_session_and_invalidates_remember_cookie(): void
     {
-        $user = User::factory()->approved()->create();
+        $user = $this->approvedAdmin();
         $cookieName = $this->webGuard()->getRecallerName();
         $response = $this->post('/login', [
             'email' => $user->email,
@@ -222,14 +222,14 @@ class AuthTest extends TestCase
         $this->assertNotSame($oldToken, $user->fresh()->remember_token);
 
         Auth::forgetGuards();
-        $this->withCookie($cookieName, $cookie->getValue())->get('/feedback')
+        $this->withCookie($cookieName, $cookie->getValue())->get(route('approve'))
             ->assertRedirect(route('login'));
         $this->assertGuest();
     }
 
     public function test_guests_cannot_access_protected_routes(): void
     {
-        $this->get('/feedback')->assertRedirect(route('login'));
+        $this->get(route('approve'))->assertRedirect(route('login'));
         $this->post('/logout')->assertRedirect(route('login'));
     }
 
@@ -240,6 +240,14 @@ class AuthTest extends TestCase
         $this->actingAs($user)->get('/logout')->assertStatus(405);
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    private function approvedAdmin(): User
+    {
+        return User::factory()->approved()->create([
+            'role_id' => Role::where('name', 'admin')->firstOrFail()->id,
+            'remember_token' => null,
+        ]);
     }
 
     private function webGuard(): SessionGuard

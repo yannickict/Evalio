@@ -4,35 +4,35 @@
 @section('intro', 'Your account will need approval before you can log in.')
 
 @section('content')
-    <form class="auth-form" method="POST" action="{{ route('register.store') }}">
+    <form class="d-grid gap-3" method="POST" action="{{ route('register.store') }}">
         @csrf
-        <div class="auth-name-row">
-            <div class="auth-field">
-                <label for="first_name">First name</label>
-                <input id="first_name" name="first_name" autocomplete="given-name" value="{{ old('first_name') }}" maxlength="255" required>
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <label class="form-label fw-semibold" for="first_name">First name</label>
+                <input class="form-control" id="first_name" name="first_name" autocomplete="given-name" value="{{ old('first_name') }}" maxlength="255" required>
             </div>
-            <div class="auth-field">
-                <label for="last_name">Last name</label>
-                <input id="last_name" name="last_name" autocomplete="family-name" value="{{ old('last_name') }}" maxlength="255" required>
+            <div class="col-sm-6">
+                <label class="form-label fw-semibold" for="last_name">Last name</label>
+                <input class="form-control" id="last_name" name="last_name" autocomplete="family-name" value="{{ old('last_name') }}" maxlength="255" required>
             </div>
         </div>
-        <div class="auth-field">
-            <label for="email">Email address</label>
-            <input id="email" type="email" name="email" autocomplete="email" placeholder="you@example.com" value="{{ old('email') }}" maxlength="255" required>
+        <div class="mb-1">
+            <label class="form-label fw-semibold" for="email">Email address</label>
+            <input class="form-control" id="email" type="email" name="email" autocomplete="email" placeholder="you@example.com" value="{{ old('email') }}" maxlength="255" required>
         </div>
-        <div class="auth-field">
-            <label for="password">Password</label>
-            <input id="password" type="password" name="password" autocomplete="new-password" minlength="8" aria-describedby="password-hint" required>
-            <p id="password-hint" class="auth-hint">Use at least 8 characters.</p>
+        <div class="mb-1">
+            <label class="form-label fw-semibold" for="password">Password</label>
+            <input class="form-control" id="password" type="password" name="password" autocomplete="new-password" minlength="8" aria-describedby="password-hint" required>
+            <p id="password-hint" class="form-text mb-0">Use at least 8 characters.</p>
         </div>
-        <div class="auth-field">
-            <label for="password_confirmation">Confirm password</label>
-            <input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" minlength="8" required>
+        <div class="mb-1">
+            <label class="form-label fw-semibold" for="password_confirmation">Confirm password</label>
+            <input class="form-control" id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" minlength="8" required>
         </div>
-        <button class="auth-button" type="submit">Create account</button>
+        <button class="btn btn-success rounded-pill py-2" type="submit">Create account</button>
     </form>
 @endsection
 
 @section('footer')
-    Already have an account? <a href="{{ route('login') }}">Log in</a>
+    Already have an account? <a class="link-success fw-semibold link-offset-2" href="{{ route('login') }}">Log in</a>
 @endsection
