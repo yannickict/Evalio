@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/livewire-starter-kit",
+    "name": "app/feedback-form",
     "type": "project",
-    "description": "The official Laravel starter kit for Livewire.",
+    "description": "Feedback form application.",
     "keywords": [
         "laravel",
         "framework"
@@ -11,12 +11,8 @@
     "require": {
         "php": "^8.3",
         "laravel/chisel": "^0.1.0",
-        "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
-        "laravel/tinker": "^3.0",
-        "livewire/blaze": "^1.0",
-        "livewire/flux": "^2.13.1",
-        "livewire/livewire": "^4.1"
+        "laravel/tinker": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
@@ -27,8 +23,7 @@
         "laravel/sail": "^1.53",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.9.3",
-        "pestphp/pest": "^5.2",
-        "pestphp/pest-plugin-laravel": "^5.0"
+        "phpunit/phpunit": "^12.5.36"
     },
     "autoload": {
         "psr-4": {
@@ -106,7 +101,6 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }
     },
