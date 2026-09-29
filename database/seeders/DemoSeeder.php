@@ -24,10 +24,15 @@ class DemoSeeder extends Seeder
 
             foreach ($courses as $index => $course) {
                 foreach ([-14, 0, 14] as $days) {
+                    do {
+                        $code = (string) random_int(100000, 999999);
+                    } while (CourseSession::where('code', $code)->exists());
+
                     $session = CourseSession::factory()
                         ->for($course)
                         ->for($instructors[$index], 'instructor')
                         ->create([
+                            'code' => $code,
                             'start_date' => today()->addDays($days),
                             'end_date' => today()->addDays($days + 2),
                         ]);

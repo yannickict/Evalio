@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreignId('course_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('instructor_id')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->string('course_session_number')->unique();
+            $table->char('code', 6)->nullable()->unique();
             $table->date('start_date');
             $table->date('end_date');
             // NULL follows the date window; open/closed is an explicit manual override.
