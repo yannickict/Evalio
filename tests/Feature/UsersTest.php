@@ -25,6 +25,32 @@ class UsersTest extends TestCase
         ]);
     }
 
+    #[DataProvider('sectionStates')]
+    public function test_user_sections_have_independent_accessible_collapse_toggles(bool $hasPendingUsers): void
+    {
+        if ($hasPendingUsers) {
+            User::factory()->create();
+        }
+        $response = $this->actingAs($this->admin())->get(route('users'))->assertOk();
+        $document = new \DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new \DOMXPath($document);
+
+        foreach (['pending-users', 'all-users'] as $id) {
+            $target = $id.'-content';
+            $this->assertCount(1, $xpath->query('//section[@id="'.$id.'"]//h2/button[@type="button" and @data-bs-toggle="collapse" and @data-bs-target="#'.$target.'" and @aria-controls="'.$target.'" and @aria-expanded="true"]'));
+            $this->assertCount(1, $xpath->query('//*[@id="'.$target.'" and contains(concat(" ", normalize-space(@class), " "), " collapse ") and contains(concat(" ", normalize-space(@class), " "), " show ") and not(@data-bs-parent)]'));
+            $this->assertCount(1, $xpath->query('//*[@id="'.$target.'"]//div[contains(concat(" ", normalize-space(@class), " "), " list-group ")]'));
+            $this->assertCount(1, $xpath->query('//section[@id="'.$id.'"]/h2[contains(concat(" ", normalize-space(@class), " "), " mb-0 ")]/following-sibling::*[1][@id="'.$target.'"]'));
+            $this->assertCount(1, $xpath->query('//*[@id="'.$target.'"]/*[1][contains(concat(" ", normalize-space(@class), " "), " card ")]'));
+        }
+    }
+
+    public static function sectionStates(): array
+    {
+        return ['empty pending list' => [false], 'populated pending list' => [true]];
+    }
+
     public function test_guests_cannot_list_approve_or_delete_users(): void
     {
         $pending = User::factory()->create();
@@ -53,28 +79,95 @@ class UsersTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $pending->id, 'is_approved' => false]);
     }
 
-    public function test_admin_sees_only_pending_users_in_registration_order(): void
+    public function test_admin_sees_pending_and_approved_users_in_separate_sections(): void
     {
         $newer = User::factory()->create(['created_at' => now()]);
         $older = User::factory()->create(['created_at' => now()->subDay()]);
         $approved = User::factory()->approved()->create();
 
-        $this->actingAs($this->admin())->get(route('users'))
+        $response = $this->actingAs($this->admin())->get(route('users'))
             ->assertOk()
             ->assertViewIs('users')
             ->assertSee('<title>Users - Feedback</title>', false)
-            ->assertSeeInOrder(['Users', 'Approve people'])
+            ->assertSeeInOrder(['Users', 'Approve people', 'All users'])
             ->assertSeeInOrder([$older->email, $newer->email])
-            ->assertDontSee($approved->email)
+            ->assertSee($approved->email)
             ->assertSee(route('users.update', $older), false)
             ->assertSee('name="_method" value="PATCH"', false)
             ->assertSee('name="_method" value="DELETE"', false);
+
+        $pendingSection = $this->sectionHtml($response->getContent(), 'pending-users');
+        $this->assertStringContainsString($older->email, $pendingSection);
+        $this->assertStringContainsString($newer->email, $pendingSection);
+        $this->assertStringNotContainsString($approved->email, $pendingSection);
+        $this->assertStringContainsString('2 pending', $pendingSection);
+
+        $allUsersSection = $this->sectionHtml($response->getContent(), 'all-users');
+        foreach ([$older, $newer] as $user) {
+            $this->assertStringNotContainsString($user->email, $allUsersSection);
+        }
+        $this->assertStringContainsString($approved->email, $allUsersSection);
+        $this->assertStringContainsString('2 users', $allUsersSection);
     }
 
     public function test_admin_sees_empty_state(): void
     {
         $this->actingAs($this->admin())->get(route('users'))
             ->assertOk()->assertSee('No users waiting for approval.');
+    }
+
+    public function test_approved_users_are_ordered_by_registration_date(): void
+    {
+        $admin = $this->admin();
+        $newer = User::factory()->approved()->create(['created_at' => now()->subDay()]);
+        $older = User::factory()->approved()->create(['created_at' => now()->subDays(2)]);
+
+        $this->actingAs($admin)->get(route('users'))->assertOk()
+            ->assertSeeInOrder([$older->email, $newer->email, $admin->email]);
+    }
+
+    public function test_user_without_a_role_cannot_access_or_modify_users(): void
+    {
+        $actor = User::factory()->approved()->create();
+        $actor->setRelation('role', null);
+        $pending = User::factory()->create();
+
+        $this->actingAs($actor)->get(route('users'))->assertForbidden();
+        $this->patch(route('users.update', $pending), ['role_id' => $actor->role_id])->assertForbidden();
+        $this->delete(route('users.destroy', $pending))->assertForbidden();
+        $this->assertDatabaseHas('users', ['id' => $pending->id, 'is_approved' => false]);
+    }
+
+    public function test_approval_ignores_unrelated_user_attributes(): void
+    {
+        $pending = User::factory()->create();
+        $original = $pending->only(['first_name', 'last_name', 'email', 'password']);
+
+        $this->actingAs($this->admin())->patch(route('users.update', $pending), [
+            'role_id' => $pending->role_id,
+            'first_name' => 'Changed',
+            'last_name' => 'Name',
+            'email' => 'changed@example.com',
+            'password' => 'changed-password',
+            'is_approved' => false,
+        ])->assertRedirect(route('users'))->assertSessionHasNoErrors();
+
+        $this->assertSame($original, $pending->fresh()->only(array_keys($original)));
+        $this->assertTrue($pending->fresh()->is_approved);
+        $this->get(route('users'))->assertSee('User approved and role assigned.');
+    }
+
+    public function test_invalid_role_error_is_visible_after_redirect_and_user_stays_pending(): void
+    {
+        $pending = User::factory()->create();
+        $this->actingAs($this->admin())->from(route('users'))
+            ->patch(route('users.update', $pending), ['role_id' => 999999])
+            ->assertRedirect(route('users'));
+
+        $response = $this->get(route('users'))->assertOk();
+        $response->assertSee('role="alert"', false)->assertSee('Please check your changes.');
+        $this->assertStringContainsString($pending->email, $this->sectionHtml($response->getContent(), 'pending-users'));
+        $this->assertFalse($pending->fresh()->is_approved);
     }
 
     #[DataProvider('assignableRoles')]
@@ -90,12 +183,69 @@ class UsersTest extends TestCase
             'is_approved' => true,
             'role_id' => $role->id,
         ]);
-        $this->get(route('users'))->assertDontSee($pending->email);
+        $response = $this->get(route('users'))->assertOk()->assertSee($pending->email);
+        $this->assertStringNotContainsString($pending->email, $this->sectionHtml($response->getContent(), 'pending-users'));
 
         $this->post(route('logout'));
         $this->post(route('login.store'), ['email' => $pending->email, 'password' => 'password'])
             ->assertRedirect('/');
         $this->assertAuthenticatedAs($pending);
+    }
+
+    public function test_approved_users_show_roles_without_unavailable_delete_actions(): void
+    {
+        $pending = User::factory()->create();
+        $approved = User::factory()->approved()->create([
+            'role_id' => Role::where('name', 'editor')->firstOrFail()->id,
+        ]);
+        $admin = $this->admin();
+
+        $response = $this->actingAs($admin)->get(route('users'))->assertOk();
+        $html = $this->sectionHtml($response->getContent(), 'all-users');
+        $this->assertStringNotContainsString($pending->email, $html);
+        $this->assertStringContainsString('Editor', $html);
+        $this->assertStringContainsString('Admin', $html);
+        $pendingHtml = $this->sectionHtml($response->getContent(), 'pending-users');
+        $this->assertStringContainsString('action="'.route('users.destroy', $pending).'"', $pendingHtml);
+        foreach ([$approved, $admin] as $user) {
+            $this->assertStringNotContainsString('action="'.route('users.destroy', $user).'"', $html);
+        }
+    }
+
+    public function test_empty_pending_section_still_shows_registered_users(): void
+    {
+        $admin = $this->admin();
+
+        $response = $this->actingAs($admin)->get(route('users'))->assertOk()
+            ->assertSee('No users waiting for approval.')->assertDontSee('No users yet.');
+
+        $html = $this->sectionHtml($response->getContent(), 'all-users');
+        $this->assertStringContainsString($admin->email, $html);
+        $this->assertStringContainsString('1 user', $html);
+    }
+
+    public function test_both_user_sections_escape_user_content(): void
+    {
+        $user = User::factory()->create(['name' => '<script>alert(1)</script>']);
+        $approved = User::factory()->approved()->create(['name' => '<script>alert(2)</script>']);
+
+        $this->actingAs($this->admin())->get(route('users'))->assertOk()
+            ->assertSee($user->name)
+            ->assertDontSee($user->name, false)
+            ->assertSee($approved->name)
+            ->assertDontSee($approved->name, false);
+    }
+
+    private function sectionHtml(string $html, string $id): string
+    {
+        $document = new \DOMDocument;
+        @$document->loadHTML($html);
+        $section = $document->getElementById($id);
+        if (! $section instanceof \DOMElement) {
+            $this->fail('Expected the users section '.$id.' to exist.');
+        }
+
+        return (string) $document->saveHTML($section);
     }
 
     /** @return array<string, array{string}> */
@@ -149,7 +299,9 @@ class UsersTest extends TestCase
             $this->assertCount(1, $xpath->query('//button[@data-bs-toggle="modal" and @data-bs-target="#'.$id.'"]'));
             $this->assertCount(1, $xpath->query('//*[@id="'.$id.'"]'));
             $form = $xpath->query('//*[@id="'.$id.'"]//form')->item(0);
-            $this->assertNotNull($form);
+            if (! $form instanceof \DOMElement) {
+                $this->fail('Expected the approval form to be a DOM element.');
+            }
             $this->assertSame(route('users.update', $user), $form->getAttribute('action'));
             $this->assertSame('POST', $form->getAttribute('method'));
             $this->assertCount(1, $xpath->query('.//input[@name="_method" and @value="PATCH"]', $form));
@@ -160,7 +312,11 @@ class UsersTest extends TestCase
             $this->assertCount(Role::count(), $xpath->query('./option', $select));
             $selected = $xpath->query('./option[@selected]', $select);
             $this->assertCount(1, $selected);
-            $this->assertSame((string) $user->role_id, $selected->item(0)->getAttribute('value'));
+            $selectedOption = $selected->item(0);
+            if (! $selectedOption instanceof \DOMElement) {
+                $this->fail('Expected the selected role option to be a DOM element.');
+            }
+            $this->assertSame((string) $user->role_id, $selectedOption->getAttribute('value'));
             foreach (Role::all() as $role) {
                 $this->assertCount(1, $xpath->query('./option[@value="'.$role->id.'"]', $select));
             }
@@ -174,6 +330,8 @@ class UsersTest extends TestCase
         $this->actingAs($this->admin())->delete(route('users.destroy', $pending))
             ->assertRedirect(route('users'))->assertSessionHas('status');
         $this->assertDatabaseMissing('users', ['id' => $pending->id]);
+        $this->get(route('users'))->assertOk()
+            ->assertSee('Pending registration deleted.')->assertDontSee($pending->email);
     }
 
     public function test_already_approved_users_and_admin_cannot_be_modified(): void

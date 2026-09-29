@@ -15,12 +15,18 @@ class UserController extends Controller
     {
         abort_unless(Auth::user()?->role?->name === 'admin', 403);
 
-        $users = User::where('is_approved', false)
+        $non_approved_users = User::where('is_approved', false)
+            ->orderBy('created_at')
+            ->get();
+
+        $approved_users = User::where('is_approved', true)
+            ->with('role')
             ->orderBy('created_at')
             ->get();
 
         return view('users', [
-            'users' => $users,
+            'approved_users' => $approved_users,
+            'non_approved_users' => $non_approved_users,
             'roles' => Role::orderBy('name')->get(),
         ]);
     }

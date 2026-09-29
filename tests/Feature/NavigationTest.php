@@ -60,7 +60,11 @@ class NavigationTest extends TestCase
         $links = $xpath->query('//nav//a[@aria-current="page"]');
 
         $this->assertCount(1, $links);
-        $this->assertSame($url, $links->item(0)->getAttribute('href'));
-        $this->assertStringContainsString('bg-success', $links->item(0)->getAttribute('class'));
+        $link = $links->item(0);
+        if (! $link instanceof \DOMElement) {
+            $this->fail('Expected the active navigation link to be a DOM element.');
+        }
+        $this->assertSame($url, $link->getAttribute('href'));
+        $this->assertStringContainsString('bg-success', $link->getAttribute('class'));
     }
 }

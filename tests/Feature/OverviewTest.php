@@ -26,6 +26,14 @@ class OverviewTest extends TestCase
         $this->get(route('overview'))->assertRedirect(route('login'));
     }
 
+    public function test_user_without_a_role_cannot_view_overview(): void
+    {
+        $user = User::factory()->approved()->create();
+        $user->setRelation('role', null);
+
+        $this->actingAs($user)->get(route('overview'))->assertForbidden();
+    }
+
     /** @return array<string, array{string}> */
     public static function roles(): array
     {
