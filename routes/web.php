@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\OverviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -19,6 +20,9 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/overview', [OverviewController::class, 'index'])
+        ->name('overview');
+
     Route::get('/approve', [ApprovalController::class, 'index'])
         ->name('approve');
 

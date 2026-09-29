@@ -38,6 +38,28 @@ class SeederTest extends TestCase
         $this->assertSame(3, User::where('is_approved', false)->count());
     }
 
+    public function test_demo_data_includes_closed_sessions_with_questionnaires(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $sessions = CourseSession::with('course.questionnaireTemplate.questions.options', 'feedbackForms')
+            ->where('evaluation_status', 'closed')->get();
+
+        $this->assertCount(5, $sessions);
+        $this->assertCount(5, $sessions->pluck('course_id')->unique());
+
+        foreach ($sessions as $session) {
+            $this->assertTrue($session->end_date->lt(today()));
+            $this->assertCount(3, $session->feedbackForms);
+            $questions = $session->course->questionnaireTemplate->questions;
+            $this->assertCount(10, $questions);
+            $this->assertTrue($questions->contains('type', 'free_text'));
+            foreach ($questions->where('type', 'single_choice') as $question) {
+                $this->assertNotEmpty($question->options);
+            }
+        }
+    }
+
     public function test_database_rejects_duplicate_session_codes(): void
     {
         CourseSession::factory()->create(['code' => '123456']);

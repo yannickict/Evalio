@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
 {
@@ -17,18 +19,27 @@ class ApprovalController extends Controller
             ->orderBy('created_at')
             ->get();
 
-        return view('approve', ['users' => $users]);
+        return view('approve', [
+            'users' => $users,
+            'roles' => Role::orderBy('name')->get(),
+        ]);
     }
 
-    public function update(User $user): RedirectResponse
+    public function update(Request $request, User $user): RedirectResponse
     {
         abort_unless(Auth::user()?->role?->name === 'admin', 403);
         abort_if($user->is_approved, 403);
 
+        $data = $request->validate([
+            'role_id' => ['required', 'integer', 'exists:roles,id'],
+        ]);
+
+        $user->role_id = $data['role_id'];
         $user->is_approved = true;
         $user->save();
 
-        return redirect()->route('approve')->with('status', 'User approved. They can now log in.');
+        return redirect()->route('approve')
+            ->with('status', 'User approved and role assigned.');
     }
 
     public function destroy(User $user): RedirectResponse

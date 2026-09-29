@@ -8,7 +8,9 @@
                 <a href="{{ route('home') }}"
                    @class(['nav-link rounded-pill px-3 fw-semibold', 'active bg-success text-white' => request()->routeIs('home'), 'link-success' => ! request()->routeIs('home')])
                    @if (request()->routeIs('home')) aria-current="page" @endif>Home</a>
-                <span class="nav-link disabled" role="link" aria-disabled="true" title="Coming soon">Overview</span>
+                <a href="{{ route('overview') }}"
+                   @class(['nav-link rounded-pill px-3 fw-semibold', 'active bg-success text-white' => request()->routeIs('overview'), 'link-success' => ! request()->routeIs('overview')])
+                   @if (request()->routeIs('overview')) aria-current="page" @endif>Overview</a>
                 @if (auth()->user()->role?->name === 'admin')
                     <a href="{{ route('approve') }}"
                        @class(['nav-link rounded-pill px-3 fw-semibold', 'active bg-success text-white' => request()->routeIs('approve*'), 'link-success' => ! request()->routeIs('approve*')])

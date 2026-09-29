@@ -46,6 +46,7 @@ class DemoSeeder extends Seeder
                             'code' => $code,
                             'start_date' => today()->addDays($days),
                             'end_date' => today()->addDays($days + 2),
+                            'evaluation_status' => $days < 0 ? 'closed' : null,
                         ]);
 
                     FeedbackForm::factory()->count(3)->for($session)->create();
