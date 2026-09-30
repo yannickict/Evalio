@@ -35,21 +35,21 @@ class DemoSeeder extends Seeder
 
             foreach ($courses as $index => $course) {
                 foreach ([-14, 0, 14] as $days) {
-                    do {
-                        $code = (string) random_int(100000, 999999);
-                    } while (CourseSession::where('code', $code)->exists());
-
                     $session = CourseSession::factory()
                         ->for($course)
                         ->for($instructors[$index], 'instructor')
                         ->create([
-                            'code' => $code,
                             'start_date' => today()->addDays($days),
                             'end_date' => today()->addDays($days + 2),
                             'evaluation_status' => $days < 0 ? 'closed' : null,
                         ]);
 
-                    FeedbackForm::factory()->count(3)->for($session)->create();
+                    for ($i = 0; $i < 3; $i++) {
+                        do {
+                            $code = (string) random_int(100000, 999999);
+                        } while (FeedbackForm::where('code', $code)->exists());
+                        FeedbackForm::factory()->for($session)->create(['code' => $code]);
+                    }
                 }
             }
         });

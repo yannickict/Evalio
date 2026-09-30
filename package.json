@@ -4,7 +4,8 @@
     "type":  "module",
     "scripts":  {
                     "build":  "vp build",
-                    "dev":  "vp dev"
+                    "dev":  "vp dev",
+                    "test:js":  "vp test run tests/js"
                 },
     "dependencies":  {
                          "concurrently":  "^10.0.3",

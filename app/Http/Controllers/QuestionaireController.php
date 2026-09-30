@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CourseSession;
+use App\Models\Answer;
+use App\Models\FeedbackForm;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class QuestionaireController extends Controller
 {
@@ -14,10 +17,10 @@ class QuestionaireController extends Controller
             'code' => ['required', 'digits:6'],
         ]);
 
-        $session = CourseSession::where('code', $data['code'])
+        $form = FeedbackForm::with('courseSession.course.questionnaireTemplate')->where('code', $data['code'])
             ->firstOrFail();
 
-        $template = $session->course->questionnaireTemplate;
+        $template = $form->courseSession->course->questionnaireTemplate;
 
         abort_if($template === null, 404, 'No questionnaire assigned.');
 
@@ -27,5 +30,36 @@ class QuestionaireController extends Controller
         ]);
     }
 
-    public function submit(): void {}
+    public function submit(Request $request): RedirectResponse
+    {
+        $answers = $request->input('answers', []);
+        $comments = $request->input('answers_comment', []);
+        $code = $request->query('code');
+
+        $form = FeedbackForm::with('courseSession.course.questionnaireTemplate')->where('code', $code)
+            ->firstOrFail();
+        foreach ($answers as $questionId => $answer) {
+            $question = Question::findOrFail($questionId);
+            $questionType = $question->type;
+            if ($questionType == "single_choice") {
+                Answer::create([
+                    'feedback_form_id' => $form->id,
+                    'question_id' => $questionId,
+                    'question_option_id' => $answer,
+                    'answer_text' => null,
+                    'comment' => $comments[$questionId] ?? null,
+                ]);
+            } elseif ($questionType == "free_text") {
+                Answer::create([
+                    'feedback_form_id' => $form->id,
+                    'question_id' => $questionId,
+                    'question_option_id' => null,
+                    'answer_text' => $answer,
+                    'comment' => $comments[$questionId] ?? null,
+                ]);
+            }
+        }
+        return redirect()->route('home')
+            ->with('status', 'Thank you! Your feedback has been submitted.');
+    }
 }

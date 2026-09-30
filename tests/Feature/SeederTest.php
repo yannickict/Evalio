@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Answer;
 use App\Models\CourseSession;
+use App\Models\FeedbackForm;
 use App\Models\QuestionnaireTemplate;
 use App\Models\Role;
 use App\Models\User;
@@ -18,7 +20,7 @@ class SeederTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_demo_data_has_approved_admin_and_unique_session_codes(): void
+    public function test_demo_data_has_approved_admin_and_unique_feedback_form_codes(): void
     {
         $this->seed(DatabaseSeeder::class);
 
@@ -27,9 +29,9 @@ class SeederTest extends TestCase
         $this->assertSame('admin', $admin->role->name);
         $this->assertTrue(Hash::check('password', $admin->password));
 
-        $codes = CourseSession::pluck('code');
-        $this->assertCount(15, $codes);
-        $this->assertCount(15, $codes->unique());
+        $codes = FeedbackForm::pluck('code');
+        $this->assertCount(45, $codes);
+        $this->assertCount(45, $codes->unique());
         foreach ($codes as $code) {
             $this->assertMatchesRegularExpression('/^[1-9][0-9]{5}$/', $code);
         }
@@ -60,24 +62,24 @@ class SeederTest extends TestCase
         }
     }
 
-    public function test_database_rejects_duplicate_session_codes(): void
+    public function test_database_rejects_duplicate_feedback_form_codes(): void
     {
-        CourseSession::factory()->create(['code' => '123456']);
+        FeedbackForm::factory()->create(['code' => '123456']);
 
         $this->expectException(QueryException::class);
-        CourseSession::factory()->create(['code' => '123456']);
+        FeedbackForm::factory()->create(['code' => '123456']);
     }
 
-    public function test_cleared_codes_can_be_reused_without_deleting_sessions(): void
+    public function test_cleared_codes_can_be_reused_without_deleting_forms(): void
     {
-        $session = CourseSession::factory()->create(['code' => '123456']);
+        $session = FeedbackForm::factory()->create(['code' => '123456']);
         $session->code = null;
         $session->save();
-        CourseSession::factory()->create(['code' => null]);
-        CourseSession::factory()->create(['code' => '123456']);
+        FeedbackForm::factory()->create(['code' => null]);
+        FeedbackForm::factory()->create(['code' => '123456']);
 
-        $this->assertDatabaseCount('course_sessions', 3);
-        $this->assertDatabaseHas('course_sessions', ['id' => $session->id, 'code' => null]);
+        $this->assertDatabaseCount('feedback_forms', 3);
+        $this->assertDatabaseHas('feedback_forms', ['id' => $session->id, 'code' => null]);
     }
 
     public function test_role_seeding_is_repeatable_and_preserves_permissions(): void
@@ -108,5 +110,30 @@ class SeederTest extends TestCase
             $this->assertSame($question->type === 'single_choice', $question->allows_comment);
             $this->assertSame($question->type === 'single_choice', $question->options->isNotEmpty());
         }
+    }
+
+    public function test_reseeding_questionnaires_preserves_existing_answers_and_option_ids(): void
+    {
+        $this->seed(QuestionnaireSeeder::class);
+        $template = QuestionnaireTemplate::sole();
+        $question = $template->questions()->where('type', 'single_choice')->firstOrFail();
+        $option = $question->options()->firstOrFail();
+        $form = FeedbackForm::factory()->create();
+        $answer = Answer::create([
+            'feedback_form_id' => $form->id,
+            'question_id' => $question->id,
+            'question_option_id' => $option->id,
+            'comment' => 'Keep this feedback',
+        ]);
+        $optionIds = $question->options()->orderBy('id')->pluck('id')->all();
+
+        $this->seed(QuestionnaireSeeder::class);
+
+        $this->assertDatabaseHas('answers', [
+            'id' => $answer->id, 'question_id' => $question->id,
+            'question_option_id' => $option->id, 'comment' => 'Keep this feedback',
+        ]);
+        $this->assertSame($optionIds, $question->options()->orderBy('id')->pluck('id')->all());
+        $this->assertDatabaseCount('question_options', 34);
     }
 }

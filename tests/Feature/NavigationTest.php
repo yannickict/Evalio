@@ -39,6 +39,24 @@ class NavigationTest extends TestCase
         }
     }
 
+    public function test_home_has_no_confirmation_without_a_status_message(): void
+    {
+        $this->get(route('home'))->assertOk()->assertDontSee('role="status"', false);
+    }
+
+    public function test_home_confirmation_is_accessible_escaped_and_above_the_code_form(): void
+    {
+        $message = '<script>alert("status")</script>';
+        $response = $this->withSession(['status' => $message])->get(route('home'))->assertOk()
+            ->assertSee($message)->assertDontSee($message, false);
+        $document = new \DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new \DOMXPath($document);
+
+        $this->assertCount(1, $xpath->query('//main/section/*[@role="status" and @aria-live="polite"]'));
+        $this->assertCount(1, $xpath->query('//*[@role="status"]/following-sibling::*//form[@action="'.route('questionaire').'"]'));
+    }
+
     public function test_admin_navigation_marks_only_the_current_page_active(): void
     {
         $admin = User::factory()->approved()->create([

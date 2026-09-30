@@ -86,8 +86,8 @@
                                         <dd class="mb-0">{{ $course_session->start_date->format('d M Y') }} &ndash; {{ $course_session->end_date->format('d M Y') }}</dd>
                                     </div>
                                     <div class="col-sm-6">
-                                        <dt class="small text-body-secondary fw-normal">Session code</dt>
-                                        <dd class="font-monospace mb-0">{{ $course_session->code ?? 'Not assigned' }}</dd>
+                                        <dt class="small text-body-secondary fw-normal">Feedback form codes</dt>
+                                        <dd class="font-monospace mb-0">{{ $course_session->feedbackForms->whereNotNull('code')->pluck('code')->join(', ') ?: 'Not assigned' }}</dd>
                                     </div>
                                     <div class="col-12">
                                         <dt class="small text-body-secondary fw-normal">Questionnaire</dt>
@@ -97,8 +97,10 @@
                             </div>
                             <div class="modal-footer px-4">
                                 <button class="btn btn-outline-secondary rounded-3" type="button" data-bs-dismiss="modal">Close</button>
-                                @if ($course_session->code && $course_session->course->questionnaireTemplate)
-                                    <a class="btn btn-success rounded-3" href="{{ route('questionaire', ['code' => $course_session->code]) }}">View questionnaire</a>
+                                @if ($course_session->course->questionnaireTemplate)
+                                    @foreach ($course_session->feedbackForms->whereNotNull('code') as $form)
+                                        <a class="btn btn-success rounded-3" href="{{ route('questionaire', ['code' => $form->code]) }}">View questionnaire {{ $form->code }}</a>
+                                    @endforeach
                                 @endif
                             </div>
                         </div>

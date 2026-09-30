@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['course_session_id'])]
+#[Fillable(['course_session_id', 'code'])]
 class FeedbackForm extends Model
 {
     /** @use HasFactory<FeedbackFormFactory> */

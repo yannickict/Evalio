@@ -26,7 +26,6 @@ return new class extends Migration
             $table->foreignId('course_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('instructor_id')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->string('course_session_number')->unique();
-            $table->char('code', 6)->nullable()->unique();
             $table->date('start_date');
             $table->date('end_date');
             // NULL follows the date window; open/closed is an explicit manual override.
@@ -60,12 +59,26 @@ return new class extends Migration
         Schema::create('feedback_forms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_session_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->char('code', 6)->nullable()->unique();
             $table->timestamps();
+        });
+
+        Schema::create('answers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('feedback_form_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('question_id')->constrained()->restrictOnDelete();
+            $table->foreignId('question_option_id')->nullable()->constrained()->restrictOnDelete();
+            $table->text('answer_text')->nullable();
+            $table->text('comment')->nullable();
+            $table->timestamps();
+
+            $table->index(['feedback_form_id', 'question_id']);
         });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('answers');
         Schema::dropIfExists('feedback_forms');
         Schema::dropIfExists('questionnaire_template_question');
         Schema::dropIfExists('question_options');
