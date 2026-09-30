@@ -108,4 +108,26 @@ class OverviewTest extends TestCase
         $this->actingAs(User::factory()->approved()->create())->get(route('overview'))
             ->assertOk()->assertSee($course->name)->assertDontSee($course->name, false);
     }
+
+    public function test_cards_target_unique_accessible_modals_and_only_available_questionnaires_are_linked(): void
+    {
+        $template = QuestionnaireTemplate::factory()->create();
+        $course = Course::factory()->for($template, 'questionnaireTemplate')->create();
+        $available = CourseSession::factory()->for($course)->create(['code' => '012345', 'evaluation_status' => 'closed']);
+        $noCode = CourseSession::factory()->for($course)->create(['evaluation_status' => 'closed']);
+        $noTemplate = CourseSession::factory()->create(['code' => '123456', 'evaluation_status' => 'closed']);
+        $response = $this->actingAs(User::factory()->approved()->create())->get(route('overview'))->assertOk();
+        $document = new \DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new \DOMXPath($document);
+
+        foreach ([$available, $noCode, $noTemplate] as $session) {
+            $id = 'session-'.$session->id;
+            $this->assertCount(1, $xpath->query('//article//button[@type="button" and @data-bs-toggle="modal" and @data-bs-target="#'.$id.'"]'));
+            $this->assertCount(1, $xpath->query('//div[@id="'.$id.'" and @aria-labelledby="session-title-'.$session->id.'"]'));
+            $this->assertCount(1, $xpath->query('//*[@id="'.$id.'"]//h2[@id="session-title-'.$session->id.'"]'));
+            $this->assertCount($session->is($available) ? 1 : 0, $xpath->query('//*[@id="'.$id.'"]//a'));
+        }
+        $response->assertSee(route('questionaire', ['code' => '012345']), false);
+    }
 }

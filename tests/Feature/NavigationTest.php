@@ -67,4 +67,16 @@ class NavigationTest extends TestCase
         $this->assertSame($url, $link->getAttribute('href'));
         $this->assertStringContainsString('bg-success', $link->getAttribute('class'));
     }
+
+    public function test_mobile_menu_toggle_targets_the_navigation_and_logout_uses_post(): void
+    {
+        $response = $this->actingAs(User::factory()->approved()->create())->get(route('home'))->assertOk();
+        $document = new \DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new \DOMXPath($document);
+        $this->assertCount(1, $xpath->query('//nav//button[@data-bs-target="#main-navigation" and @aria-controls="main-navigation" and @aria-expanded="false"]'));
+        $this->assertCount(1, $xpath->query('//nav//*[@id="main-navigation"]'));
+        $this->assertCount(1, $xpath->query('//nav//form[@method="POST" and @action="'.route('logout').'"]/input[@name="_token"]'));
+        $this->assertCount(1, $xpath->query('//form[@method="GET" and @action="'.route('questionaire').'"]//input[@name="code" and @required]'));
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CourseSession;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -41,7 +42,7 @@ class UsersTest extends TestCase
             $this->assertCount(1, $xpath->query('//section[@id="'.$id.'"]//h2/button[@type="button" and @data-bs-toggle="collapse" and @data-bs-target="#'.$target.'" and @aria-controls="'.$target.'" and @aria-expanded="true"]'));
             $this->assertCount(1, $xpath->query('//*[@id="'.$target.'" and contains(concat(" ", normalize-space(@class), " "), " collapse ") and contains(concat(" ", normalize-space(@class), " "), " show ") and not(@data-bs-parent)]'));
             $this->assertCount(1, $xpath->query('//*[@id="'.$target.'"]//div[contains(concat(" ", normalize-space(@class), " "), " list-group ")]'));
-            $this->assertCount(1, $xpath->query('//section[@id="'.$id.'"]/h2[contains(concat(" ", normalize-space(@class), " "), " mb-0 ")]/following-sibling::*[1][@id="'.$target.'"]'));
+            $this->assertCount(1, $xpath->query('//section[@id="'.$id.'"]/div[contains(concat(" ", normalize-space(@class), " "), " accordion-item ")]/h2[contains(concat(" ", normalize-space(@class), " "), " accordion-header ")]/following-sibling::*[1][@id="'.$target.'"]'));
             $this->assertCount(1, $xpath->query('//*[@id="'.$target.'"]/*[1][contains(concat(" ", normalize-space(@class), " "), " card ")]'));
         }
     }
@@ -192,7 +193,7 @@ class UsersTest extends TestCase
         $this->assertAuthenticatedAs($pending);
     }
 
-    public function test_approved_users_show_roles_without_unavailable_delete_actions(): void
+    public function test_approved_users_show_roles_and_delete_actions(): void
     {
         $pending = User::factory()->create();
         $approved = User::factory()->approved()->create([
@@ -208,7 +209,7 @@ class UsersTest extends TestCase
         $pendingHtml = $this->sectionHtml($response->getContent(), 'pending-users');
         $this->assertStringContainsString('action="'.route('users.destroy', $pending).'"', $pendingHtml);
         foreach ([$approved, $admin] as $user) {
-            $this->assertStringNotContainsString('action="'.route('users.destroy', $user).'"', $html);
+            $this->assertStringContainsString('action="'.route('users.destroy', $user).'"', $html);
         }
     }
 
@@ -334,19 +335,60 @@ class UsersTest extends TestCase
             ->assertSee('Pending registration deleted.')->assertDontSee($pending->email);
     }
 
-    public function test_already_approved_users_and_admin_cannot_be_modified(): void
+    public function test_admin_can_update_an_approved_users_role(): void
+    {
+        $approved = User::factory()->approved()->create();
+        $role = Role::where('name', 'editor')->firstOrFail();
+
+        $this->actingAs($this->admin())->patch(route('users.update', $approved), [
+            'role_id' => $role->id,
+        ])->assertRedirect(route('users'))->assertSessionHas('status', 'User role updated.');
+
+        $this->assertDatabaseHas('users', ['id' => $approved->id, 'is_approved' => true, 'role_id' => $role->id]);
+    }
+
+    public function test_admin_changing_their_own_role_is_redirected_home(): void
     {
         $admin = $this->admin();
-        $approved = User::factory()->approved()->create();
+        $role = Role::where('name', 'editor')->firstOrFail();
+
+        $this->actingAs($admin)->patch(route('users.update', $admin), [
+            'role_id' => $role->id,
+        ])->assertRedirect(route('home'));
+
+        $this->assertDatabaseHas('users', ['id' => $admin->id, 'role_id' => $role->id]);
+    }
+
+    public function test_admin_cannot_delete_their_own_account(): void
+    {
+        $admin = $this->admin();
         $this->actingAs($admin);
 
-        foreach ([$admin, $approved] as $user) {
-            $this->patch(route('users.update', $user), [
-                'role_id' => Role::where('name', 'editor')->firstOrFail()->id,
-            ])->assertForbidden();
-            $this->delete(route('users.destroy', $user))->assertForbidden();
-            $this->assertDatabaseHas('users', ['id' => $user->id, 'is_approved' => true, 'role_id' => $user->role_id]);
-        }
+        $this->delete(route('users.destroy', $admin))->assertForbidden();
+        $this->assertModelExists($admin);
+    }
+
+    public function test_admin_can_delete_approved_user_without_course_sessions(): void
+    {
+        $user = User::factory()->approved()->create();
+
+        $this->actingAs($this->admin())->delete(route('users.destroy', $user))
+            ->assertRedirect(route('users'))->assertSessionHas('status', 'User deleted.');
+
+        $this->assertModelMissing($user);
+    }
+
+    public function test_deleting_an_instructor_with_sessions_shows_a_useful_error(): void
+    {
+        $user = User::factory()->approved()->create();
+        $session = CourseSession::factory()->create(['instructor_id' => $user->id]);
+
+        $this->actingAs($this->admin())->delete(route('users.destroy', $user))
+            ->assertRedirect(route('users'))->assertSessionHasErrors('user');
+
+        $this->assertModelExists($user);
+        $this->assertModelExists($session);
+
     }
 
     public function test_missing_users_return_not_found(): void
@@ -354,6 +396,41 @@ class UsersTest extends TestCase
         $this->actingAs($this->admin());
         $this->patch(route('users.update', 999999))->assertNotFound();
         $this->delete(route('users.destroy', 999999))->assertNotFound();
+    }
+
+    public function test_approved_role_forms_submit_on_change_and_only_self_delete_is_disabled(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->approved()->create();
+        $response = $this->actingAs($admin)->get(route('users'))->assertOk();
+        $document = new \DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new \DOMXPath($document);
+
+        foreach ([$admin, $user] as $account) {
+            $form = '//section[@id="all-users"]//form[@action="'.route('users.update', $account).'" and input[@name="_method" and @value="PATCH"]]';
+            $this->assertCount(1, $xpath->query($form.'/input[@name="_token"]'));
+            $this->assertCount(1, $xpath->query($form.'/select[@name="role_id" and @onchange="this.form.requestSubmit()"]/option[@selected and @value="'.$account->role_id.'"]'));
+            $delete = '//form[@action="'.route('users.destroy', $account).'" and input[@value="DELETE"]]/button[@disabled]';
+            $this->assertCount($account->is($admin) ? 1 : 0, $xpath->query($delete));
+        }
+    }
+
+    public function test_non_admin_cannot_change_or_delete_an_approved_user(): void
+    {
+        $user = User::factory()->approved()->create();
+        $this->actingAs(User::factory()->approved()->create());
+        $this->patch(route('users.update', $user), ['role_id' => Role::where('name', 'admin')->firstOrFail()->id])->assertForbidden();
+        $this->delete(route('users.destroy', $user))->assertForbidden();
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'role_id' => $user->role_id]);
+    }
+
+    public function test_invalid_role_does_not_change_an_approved_user(): void
+    {
+        $user = User::factory()->approved()->create();
+        $this->actingAs($this->admin())->patch(route('users.update', $user), ['role_id' => 999999])
+            ->assertSessionHasErrors('role_id');
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'role_id' => $user->role_id, 'is_approved' => true]);
     }
 
     public function test_get_requests_cannot_approve_or_delete_users(): void

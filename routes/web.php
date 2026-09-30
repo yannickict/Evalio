@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OverviewController;
+use App\Http\Controllers\QuestionaireController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,9 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
+Route::post('/questionaire', [QuestionaireController::class, 'submit'])
+    ->name('questionaire.submit');
+
 Route::middleware('auth')->group(function () {
     Route::get('/overview', [OverviewController::class, 'index'])
         ->name('overview');
@@ -32,3 +36,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'destroy'])
         ->name('users.destroy');
 });
+
+Route::get('/questionaire', [QuestionaireController::class, 'index'])
+    ->name('questionaire');

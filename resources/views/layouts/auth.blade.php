@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title') · Feedback</title>
     @vite('resources/css/app.css')
+    <x-page-scrollbar />
 </head>
 <body class="bg-body-tertiary">
     <main class="container min-vh-100 d-flex align-items-center py-5">

@@ -34,7 +34,7 @@ class UserController extends Controller
     public function update(Request $request, User $user): RedirectResponse
     {
         abort_unless(Auth::user()?->role?->name === 'admin', 403);
-        abort_if($user->is_approved, 403);
+        $wasApproved = $user->is_approved;
 
         $data = $request->validate([
             'role_id' => ['required', 'integer', 'exists:roles,id'],
@@ -44,17 +44,26 @@ class UserController extends Controller
         $user->is_approved = true;
         $user->save();
 
-        return redirect()->route('users')
-            ->with('status', 'User approved and role assigned.');
+        $destination = $user->is(Auth::user()) && $user->role()->first()?->name !== 'admin'
+            ? 'home' : 'users';
+
+        return redirect()->route($destination)
+            ->with('status', $wasApproved ? 'User role updated.' : 'User approved and role assigned.');
     }
 
     public function destroy(User $user): RedirectResponse
     {
         abort_unless(Auth::user()?->role?->name === 'admin', 403);
-        abort_if($user->is_approved, 403);
+        abort_if($user->is(Auth::user()), 403);
+
+        if ($user->courseSessions()->exists()) {
+            return redirect()->route('users')->withErrors([
+                'user' => 'This user is assigned to course sessions. Reassign those sessions to another instructor before deleting this user.',
+            ]);
+        }
 
         $user->delete();
 
-        return redirect()->route('users')->with('status', 'Pending registration deleted.');
+        return redirect()->route('users')->with('status', $user->is_approved ? 'User deleted.' : 'Pending registration deleted.');
     }
 }

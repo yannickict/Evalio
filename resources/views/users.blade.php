@@ -28,8 +28,9 @@
             @endif
 
             <section id="pending-users" class="accordion mb-5" aria-labelledby="approval-title">
-                <h2 class="mb-0" id="approval-title">
-                    <button class="accordion-button rounded-3 bg-white shadow-sm gap-3" type="button"
+                <div class="accordion-item border-0 shadow-sm">
+                <h2 class="accordion-header" id="approval-title">
+                    <button class="accordion-button bg-white gap-3" type="button"
                         data-bs-toggle="collapse" data-bs-target="#pending-users-content"
                         aria-expanded="true" aria-controls="pending-users-content">
                         <span class="h3 fw-bold mb-0">Approve people</span>
@@ -37,17 +38,29 @@
                     </button>
                 </h2>
                 <div id="pending-users-content" class="collapse show">
-                    <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
+                    <div class="card border-0 rounded-0 rounded-bottom overflow-hidden">
                         <div class="list-group list-group-flush">
                             @forelse ($non_approved_users as $user)
-                            <article class="list-group-item p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                                <div class="text-break">
-                                    <h3 class="h5 mb-1">{{ $user->name }}</h3>
-                                    <p class="text-body-secondary mb-0">{{ $user->email }}</p>
-                                    <p class="small text-body-secondary mt-2 mb-0">Registered {{ $user->created_at->format('M j, Y') }}</p>
-                                </div>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <button class="btn btn-success rounded-pill px-3"
+                            <article class="list-group-item px-3 px-md-4 py-3">
+                                <div class="row align-items-center g-3">
+                                    <div class="col-12 col-md-7">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success-emphasis fw-bold p-3 lh-1 flex-shrink-0" aria-hidden="true">
+                                                {{ mb_strtoupper(mb_substr($user->first_name, 0, 1).mb_substr($user->last_name, 0, 1)) }}
+                                            </span>
+                                            <div class="text-break">
+                                                <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                                                    <h3 class="h6 fw-semibold mb-0">{{ $user->name }}</h3>
+                                                    <span class="badge rounded-pill text-bg-light border fw-normal">Pending</span>
+                                                </div>
+                                                <p class="small text-body-secondary mb-1">{{ $user->email }}</p>
+                                                <p class="small text-body-secondary mb-0">Joined {{ $user->created_at->format('M j, Y') }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-5">
+                                <div class="d-flex align-items-center gap-3">
+                                    <button class="btn btn-success btn-sm rounded-3 px-3 flex-grow-1"
                                         type="button"
                                         data-bs-toggle="modal"
                                         data-bs-target="#approve-user-{{ $user->id }}">
@@ -107,8 +120,11 @@
                                         onsubmit="return confirm('Permanently delete this pending registration?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-outline-danger rounded-pill px-3" type="submit" aria-label="Delete {{ $user->name }}">Delete</button>
+                                        <button class="btn btn-outline-danger btn-sm rounded-3 px-3" type="submit" aria-label="Delete {{ $user->name }}">Delete</button>
                                     </form>
+                                </div>
+                                        <p class="small text-body-secondary mt-2 mb-0">Choose a role when approving.</p>
+                                    </div>
                                 </div>
                             </article>
                             @empty
@@ -121,10 +137,12 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </section>
             <section id="all-users" class="accordion" aria-labelledby="users-title">
-                <h2 class="mb-0" id="users-title">
-                    <button class="accordion-button rounded-3 bg-white shadow-sm gap-3" type="button"
+                <div class="accordion-item border-0 shadow-sm">
+                <h2 class="accordion-header" id="users-title">
+                    <button class="accordion-button bg-white gap-3" type="button"
                         data-bs-toggle="collapse" data-bs-target="#all-users-content"
                         aria-expanded="true" aria-controls="all-users-content">
                         <span class="h3 fw-bold mb-0">All users</span>
@@ -134,17 +152,57 @@
                     </button>
                 </h2>
                 <div id="all-users-content" class="collapse show">
-                    <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
+                    <div class="card border-0 rounded-0 rounded-bottom overflow-hidden">
                         <div class="list-group list-group-flush">
                             @forelse ($approved_users as $user)
-                            <article class="list-group-item p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                                <div class="text-break">
-                                    <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
-                                        <h3 class="h5 mb-0">{{ $user->name }}</h3>
-                                        <span class="badge rounded-pill text-bg-light border">{{ ucfirst($user->role?->name ?? 'No role assigned') }}</span>
+                            <article class="list-group-item px-3 px-md-4 py-3">
+                                <div class="row align-items-center g-3">
+                                    <div class="col-12 col-md-7">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success-emphasis fw-bold p-3 lh-1 flex-shrink-0" aria-hidden="true">
+                                                {{ mb_strtoupper(mb_substr($user->first_name, 0, 1).mb_substr($user->last_name, 0, 1)) }}
+                                            </span>
+                                            <div class="text-break">
+                                                <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                                                    <h3 class="h6 fw-semibold mb-0">{{ $user->name }}</h3>
+                                                    @if ($user->id === auth()->id())
+                                                        <span class="badge rounded-pill text-bg-light border fw-normal">You</span>
+                                                    @endif
+                                                </div>
+                                                <p class="small text-body-secondary mb-1">{{ $user->email }}</p>
+                                                <p class="small text-body-secondary mb-0">Joined {{ $user->created_at->format('M j, Y') }}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p class="text-body-secondary mb-0">{{ $user->email }}</p>
-                                    <p class="small text-body-secondary mt-2 mb-0">Registered {{ $user->created_at->format('M j, Y') }}</p>
+                                    <div class="col-12 col-md-5">
+                                        <div class="d-flex align-items-end gap-3">
+                                    <form class="flex-grow-1" method="POST" action="{{ route('users.update', $user) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <label class="form-label small text-body-secondary mb-1" for="role-{{ $user->id }}">
+                                            Role <span class="visually-hidden">for {{ $user->name }}</span>
+                                        </label>
+                                        <select class="form-select form-select-sm bg-body-tertiary rounded-3"
+                                            id="role-{{ $user->id }}"
+                                            name="role_id" required onchange="this.form.requestSubmit()">
+                                            @foreach ($roles as $role)
+                                            <option value="{{ $role->id }}"
+                                                @selected($role->id === $user->role_id)>
+                                                {{ ucfirst($role->name) }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                        <noscript><button class="btn btn-success btn-sm mt-2" type="submit">Save role</button></noscript>
+                                    </form>
+                                    <form method="POST" action="{{ route('users.destroy', $user) }}"
+                                        onsubmit="return confirm('Permanently delete this user?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-outline-danger btn-sm rounded-3 px-3" type="submit" aria-label="Delete {{ $user->name }}" @disabled($user->id === auth()->id())>Delete</button>
+                                    </form>
+                                        </div>
+                                        <p class="small text-body-secondary mt-2 mb-0">Role changes save automatically.</p>
+                                    </div>
                                 </div>
                             </article>
                             @empty
@@ -155,6 +213,7 @@
                             @endforelse
                         </div>
                     </div>
+                </div>
                 </div>
             </section>
         </div>

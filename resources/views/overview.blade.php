@@ -3,6 +3,18 @@
 @section('title', 'Overview - Feedback')
 
 @section('content')
+    <style>
+        .session-card { transition: transform .15s ease, box-shadow .15s ease; }
+        .session-card:hover, .session-card:focus-within {
+            transform: translateY(-3px);
+            box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .12) !important;
+        }
+        .session-card:focus-within { outline: 2px solid var(--bs-success); outline-offset: 3px; }
+        @media (prefers-reduced-motion: reduce) {
+            .session-card { transition: none; }
+            .session-card:hover, .session-card:focus-within { transform: none; }
+        }
+    </style>
     <main class="container py-5">
         <header class="mb-4">
             <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
@@ -18,7 +30,7 @@
         <div class="row g-4">
             @forelse ($course_sessions as $course_session)
                 <div class="col-12 col-md-6 col-xl-4">
-                    <article class="card h-100 border-0 rounded-4 shadow-sm">
+                    <article class="session-card card h-100 border-0 rounded-4 shadow-sm">
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                                 <span class="small text-body-secondary font-monospace text-break">{{ $course_session->course_session_number }}</span>
@@ -39,8 +51,58 @@
                         <div class="card-footer bg-transparent border-top px-4 py-3">
                             <p class="small text-body-secondary mb-1">Questionnaire</p>
                             <p class="small fw-medium text-break mb-0">{{ $course_session->course->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</p>
+                            <button class="btn btn-link link-success text-decoration-none fw-semibold small p-0 mt-3 stretched-link"
+                                type="button" data-bs-toggle="modal" data-bs-target="#session-{{ $course_session->id }}"
+                                aria-label="View details for {{ $course_session->course->name }}, {{ $course_session->course_session_number }}">
+                                View details <span aria-hidden="true">&rarr;</span>
+                            </button>
                         </div>
                     </article>
+                </div>
+                <div class="modal fade" id="session-{{ $course_session->id }}" tabindex="-1"
+                    aria-labelledby="session-title-{{ $course_session->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                        <div class="modal-content border-0 rounded-4 shadow">
+                            <div class="modal-header px-4 py-3">
+                                <div>
+                                    <p class="small text-success fw-semibold mb-1">Session details</p>
+                                    <h2 class="modal-title fs-5 text-break" id="session-title-{{ $course_session->id }}">{{ $course_session->course->name }}</h2>
+                                </div>
+                                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis mb-4">Evaluation closed</span>
+                                <dl class="row g-3 mb-0">
+                                    <div class="col-sm-6">
+                                        <dt class="small text-body-secondary fw-normal">Session number</dt>
+                                        <dd class="font-monospace text-break mb-0">{{ $course_session->course_session_number }}</dd>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <dt class="small text-body-secondary fw-normal">Instructor</dt>
+                                        <dd class="text-break mb-0">{{ $course_session->instructor->name }}</dd>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <dt class="small text-body-secondary fw-normal">Course dates</dt>
+                                        <dd class="mb-0">{{ $course_session->start_date->format('d M Y') }} &ndash; {{ $course_session->end_date->format('d M Y') }}</dd>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <dt class="small text-body-secondary fw-normal">Session code</dt>
+                                        <dd class="font-monospace mb-0">{{ $course_session->code ?? 'Not assigned' }}</dd>
+                                    </div>
+                                    <div class="col-12">
+                                        <dt class="small text-body-secondary fw-normal">Questionnaire</dt>
+                                        <dd class="text-break mb-0">{{ $course_session->course->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                            <div class="modal-footer px-4">
+                                <button class="btn btn-outline-secondary rounded-3" type="button" data-bs-dismiss="modal">Close</button>
+                                @if ($course_session->code && $course_session->course->questionnaireTemplate)
+                                    <a class="btn btn-success rounded-3" href="{{ route('questionaire', ['code' => $course_session->code]) }}">View questionnaire</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @empty
                 <div class="col-12">
