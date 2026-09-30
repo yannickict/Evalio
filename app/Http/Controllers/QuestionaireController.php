@@ -27,7 +27,5 @@ class QuestionaireController extends Controller
         ]);
     }
 
-    public function submit(){
-        
-    }
+    public function submit(): void {}
 }
