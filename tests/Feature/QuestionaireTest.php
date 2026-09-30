@@ -60,6 +60,9 @@ class QuestionaireTest extends TestCase
 
         $ids = [];
         foreach ($xpath->query('//*[@id]') as $element) {
+            if (! $element instanceof \DOMElement) {
+                $this->fail('Expected an element with an ID attribute.');
+            }
             $ids[] = $element->getAttribute('id');
         }
         $this->assertSame($ids, array_values(array_unique($ids)));
