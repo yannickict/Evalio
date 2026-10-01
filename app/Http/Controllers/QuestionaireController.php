@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Answer;
 use App\Models\FeedbackForm;
 use App\Models\Question;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
 
 class QuestionaireController extends Controller
 {
@@ -39,9 +39,9 @@ class QuestionaireController extends Controller
         $form = FeedbackForm::with('courseSession.course.questionnaireTemplate')->where('code', $code)
             ->firstOrFail();
         foreach ($answers as $questionId => $answer) {
-            $question = Question::findOrFail($questionId);
+            $question = Question::query()->whereKey($questionId)->firstOrFail();
             $questionType = $question->type;
-            if ($questionType == "single_choice") {
+            if ($questionType == 'single_choice') {
                 Answer::create([
                     'feedback_form_id' => $form->id,
                     'question_id' => $questionId,
@@ -49,7 +49,7 @@ class QuestionaireController extends Controller
                     'answer_text' => null,
                     'comment' => $comments[$questionId] ?? null,
                 ]);
-            } elseif ($questionType == "free_text") {
+            } elseif ($questionType == 'free_text') {
                 Answer::create([
                     'feedback_form_id' => $form->id,
                     'question_id' => $questionId,
@@ -59,6 +59,7 @@ class QuestionaireController extends Controller
                 ]);
             }
         }
+
         return redirect()->route('home')
             ->with('status', 'Thank you! Your feedback has been submitted.');
     }
