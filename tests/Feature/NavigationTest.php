@@ -86,7 +86,7 @@ class NavigationTest extends TestCase
         $this->assertStringContainsString('bg-success', $link->getAttribute('class'));
     }
 
-    public function test_mobile_menu_toggle_targets_the_navigation_and_logout_uses_post(): void
+    public function test_navigation_has_direct_mobile_logout_and_a_desktop_profile_dropdown(): void
     {
         $response = $this->actingAs(User::factory()->approved()->create())->get(route('home'))->assertOk();
         $document = new \DOMDocument;
@@ -94,7 +94,18 @@ class NavigationTest extends TestCase
         $xpath = new \DOMXPath($document);
         $this->assertCount(1, $xpath->query('//nav//button[@data-bs-target="#main-navigation" and @aria-controls="main-navigation" and @aria-expanded="false"]'));
         $this->assertCount(1, $xpath->query('//nav//*[@id="main-navigation"]'));
-        $this->assertCount(1, $xpath->query('//nav//form[@method="POST" and @action="'.route('logout').'"]/input[@name="_token"]'));
+        $logoutForm = 'form[@method="POST" and @action="'.route('logout').'"]';
+        $mobileLogout = '//*[@id="main-navigation"]/'.$logoutForm.'[contains(concat(" ", normalize-space(@class), " "), " d-md-none ")]';
+        $desktopProfile = '//*[@id="main-navigation"]/div[contains(concat(" ", normalize-space(@class), " "), " d-none ") and contains(concat(" ", normalize-space(@class), " "), " d-md-block ")]';
+        $desktopMenu = $desktopProfile.'/div[@aria-labelledby="profile-menu-toggle" and contains(concat(" ", normalize-space(@class), " "), " dropdown-menu ") and not(contains(concat(" ", normalize-space(@class), " "), " show "))]';
+
+        $this->assertCount(2, $xpath->query('//nav//form[@action="'.route('logout').'"]'));
+        foreach ([$mobileLogout, $desktopMenu.'/'.$logoutForm] as $form) {
+            $this->assertCount(1, $xpath->query($form));
+            $this->assertCount(1, $xpath->query($form.'/input[@name="_token" and @type="hidden"]'));
+            $this->assertCount(1, $xpath->query($form.'/button[@type="submit" and normalize-space(.)="Log out"]'));
+        }
+        $this->assertCount(1, $xpath->query($desktopProfile.'/button[@id="profile-menu-toggle" and @type="button" and @data-bs-toggle="dropdown" and @aria-expanded="false" and @aria-label]'));
         $this->assertCount(1, $xpath->query('//form[@method="GET" and @action="'.route('questionaire').'"]//input[@name="code" and @required]'));
     }
 }

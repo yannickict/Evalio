@@ -45,7 +45,7 @@
                                 <div class="row align-items-center g-3">
                                     <div class="col-12 col-md-7">
                                         <div class="d-flex align-items-start gap-3">
-                                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success-emphasis fw-bold p-3 lh-1 flex-shrink-0" aria-hidden="true">
+                                            <span class="user-avatar d-inline-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success-emphasis fw-bold lh-1 flex-shrink-0" aria-hidden="true">
                                                 {{ mb_strtoupper(mb_substr($user->first_name, 0, 1).mb_substr($user->last_name, 0, 1)) }}
                                             </span>
                                             <div class="text-break">
@@ -159,7 +159,7 @@
                                 <div class="row align-items-center g-3">
                                     <div class="col-12 col-md-7">
                                         <div class="d-flex align-items-start gap-3">
-                                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success-emphasis fw-bold p-3 lh-1 flex-shrink-0" aria-hidden="true">
+                                            <span class="user-avatar d-inline-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success-emphasis fw-bold lh-1 flex-shrink-0" aria-hidden="true">
                                                 {{ mb_strtoupper(mb_substr($user->first_name, 0, 1).mb_substr($user->last_name, 0, 1)) }}
                                             </span>
                                             <div class="text-break">

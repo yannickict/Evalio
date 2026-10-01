@@ -23,12 +23,22 @@
                        @if (request()->routeIs('users*')) aria-current="page" @endif>Users</a>
                 @endif
                 </div>
-                <div class="d-flex align-items-center justify-content-between gap-3 ms-md-auto pt-3 pt-md-0 mt-2 mt-md-0 ps-md-4">
-                    <span class="small text-body-secondary text-break">{{ auth()->user()->name }}</span>
-                <form method="POST" action="{{ route('logout') }}" class="m-0">
+                <form method="POST" action="{{ route('logout') }}" class="d-md-none border-top mt-3 pt-3">
                     @csrf
-                    <button class="btn btn-outline-secondary btn-sm rounded-3 px-3 text-nowrap" type="submit">Log out</button>
+                    <button class="btn btn-outline-secondary rounded-3 w-100 py-2" type="submit">Log out</button>
                 </form>
+                <div class="dropdown d-none d-md-block ms-md-auto ps-md-4">
+                    <button class="user-avatar btn d-inline-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success-emphasis fw-bold lh-1 flex-shrink-0 p-0"
+                        type="button" id="profile-menu-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                        aria-label="Account menu for {{ auth()->user()->name }}">
+                        {{ mb_strtoupper(mb_substr(auth()->user()->first_name, 0, 1).mb_substr(auth()->user()->last_name, 0, 1)) }}
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-md-end" aria-labelledby="profile-menu-toggle">
+                        <form method="POST" action="{{ route('logout') }}" class="m-0">
+                            @csrf
+                            <button class="dropdown-item" type="submit">Log out</button>
+                        </form>
+                    </div>
                 </div>
             </div>
             @else
