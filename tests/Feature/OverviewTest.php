@@ -53,10 +53,10 @@ class OverviewTest extends TestCase
         ]);
 
         $this->actingAs($user)->get(route('overview'))->assertOk()
-            ->assertViewIs('overview')->assertSee('No closed evaluations yet');
+            ->assertViewIs('overview')->assertSee('No course sessions yet');
     }
 
-    public function test_only_explicitly_closed_sessions_are_shown_with_their_details(): void
+    public function test_all_sessions_are_shown_with_their_details_and_evaluation_statuses(): void
     {
         $instructor = User::factory()->approved()->create([
             'first_name' => 'Alex', 'last_name' => 'Example',
@@ -78,9 +78,14 @@ class OverviewTest extends TestCase
         $this->actingAs($instructor)->get(route('overview'))->assertOk()
             ->assertSee('Laravel basics')->assertSee('Alex Example')
             ->assertSee('Training questionnaire')->assertSee('10 Jan 2026')->assertSee('12 Jan 2026')
-            ->assertSee($closed->course_session_number)->assertSee('1 closed session')
-            ->assertDontSee($open->course_session_number)->assertDontSee($automatic->course_session_number)
-            ->assertDontSee('No closed evaluations yet');
+            ->assertSee($closed->course_session_number)->assertSee('3 sessions')
+            ->assertSee($open->course_session_number)->assertSee($automatic->course_session_number)
+            ->assertSee('Evaluation closed')->assertSee('Evaluation open')->assertSee('Evaluation status not set')
+            ->assertViewHas('courses', fn ($courses) => $courses->contains('id', $open->course_id)
+                && $courses->contains('id', $automatic->course_id))
+            ->assertViewHas('instructors', fn ($instructors) => $instructors->contains('id', $open->instructor_id)
+                && $instructors->contains('id', $automatic->instructor_id))
+            ->assertDontSee('No course sessions yet');
     }
 
     public function test_session_without_questionnaire_shows_fallback(): void
@@ -97,7 +102,7 @@ class OverviewTest extends TestCase
         $older = CourseSession::factory()->create(['evaluation_status' => 'closed', 'created_at' => now()->subDay()]);
 
         $this->actingAs(User::factory()->approved()->create())->get(route('overview'))->assertOk()
-            ->assertSee('2 closed sessions')
+            ->assertSee('2 sessions')
             ->assertSeeInOrder([$older->course_session_number, $newer->course_session_number]);
     }
 
@@ -108,6 +113,53 @@ class OverviewTest extends TestCase
 
         $this->actingAs(User::factory()->approved()->create())->get(route('overview'))
             ->assertOk()->assertSee($course->name)->assertDontSee($course->name, false);
+    }
+
+    public function test_filter_options_are_unique_sorted_and_only_include_session_participants(): void
+    {
+        $alpha = Course::factory()->create(['name' => 'Alpha course']);
+        $zulu = Course::factory()->create(['name' => 'Zulu course']);
+        $alice = User::factory()->approved()->create(['first_name' => 'Alice', 'last_name' => 'Example']);
+        $zoe = User::factory()->approved()->create(['first_name' => 'Zoe', 'last_name' => 'Example']);
+        Course::factory()->create(['name' => 'Unused course']);
+        $viewer = User::factory()->approved()->create();
+        CourseSession::factory()->for($zulu)->for($zoe, 'instructor')->create(['evaluation_status' => 'open']);
+        CourseSession::factory()->for($alpha)->for($alice, 'instructor')->count(2)->create();
+
+        $response = $this->actingAs($viewer)->get(route('overview'))->assertOk()
+            ->assertViewHas('courses', fn ($courses) => $courses->pluck('id')->all() === [$alpha->id, $zulu->id])
+            ->assertViewHas('instructors', fn ($instructors) => $instructors->pluck('id')->all() === [$alice->id, $zoe->id]);
+        $document = new \DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new \DOMXPath($document);
+
+        foreach (['course' => [$alpha, $zulu], 'instructor' => [$alice, $zoe]] as $field => $expected) {
+            $this->assertCount(1, $xpath->query('//input[@id="'.$field.'-filter" and @role="combobox" and @aria-controls="'.$field.'-options" and @aria-expanded="false"]'));
+            $this->assertCount(1, $xpath->query('//label[@for="'.$field.'-filter"]'));
+            $this->assertCount(1, $xpath->query('//*[@id="'.$field.'-options" and @role="listbox"]'));
+            $options = $xpath->query('//*[@id="'.$field.'-options"]//*[@role="option"]');
+            $this->assertCount(2, $options);
+            foreach ($expected as $index => $model) {
+                $this->assertSame($model->name, trim($options->item($index)->textContent));
+                $this->assertSame($field.'-option-'.$model->id, $options->item($index)->getAttribute('id'));
+            }
+        }
+        $this->assertCount(3, $xpath->query('//*[@data-session and @data-course and @data-instructor]'));
+        $this->assertCount(2, $xpath->query('//*[@data-session and @data-course="Alpha course" and @data-instructor="Alice Example"]'));
+        $response->assertDontSee('Unused course');
+    }
+
+    public function test_empty_overview_has_empty_filters_and_single_session_uses_singular_count(): void
+    {
+        $user = User::factory()->approved()->create();
+        $this->actingAs($user)->get(route('overview'))->assertOk()
+            ->assertSee('0 sessions')->assertSee('No course sessions yet')
+            ->assertViewHas('courses', fn ($courses) => $courses->isEmpty())
+            ->assertViewHas('instructors', fn ($instructors) => $instructors->isEmpty());
+
+        CourseSession::factory()->create(['evaluation_status' => 'open']);
+        $this->get(route('overview'))->assertOk()->assertSee('1 session')
+            ->assertDontSee('1 sessions')->assertDontSee('No course sessions yet');
     }
 
     public function test_cards_target_unique_accessible_modals_and_only_available_questionnaires_are_linked(): void

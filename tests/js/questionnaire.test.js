@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 // Bootstrap has its own DOM behavior; these tests exercise our message handlers.
 vi.mock('bootstrap/js/dist/modal', () => ({}));
 vi.mock('bootstrap/js/dist/collapse', () => ({}));
+vi.mock('bootstrap/js/dist/dropdown', () => ({}));
 
 describe('incomplete questionnaire message', () => {
     let form;
@@ -15,7 +16,12 @@ describe('incomplete questionnaire message', () => {
         vi.spyOn(form, 'addEventListener');
         message = { hidden: true };
         vi.stubGlobal('document', {
-            getElementById: vi.fn((id) => id === 'questionnaire-form' ? form : message),
+            querySelectorAll: vi.fn().mockReturnValue([]),
+            getElementById: vi.fn((id) => {
+                if (id === 'questionnaire-form') return form;
+                if (id === 'incomplete-answers') return message;
+                return null;
+            }),
         });
     });
 
