@@ -5,6 +5,13 @@
     height: 3rem;
 }
 
+.editor-remove:disabled {
+    color: var(--bs-secondary-color);
+    background-color: var(--bs-secondary-bg);
+    border-color: var(--bs-border-color);
+    opacity: .5;
+}
+
 @media (max-width: 767.98px) {
     /* Leave a visible gap below the dialog, even with mobile browser controls. */
     .modal {

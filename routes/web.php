@@ -29,8 +29,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses', [CourseController::class, 'index'])->name('courses');
     Route::view('/courses/create', 'courses.create')->name('courses.create');
 
-    Route::view('/questionnaires', 'questionnaires.index')->name('questionnaires.index');
-    Route::view('/questionnaires/create', 'questionnaires.create')->name('questionnaires.create');
+    Route::get('/questionnaires', [QuestionnaireController::class, 'library'])->name('questionnaires.index');
+    Route::post('/questionnaires', [QuestionnaireController::class, 'store'])->name('questionnaires.store');
+    Route::get('/questionnaires/create', [QuestionnaireController::class, 'create'])
+        ->name('questionnaires.create');
+
+    Route::post('/questionnaires/preview', [QuestionnaireController::class, 'preview'])
+        ->name('questionnaires.preview');
 
     Route::get('/session/create', [SessionController::class, 'index'])
         ->name('sessionscreate');

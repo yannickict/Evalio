@@ -13,14 +13,35 @@
         <p class="text-body-secondary mb-0">Create reusable feedback questionnaires for your course sessions.</p>
     </header>
 
+    @if (session('status'))
+    <div class="alert alert-success" role="status">{{ session('status') }}</div>
+    @endif
+
+    <div class="row g-4">
+        @forelse ($templates as $template)
+        <div class="col-12 col-md-6 col-xl-4">
+            <article class="card h-100 border-0 rounded-4 shadow-sm">
+                <div class="card-body p-4">
+                    <p class="small text-success fw-semibold text-uppercase mb-2">Questionnaire library</p>
+                    <h2 class="h5 fw-semibold text-break mb-3">{{ $template->name }}</h2>
+                    <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
+                        {{ $template->questions_count }} {{ $template->questions_count === 1 ? 'question' : 'questions' }}
+                    </span>
+                </div>
+            </article>
+        </div>
+        @empty
+        <div class="col-12">
     <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-4 p-md-5 text-center">
             <span class="badge rounded-pill bg-success-subtle text-success-emphasis mb-3">Questionnaire library</span>
             <h2 class="h5 fw-semibold">Build your next feedback form</h2>
             <p class="text-body-secondary mb-4">Start with a name, then add questions and answer options.</p>
             <a href="{{ route('questionnaires.create') }}" class="btn btn-outline-success rounded-3">Create a questionnaire</a>
-            <p class="small text-body-secondary mt-4 mb-0">Saved questionnaires and editing will be available here soon.</p>
         </div>
+    </div>
+        </div>
+        @endforelse
     </div>
 </main>
 @endsection

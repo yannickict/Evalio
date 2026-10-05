@@ -2,22 +2,47 @@ import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
 
-const answerType = document.getElementById("question-one-type");
+const refreshAnswerTypes = document.getElementById("refresh-answer-types");
 
-if (answerType) {
-    const answerOptions = document.getElementById("question-one-options");
-    const freeTextPreview = document.getElementById("question-one-preview");
-    const commentOptions = document.getElementById("question-one-comment-options");
+if (refreshAnswerTypes) {
+    refreshAnswerTypes.hidden = true;
+    const scrollKey = "questionnaire-editor-scroll";
 
-    const updateAnswerType = () => {
-        const isSingleChoice = answerType.value === "single_choice";
-        answerOptions.hidden = !isSingleChoice;
-        commentOptions.hidden = !isSingleChoice;
-        freeTextPreview.hidden = isSingleChoice;
-    };
+    try {
+        const savedPosition = sessionStorage.getItem(scrollKey);
+        sessionStorage.removeItem(scrollKey);
 
-    answerType.addEventListener("change", updateAnswerType);
-    updateAnswerType();
+        if (savedPosition !== null) {
+            const position = JSON.parse(savedPosition);
+            requestAnimationFrame(() => {
+                document.getElementById(position.focusId)?.focus({ preventScroll: true });
+                window.scrollTo({ top: position.top, behavior: "instant" });
+            });
+        }
+    } catch {
+        // The editor still works when browser storage is unavailable.
+    }
+
+    refreshAnswerTypes.form.addEventListener("submit", (event) => {
+        try {
+            if (event.submitter?.hasAttribute("formaction")) {
+                sessionStorage.removeItem(scrollKey);
+                return;
+            }
+            sessionStorage.setItem(scrollKey, JSON.stringify({
+                top: window.scrollY,
+                focusId: document.activeElement?.id ?? "",
+            }));
+        } catch {
+            // Saving scroll position is optional.
+        }
+    });
+
+    document.querySelectorAll("[data-answer-type]").forEach((select) => {
+        select.addEventListener("change", () => {
+            select.form.requestSubmit(refreshAnswerTypes);
+        });
+    });
 }
 
 const instructorFilter = document.getElementById("instructor-filter");
