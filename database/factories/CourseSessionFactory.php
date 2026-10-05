@@ -16,7 +16,6 @@ class CourseSessionFactory extends Factory
         return [
             'course_id' => Course::factory(),
             'instructor_id' => User::factory(),
-            'course_session_number' => fake()->unique()->bothify('COURSE.####'),
             'start_date' => today(),
             'end_date' => today()->addDays(2),
             'evaluation_status' => null,

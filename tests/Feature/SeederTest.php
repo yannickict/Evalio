@@ -20,6 +20,17 @@ class SeederTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_production_seeding_excludes_demo_accounts_and_sessions(): void
+    {
+        $this->app->instance('env', 'production');
+        $this->artisan('db:seed', ['--class' => DatabaseSeeder::class, '--force' => true])->assertSuccessful();
+
+        $this->assertDatabaseCount('roles', 3);
+        $this->assertDatabaseCount('questionnaire_templates', 1);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('course_sessions', 0);
+    }
+
     public function test_demo_data_has_approved_admin_and_unique_feedback_form_codes(): void
     {
         $this->seed(DatabaseSeeder::class);
@@ -37,6 +48,10 @@ class SeederTest extends TestCase
         }
 
         $this->assertDatabaseCount('feedback_forms', 45);
+        $this->assertSame(
+            array_map(fn (int $number) => sprintf('COURSE.%04d', $number), range(1, 15)),
+            CourseSession::orderBy('id')->pluck('course_session_number')->all(),
+        );
         $this->assertSame(3, User::where('is_approved', false)->count());
     }
 

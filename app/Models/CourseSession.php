@@ -20,6 +20,27 @@ class CourseSession extends Model
     /** @use HasFactory<CourseSessionFactory> */
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::creating(function (CourseSession $session): void {
+            $number = $session->getAttributes()['course_session_number'] ?? null;
+
+            if ($number !== null && $number !== '') {
+                return;
+            }
+
+            $highestNumber = 0;
+
+            foreach (static::query()->pluck('course_session_number') as $number) {
+                if (preg_match('/^COURSE\.(\d+)$/', $number, $matches)) {
+                    $highestNumber = max($highestNumber, (int) $matches[1]);
+                }
+            }
+
+            $session->course_session_number = sprintf('COURSE.%04d', $highestNumber + 1);
+        });
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {

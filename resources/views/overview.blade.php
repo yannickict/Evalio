@@ -4,17 +4,6 @@
 
 @section('content')
 <style>
-    .overview-filter-clear {
-        position: absolute;
-        top: 50%;
-        right: .5rem;
-        transform: translateY(-50%);
-        width: 1.5rem;
-        height: 1.5rem;
-        padding: 0;
-        background-size: .625rem;
-    }
-
     .session-card {
         transition: transform .15s ease, box-shadow .15s ease;
     }
@@ -49,31 +38,27 @@
             <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">
                 {{ $course_sessions->count() }} {{ $course_sessions->count() === 1 ? 'session' : 'sessions' }}
             </span>
+            <a class="btn btn-success rounded-3 ms-md-auto" href="{{ route('sessionscreate') }}">New session</a>
         </div>
         <p class="text-body-secondary mb-0">All your course sessions, in one place.</p>
     </header>
 
+    @if (session('status'))
+    <div class="alert alert-success" role="status" aria-live="polite">
+        {{ session('status') }}
+    </div>
+    @endif
+
     <div class="row g-3 mb-4">
         @foreach (['course' => 'Courses', 'instructor' => 'Instructors'] as $field => $label)
-        <div class="col-12 col-md-6 col-lg-4">
+        <div class="col-12 col-md-4">
             <label for="{{ $field }}-filter" class="form-label">{{ $label }}</label>
-            <div class="position-relative" data-searchable-dropdown>
-                <input id="{{ $field }}-filter" name="{{ $field }}" type="text"
-                    class="form-control pe-5" placeholder="All {{ strtolower($label) }}" autocomplete="off"
-                    role="combobox" aria-autocomplete="list" aria-expanded="false"
-                    aria-controls="{{ $field }}-options">
-                <button type="button" class="btn-close overview-filter-clear"
-                    data-clear-search aria-label="Clear {{ strtolower($label) }} search" hidden></button>
-                <div id="{{ $field }}-options" class="dropdown-menu w-100 overflow-auto"
-                    role="listbox" aria-label="{{ $label }}" style="max-height: 16rem;">
-                    @foreach (($field === 'course' ? $courses : $instructors) as $option)
-                    <button id="{{ $field }}-option-{{ $option->id }}" type="button"
-                        class="dropdown-item text-wrap" role="option" aria-selected="false"
-                        tabindex="-1">{{ $option->name }}</button>
-                    @endforeach
-                    <span class="dropdown-item-text text-body-secondary" data-no-results hidden>No matches found</span>
-                </div>
-            </div>
+            <select id="{{ $field }}-filter" name="{{ $field }}" class="form-select">
+                <option value="">All {{ strtolower($label) }}</option>
+                @foreach (($field === 'course' ? $courses : $instructors) as $option)
+                <option value="{{ $option->id }}">{{ $option->name }}</option>
+                @endforeach
+            </select>
         </div>
         @endforeach
     </div>
@@ -90,8 +75,8 @@
         @endphp
         <div class="col-12 col-md-6 col-xl-4"
             data-session
-            data-course="{{ $course_session->course->name }}"
-            data-instructor="{{ $course_session->instructor->name }}">
+            data-course="{{ $course_session->course_id }}"
+            data-instructor="{{ $course_session->instructor_id }}">
             <article class="session-card card h-100 border-0 rounded-4 shadow-sm">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">

@@ -134,18 +134,17 @@ class OverviewTest extends TestCase
         $xpath = new \DOMXPath($document);
 
         foreach (['course' => [$alpha, $zulu], 'instructor' => [$alice, $zoe]] as $field => $expected) {
-            $this->assertCount(1, $xpath->query('//input[@id="'.$field.'-filter" and @role="combobox" and @aria-controls="'.$field.'-options" and @aria-expanded="false"]'));
+            $this->assertCount(1, $xpath->query('//select[@id="'.$field.'-filter"]'));
             $this->assertCount(1, $xpath->query('//label[@for="'.$field.'-filter"]'));
-            $this->assertCount(1, $xpath->query('//*[@id="'.$field.'-options" and @role="listbox"]'));
-            $options = $xpath->query('//*[@id="'.$field.'-options"]//*[@role="option"]');
+            $options = $xpath->query('//select[@id="'.$field.'-filter"]/option[@value!=""]');
             $this->assertCount(2, $options);
             foreach ($expected as $index => $model) {
                 $this->assertSame($model->name, trim($options->item($index)->textContent));
-                $this->assertSame($field.'-option-'.$model->id, $options->item($index)->getAttribute('id'));
+                $this->assertSame((string) $model->id, $options->item($index)->getAttribute('value'));
             }
         }
         $this->assertCount(3, $xpath->query('//*[@data-session and @data-course and @data-instructor]'));
-        $this->assertCount(2, $xpath->query('//*[@data-session and @data-course="Alpha course" and @data-instructor="Alice Example"]'));
+        $this->assertCount(2, $xpath->query('//*[@data-session and @data-course="'.$alpha->id.'" and @data-instructor="'.$alice->id.'"]'));
         $response->assertDontSee('Unused course');
     }
 

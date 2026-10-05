@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\QuestionaireController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,15 @@ Route::post('/questionaire', [QuestionaireController::class, 'submit'])
     ->name('questionaire.submit');
 
 Route::middleware('auth')->group(function () {
+    Route::view('/questionnaires', 'questionnaires.index')->name('questionnaires.index');
+    Route::view('/questionnaires/create', 'questionnaires.create')->name('questionnaires.create');
+
+    Route::get('/session/create', [SessionController::class, 'index'])
+        ->name('sessionscreate');
+
+    Route::post('/session', [SessionController::class, 'store'])
+        ->name('sessions.store');
+
     Route::get('/overview', [OverviewController::class, 'index'])
         ->name('overview');
 

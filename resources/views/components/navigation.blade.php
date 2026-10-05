@@ -17,6 +17,9 @@
                 <a href="{{ route('overview') }}"
                    @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('overview')])
                    @if (request()->routeIs('overview')) aria-current="page" @endif>Overview</a>
+                <a href="{{ route('questionnaires.index') }}"
+                   @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('questionnaires.*')])
+                   @if (request()->routeIs('questionnaires.index')) aria-current="page" @endif>Questionnaires</a>
                 @if (auth()->user()->role?->name === 'admin')
                     <a href="{{ route('users') }}"
                        @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('users*')])
