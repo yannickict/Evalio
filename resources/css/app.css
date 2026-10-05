@@ -6,17 +6,22 @@
 }
 
 @media (max-width: 767.98px) {
-    /* Keep modal content inside the visible viewport as browser controls change. */
+    /* Leave a visible gap below the dialog, even with mobile browser controls. */
     .modal {
         height: 100dvh;
+        --mobile-modal-height: calc(92svh - 2rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    }
+
+    .modal-dialog {
+        margin: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
     }
 
     .modal-dialog-scrollable {
-        height: calc(100dvh - var(--bs-modal-margin) * 2);
+        height: var(--mobile-modal-height);
     }
 
     .modal-dialog-centered {
-        min-height: calc(100dvh - var(--bs-modal-margin) * 2);
+        min-height: var(--mobile-modal-height);
     }
 
     .modal-dialog-scrollable .modal-body {

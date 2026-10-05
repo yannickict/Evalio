@@ -167,9 +167,8 @@ class OverviewTest extends TestCase
         $course = Course::factory()->for($template, 'questionnaireTemplate')->create();
         $available = CourseSession::factory()->for($course)->create(['evaluation_status' => 'closed']);
         FeedbackForm::factory()->for($available, 'courseSession')->create(['code' => '012345']);
-        FeedbackForm::factory()->for($available, 'courseSession')->create(['code' => '654321']);
-        FeedbackForm::factory()->for($available, 'courseSession')->create(['code' => null]);
         $noCode = CourseSession::factory()->for($course)->create(['evaluation_status' => 'closed']);
+        FeedbackForm::factory()->for($noCode, 'courseSession')->create(['code' => null]);
         $noTemplate = CourseSession::factory()->create(['evaluation_status' => 'closed']);
         FeedbackForm::factory()->for($noTemplate, 'courseSession')->create(['code' => '111111']);
         $response = $this->actingAs(User::factory()->approved()->create())->get(route('overview'))->assertOk();
@@ -182,10 +181,9 @@ class OverviewTest extends TestCase
             $this->assertCount(1, $xpath->query('//article//button[@type="button" and @data-bs-toggle="modal" and @data-bs-target="#'.$id.'"]'));
             $this->assertCount(1, $xpath->query('//div[@id="'.$id.'" and @aria-labelledby="session-title-'.$session->id.'"]'));
             $this->assertCount(1, $xpath->query('//*[@id="'.$id.'"]//h2[@id="session-title-'.$session->id.'"]'));
-            $this->assertCount($session->is($available) ? 2 : 0, $xpath->query('//*[@id="'.$id.'"]//a'));
+            $this->assertCount($session->is($available) ? 1 : 0, $xpath->query('//*[@id="'.$id.'"]//a'));
         }
         $response->assertSee(route('questionnaire', ['code' => '012345']), false);
-        $response->assertSee(route('questionnaire', ['code' => '654321']), false)
-            ->assertDontSee(route('questionnaire', ['code' => '111111']), false);
+        $response->assertDontSee(route('questionnaire', ['code' => '111111']), false);
     }
 }

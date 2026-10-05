@@ -58,7 +58,7 @@ return new class extends Migration
 
         Schema::create('feedback_forms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('course_session_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('course_session_id')->unique()->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->char('code', 6)->nullable()->unique();
             $table->timestamps();
         });

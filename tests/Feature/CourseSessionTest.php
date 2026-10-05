@@ -3,12 +3,25 @@
 namespace Tests\Feature;
 
 use App\Models\CourseSession;
+use App\Models\FeedbackForm;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CourseSessionTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_session_has_one_feedback_form_and_rejects_a_second(): void
+    {
+        $session = CourseSession::factory()->create();
+        $form = FeedbackForm::factory()->for($session)->create(['code' => '123456']);
+
+        $this->assertTrue($session->feedbackForm->is($form));
+        $this->expectException(QueryException::class);
+
+        FeedbackForm::factory()->for($session)->create(['code' => '654321']);
+    }
 
     public function test_session_numbers_increment_by_default(): void
     {

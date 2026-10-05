@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -59,9 +59,9 @@ class CourseSession extends Model
         return $this->belongsTo(User::class, 'instructor_id');
     }
 
-    /** @return HasMany<FeedbackForm, $this> */
-    public function feedbackForms(): HasMany
+    /** @return HasOne<FeedbackForm, $this> */
+    public function feedbackForm(): HasOne
     {
-        return $this->hasMany(FeedbackForm::class);
+        return $this->hasOne(FeedbackForm::class);
     }
 }

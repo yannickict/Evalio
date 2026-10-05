@@ -129,11 +129,12 @@ class QuestionnaireTest extends TestCase
         $this->get(route('home'))->assertOk()->assertDontSee('Thank you! Your feedback has been submitted.');
     }
 
-    public function test_submissions_use_the_selected_form_when_a_session_has_multiple_codes(): void
+    public function test_submissions_use_the_selected_sessions_form(): void
     {
         $template = $this->questionnaire();
         $first = FeedbackForm::where('code', '012345')->firstOrFail();
-        $second = FeedbackForm::factory()->create(['course_session_id' => $first->course_session_id, 'code' => '654321']);
+        $secondSession = CourseSession::factory()->create(['course_id' => $first->courseSession->course_id]);
+        $second = FeedbackForm::factory()->for($secondSession, 'courseSession')->create(['code' => '654321']);
         $question = Question::factory()->create(['type' => 'free_text']);
         $template->questions()->attach($question, ['position' => 1]);
 

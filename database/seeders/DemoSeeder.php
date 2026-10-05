@@ -44,12 +44,10 @@ class DemoSeeder extends Seeder
                             'evaluation_status' => $days < 0 ? 'closed' : null,
                         ]);
 
-                    for ($i = 0; $i < 3; $i++) {
-                        do {
-                            $code = (string) random_int(100000, 999999);
-                        } while (FeedbackForm::where('code', $code)->exists());
-                        FeedbackForm::factory()->for($session)->create(['code' => $code]);
-                    }
+                    do {
+                        $code = (string) random_int(100000, 999999);
+                    } while (FeedbackForm::where('code', $code)->exists());
+                    FeedbackForm::factory()->for($session)->create(['code' => $code]);
                 }
             }
         });

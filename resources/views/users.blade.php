@@ -72,7 +72,7 @@
                                         tabindex="-1"
                                         aria-labelledby="approve-title-{{ $user->id }}"
                                         aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                                             <form class="modal-content"
                                                 method="POST"
                                                 action="{{ route('users.update', $user) }}">

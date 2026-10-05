@@ -12,7 +12,7 @@ class OverviewController extends Controller
     {
         abort_unless(Auth::user()?->role !== null, 403);
 
-        $course_sessions = CourseSession::with(['course.questionnaireTemplate', 'instructor', 'feedbackForms'])
+        $course_sessions = CourseSession::with(['course.questionnaireTemplate', 'instructor', 'feedbackForm'])
             ->orderBy('created_at')
             ->get();
 

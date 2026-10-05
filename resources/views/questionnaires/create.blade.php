@@ -28,7 +28,7 @@
                 <h2 class="h5 fw-semibold mb-0">Questions</h2>
                 <span class="badge rounded-pill bg-success-subtle text-success-emphasis">2 sample questions</span>
             </div>
-            <p id="question-editor-note" class="small text-body-secondary mb-3">These sample fields show the question layout. Adding, removing, and changing question types will be available soon.</p>
+            <p id="question-editor-note" class="small text-body-secondary mb-3">These sample fields show the question layout. Adding and removing questions will be available soon.</p>
 
             <section class="card border-0 rounded-4 shadow-sm mb-3" aria-labelledby="question-one-heading">
                 <div class="card-body p-4">
@@ -42,12 +42,12 @@
                     </div>
                     <div class="mb-4">
                         <label for="question-one-type" class="form-label fw-medium">Answer type</label>
-                        <select id="question-one-type" class="form-select" disabled aria-describedby="question-editor-note">
-                            <option selected>Single choice</option>
-                            <option>Free text</option>
+                        <select id="question-one-type" class="form-select">
+                            <option value="single_choice" selected>Single choice</option>
+                            <option value="free_text">Free text</option>
                         </select>
                     </div>
-                    <fieldset class="mb-4">
+                    <fieldset id="question-one-options" class="mb-4">
                         <legend class="fs-6 fw-medium mb-2">Answer options</legend>
                         <div class="d-grid gap-2">
                             <div class="input-group">
@@ -65,37 +65,17 @@
                         </div>
                         <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 mt-3" disabled aria-describedby="question-editor-note">Add option</button>
                     </fieldset>
-                    <div class="form-check border-top pt-3">
+                    <div id="question-one-preview" class="bg-body-tertiary border rounded-3 p-3" hidden>
+                        <p class="small text-body-secondary mb-2">Answer preview</p>
+                        <label for="question-one-free-text" class="visually-hidden">Participant free-text answer preview</label>
+                        <textarea id="question-one-free-text" class="form-control" rows="3" placeholder="Participants will write their answer here" disabled></textarea>
+                    </div>
+                    <div id="question-one-comment-options" class="form-check border-top pt-3">
                         <input id="question-one-comment" type="checkbox" class="form-check-input">
                         <label for="question-one-comment" class="form-check-label">Allow an optional comment</label>
                     </div>
                 </div>
-            </section>
-
-            <section class="card border-0 rounded-4 shadow-sm mb-3" aria-labelledby="question-two-heading">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
-                        <h3 id="question-two-heading" class="h6 text-success fw-semibold mb-0">Question 2</h3>
-                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-3" disabled aria-label="Remove question 2" aria-describedby="question-editor-note">Remove</button>
-                    </div>
-                    <div class="mb-3">
-                        <label for="question-two-text" class="form-label fw-medium">Question</label>
-                        <input id="question-two-text" type="text" class="form-control" placeholder="e.g. What could we improve?">
-                    </div>
-                    <div class="mb-4">
-                        <label for="question-two-type" class="form-label fw-medium">Answer type</label>
-                        <select id="question-two-type" class="form-select" disabled aria-describedby="question-editor-note">
-                            <option>Single choice</option>
-                            <option selected>Free text</option>
-                        </select>
-                    </div>
-                    <div class="bg-body-tertiary border rounded-3 p-3">
-                        <p class="small text-body-secondary mb-2">Answer preview</p>
-                        <label for="question-two-preview" class="visually-hidden">Participant free-text answer preview</label>
-                        <textarea id="question-two-preview" class="form-control" rows="3" placeholder="Participants will write their answer here" disabled></textarea>
-                    </div>
-                </div>
-            </section>
+            </section> 
 
             <button type="button" class="btn btn-outline-success rounded-3 w-100 py-3 mb-4" disabled aria-describedby="question-editor-note">+ Add question</button>
 

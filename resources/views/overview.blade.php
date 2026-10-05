@@ -133,19 +133,17 @@
                                 <dd class="mb-0">{{ $course_session->start_date->format('d M Y') }} &ndash; {{ $course_session->end_date->format('d M Y') }}</dd>
                             </div>
                             <div class="col-sm-6">
-                                <dt class="small text-body-secondary fw-normal">Feedback form codes</dt>
-                                <dd class="font-monospace mb-0">{{ $course_session->feedbackForms->whereNotNull('code')->pluck('code')->join(', ') ?: 'Not assigned' }}</dd>
+                                <dt class="small text-body-secondary fw-normal">Feedback form code</dt>
+                                <dd class="font-monospace mb-0">{{ $course_session->feedbackForm?->code ?? 'Not assigned' }}</dd>
                             </div>
                             <div class="col-12">
                                 <dt class="small text-body-secondary fw-normal">Questionnaire</dt>
                                 <dd class="text-break mb-0">{{ $course_session->course->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</dd>
                             </div>
                         </dl>
-                        @if ($course_session->course->questionnaireTemplate)
+                        @if ($course_session->course->questionnaireTemplate && $course_session->feedbackForm?->code !== null)
                         <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 border-top pt-3 mt-4">
-                            @foreach ($course_session->feedbackForms->whereNotNull('code') as $form)
-                            <a class="btn btn-success rounded-3 text-break" href="{{ route('questionnaire', ['code' => $form->code]) }}">View questionnaire {{ $form->code }}</a>
-                            @endforeach
+                            <a class="btn btn-success rounded-3 text-break" href="{{ route('questionnaire', ['code' => $course_session->feedbackForm->code]) }}">View questionnaire</a>
                         </div>
                         @endif
                     </div>
