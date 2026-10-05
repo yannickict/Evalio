@@ -37,3 +37,7 @@ yarn-error.log
 /boost.json
 /opencode.json
 /opencode.jsonc
+
+# Personal Obsidian vault configuration and caches
+**/.obsidian/
+**/.trash/
