@@ -184,8 +184,8 @@ class OverviewTest extends TestCase
             $this->assertCount(1, $xpath->query('//*[@id="'.$id.'"]//h2[@id="session-title-'.$session->id.'"]'));
             $this->assertCount($session->is($available) ? 2 : 0, $xpath->query('//*[@id="'.$id.'"]//a'));
         }
-        $response->assertSee(route('questionaire', ['code' => '012345']), false);
-        $response->assertSee(route('questionaire', ['code' => '654321']), false)
-            ->assertDontSee(route('questionaire', ['code' => '111111']), false);
+        $response->assertSee(route('questionnaire', ['code' => '012345']), false);
+        $response->assertSee(route('questionnaire', ['code' => '654321']), false)
+            ->assertDontSee(route('questionnaire', ['code' => '111111']), false);
     }
 }

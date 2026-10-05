@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OverviewController;
-use App\Http\Controllers\QuestionaireController;
+use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -21,8 +21,8 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-Route::post('/questionaire', [QuestionaireController::class, 'submit'])
-    ->name('questionaire.submit');
+Route::post('/questionnaire', [QuestionnaireController::class, 'submit'])
+    ->name('questionnaire.submit');
 
 Route::middleware('auth')->group(function () {
     Route::view('/questionnaires', 'questionnaires.index')->name('questionnaires.index');
@@ -47,5 +47,5 @@ Route::middleware('auth')->group(function () {
         ->name('users.destroy');
 });
 
-Route::get('/questionaire', [QuestionaireController::class, 'index'])
-    ->name('questionaire');
+Route::get('/questionnaire', [QuestionnaireController::class, 'index'])
+    ->name('questionnaire');

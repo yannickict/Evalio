@@ -10,6 +10,7 @@
                 <p class="text-success small fw-semibold text-uppercase mb-2">Course feedback</p>
                 <h1 class="display-6 fw-bold mb-3">How was your experience?</h1>
                 <p class="text-body-secondary mb-3">Share what worked well and what we could improve.</p>
+                <p class="text-body-secondary small">All questions are optional. You can skip any question.</p>
                 <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle px-3 py-2">
                     {{ $questions->count() }} {{ $questions->count() === 1 ? 'question' : 'questions' }}
                 </span>
@@ -26,7 +27,7 @@
             </div>
             @endif
             <form method="POST" id="questionnaire-form"
-                action="{{ route('questionaire.submit', ['code' => request()->query('code')]) }}">
+                action="{{ route('questionnaire.submit', ['code' => request()->query('code')]) }}">
                 @csrf
                 @forelse ($questions as $question)
                 <fieldset class="card border-0 rounded-4 shadow-sm p-3 px-md-4 mb-3" aria-labelledby="question-title-{{ $question->id }}">
@@ -42,7 +43,7 @@
                         <label class="d-flex align-items-center gap-2 border rounded-3 px-3 py-2 bg-body-tertiary" for="question-{{ $question->id }}-option-{{ $option->id }}">
                             <input class="form-check-input flex-shrink-0 mt-0" type="radio"
                                 id="question-{{ $question->id }}-option-{{ $option->id }}"
-                                name="answers[{{ $question->id }}]" value="{{ $option->id }}" required
+                                name="answers[{{ $question->id }}]" value="{{ $option->id }}"
                                 @checked((string) old('answers.'.$question->id) === (string) $option->id)>
                             <span>{{ $option->option_text }}</span>
                         </label>
@@ -51,7 +52,7 @@
                     @elseif ($question->type === 'free_text')
                     <textarea class="form-control bg-body-tertiary rounded-3 px-3 py-2" rows="3"
                         id="answer-{{ $question->id }}" name="answers[{{ $question->id }}]"
-                        aria-labelledby="question-title-{{ $question->id }}" required
+                        aria-labelledby="question-title-{{ $question->id }}"
                         placeholder="Share your thoughts…">{{ old('answers.'.$question->id) }}</textarea>
                     @endif
                     @if ($question->allows_comment)
@@ -73,9 +74,6 @@
                 @endforelse
 
                 @if ($questions->isNotEmpty())
-                <p class="alert alert-warning rounded-3 mt-4 mb-0" id="incomplete-answers" role="alert" hidden>
-                    Please answer every question before submitting. Comments are optional.
-                </p>
                 <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mt-4">
                     <p class="text-body-secondary small mb-0">Thank you for taking the time to share your feedback.</p>
                     <button class="btn btn-success rounded-pill px-4 py-3 flex-shrink-0" type="submit">Submit feedback</button>

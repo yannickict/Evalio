@@ -21,7 +21,7 @@
                 <h1 class="h2 fw-bold mb-3" id="entry-title">Share your feedback.</h1>
                 <p class="text-body-secondary mb-0">Enter the six-digit code from your instructor.</p>
             </header>
-            <form method="GET" action="{{ route('questionaire') }}">
+            <form method="GET" action="{{ route('questionnaire') }}">
             <label class="form-label fw-semibold small" for="session-code">Feedback code</label>
             <input class="form-control form-control-lg bg-body-tertiary text-center fs-2 py-3 rounded-3" id="session-code" name="code" type="text" inputmode="numeric"
                 pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="off" required

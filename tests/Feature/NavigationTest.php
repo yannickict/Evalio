@@ -54,7 +54,7 @@ class NavigationTest extends TestCase
         $xpath = new \DOMXPath($document);
 
         $this->assertCount(1, $xpath->query('//main/section/*[@role="status" and @aria-live="polite"]'));
-        $this->assertCount(1, $xpath->query('//*[@role="status"]/following-sibling::*//form[@action="'.route('questionaire').'"]'));
+        $this->assertCount(1, $xpath->query('//*[@role="status"]/following-sibling::*//form[@action="'.route('questionnaire').'"]'));
     }
 
     public function test_admin_navigation_marks_only_the_current_page_active(): void
@@ -106,6 +106,6 @@ class NavigationTest extends TestCase
             $this->assertCount(1, $xpath->query($form.'/button[@type="submit" and normalize-space(.)="Log out"]'));
         }
         $this->assertCount(1, $xpath->query($desktopProfile.'/button[@id="profile-menu-toggle" and @type="button" and @data-bs-toggle="dropdown" and @aria-expanded="false" and @aria-label]'));
-        $this->assertCount(1, $xpath->query('//form[@method="GET" and @action="'.route('questionaire').'"]//input[@name="code" and @required]'));
+        $this->assertCount(1, $xpath->query('//form[@method="GET" and @action="'.route('questionnaire').'"]//input[@name="code" and @required]'));
     }
 }

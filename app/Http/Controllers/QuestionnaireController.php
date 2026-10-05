@@ -9,7 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class QuestionaireController extends Controller
+class QuestionnaireController extends Controller
 {
     public function index(Request $request): View
     {
@@ -24,7 +24,7 @@ class QuestionaireController extends Controller
 
         abort_if($template === null, 404, 'No questionnaire assigned.');
 
-        return view('questionaire', [
+        return view('questionnaire', [
             'questions' => $template->questions()
                 ->get(),
         ]);

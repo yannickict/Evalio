@@ -146,7 +146,7 @@
                         <button class="btn btn-outline-secondary rounded-3" type="button" data-bs-dismiss="modal">Close</button>
                         @if ($course_session->course->questionnaireTemplate)
                         @foreach ($course_session->feedbackForms->whereNotNull('code') as $form)
-                        <a class="btn btn-success rounded-3" href="{{ route('questionaire', ['code' => $form->code]) }}">View questionnaire {{ $form->code }}</a>
+                        <a class="btn btn-success rounded-3" href="{{ route('questionnaire', ['code' => $form->code]) }}">View questionnaire {{ $form->code }}</a>
                         @endforeach
                         @endif
                     </div>

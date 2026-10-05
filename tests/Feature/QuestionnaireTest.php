@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
-class QuestionaireTest extends TestCase
+class QuestionnaireTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -39,7 +39,7 @@ class QuestionaireTest extends TestCase
         $unrelated = Question::factory()->create(['question_text' => 'Unrelated question']);
         $template->questions()->attach([$last->id => ['position' => 2], $first->id => ['position' => 1]]);
 
-        $this->get(route('questionaire', ['code' => '012345']))->assertOk()->assertViewIs('questionaire')
+        $this->get(route('questionnaire', ['code' => '012345']))->assertOk()->assertViewIs('questionnaire')
             ->assertSeeInOrder([$first->question_text, $last->question_text])->assertDontSee($unrelated->question_text);
     }
 
@@ -54,7 +54,7 @@ class QuestionaireTest extends TestCase
         $response = $this->withSession(['_old_input' => [
             'answers' => [$choice->id => (string) $options[1]->id, $text->id => 'My answer'],
             'answers_comment' => [$text->id => 'My comment'],
-        ]])->get(route('questionaire', ['code' => '012345']))->assertOk();
+        ]])->get(route('questionnaire', ['code' => '012345']))->assertOk();
         $document = new \DOMDocument;
         @$document->loadHTML($response->getContent());
         $xpath = new \DOMXPath($document);
@@ -76,11 +76,30 @@ class QuestionaireTest extends TestCase
         $this->assertSame('My answer', $xpath->query('//textarea[@name="answers['.$text->id.']"]')->item(0)->textContent);
         $this->assertSame('My comment', $xpath->query('//textarea[@name="answers_comment['.$text->id.']"]')->item(0)->textContent);
         $this->assertCount(0, $xpath->query('//textarea[@name="answers_comment['.$noComment->id.']"]'));
-        $this->assertCount(2, $xpath->query('//input[@type="radio" and @required]'));
-        $this->assertCount(1, $xpath->query('//textarea[@name="answers['.$text->id.']" and @required]'));
+        $this->assertCount(0, $xpath->query('//input[@type="radio" and @required]'));
+        $this->assertCount(0, $xpath->query('//textarea[@name="answers['.$text->id.']" and @required]'));
         $this->assertCount(0, $xpath->query('//textarea[starts-with(@name, "answers_comment[") and @required]'));
-        $this->assertCount(1, $xpath->query('//form[@id="questionnaire-form"]//*[@id="incomplete-answers" and @role="alert" and @hidden]'));
-        $this->assertCount(1, $xpath->query('//form[@method="POST" and @action="'.route('questionaire.submit', ['code' => '012345']).'"]/input[@name="_token"]'));
+        $this->assertCount(0, $xpath->query('//*[@id="incomplete-answers"]'));
+        $this->assertCount(1, $xpath->query('//form[@method="POST" and @action="'.route('questionnaire.submit', ['code' => '012345']).'"]/input[@name="_token"]'));
+    }
+
+    public function test_submission_accepts_skipped_questions_and_blank_free_text(): void
+    {
+        $template = $this->questionnaire();
+        $choice = Question::factory()->create();
+        $text = Question::factory()->create(['type' => 'free_text']);
+        $template->questions()->attach([$choice->id => ['position' => 1], $text->id => ['position' => 2]]);
+
+        // Browsers omit unselected radio groups and send empty textareas.
+        $this->post(route('questionnaire.submit', ['code' => '012345']), [
+            'answers' => [$text->id => ''],
+        ])->assertRedirect(route('home'))->assertSessionHasNoErrors()
+            ->assertSessionHas('status', 'Thank you! Your feedback has been submitted.');
+
+        $this->assertDatabaseMissing('answers', ['question_id' => $choice->id]);
+
+        $this->post(route('questionnaire.submit', ['code' => '012345']))
+            ->assertRedirect(route('home'))->assertSessionHasNoErrors();
     }
 
     public function test_submission_saves_answers_without_comments_and_shows_confirmation_once(): void
@@ -92,7 +111,7 @@ class QuestionaireTest extends TestCase
         $option = QuestionOption::factory()->for($choice)->create();
         $template->questions()->attach([$choice->id => ['position' => 1], $text->id => ['position' => 2]]);
 
-        $this->post(route('questionaire.submit', ['code' => '012345']), [
+        $this->post(route('questionnaire.submit', ['code' => '012345']), [
             'answers' => [$choice->id => $option->id, $text->id => 'A useful course'],
         ])->assertRedirect(route('home'))->assertSessionHasNoErrors()
             ->assertSessionHas('status', 'Thank you! Your feedback has been submitted.');
@@ -119,8 +138,8 @@ class QuestionaireTest extends TestCase
         $template->questions()->attach($question, ['position' => 1]);
 
         foreach ([$first, $second] as $form) {
-            $this->get(route('questionaire', ['code' => $form->code]))->assertOk()->assertSee($question->question_text);
-            $this->post(route('questionaire.submit', ['code' => $form->code]), [
+            $this->get(route('questionnaire', ['code' => $form->code]))->assertOk()->assertSee($question->question_text);
+            $this->post(route('questionnaire.submit', ['code' => $form->code]), [
                 'answers' => [$question->id => 'Response for '.$form->code],
             ])->assertRedirect(route('home'))->assertSessionHasNoErrors();
             $this->assertDatabaseHas('answers', [
@@ -137,7 +156,7 @@ class QuestionaireTest extends TestCase
         $question = Question::factory()->create(['type' => 'free_text']);
         $template->questions()->attach($question, ['position' => 1]);
 
-        $this->post(route('questionaire.submit', ['code' => '999999']), [
+        $this->post(route('questionnaire.submit', ['code' => '999999']), [
             'answers' => [$question->id => 'An answer'],
         ])->assertNotFound();
         $this->assertDatabaseCount('answers', 0);
@@ -156,7 +175,7 @@ class QuestionaireTest extends TestCase
         $this->withSession(['_old_input' => [
             'answers' => [$text->id => $answer],
             'answers_comment' => [$choice->id => $answer],
-        ]])->get(route('questionaire', ['code' => '012345']))->assertOk()
+        ]])->get(route('questionnaire', ['code' => '012345']))->assertOk()
             ->assertSee($unsafe)->assertDontSee($unsafe, false)
             ->assertSee('<b>Option</b>')->assertDontSee('<b>Option</b>', false)
             ->assertSee($answer)->assertDontSee($answer, false);
@@ -170,7 +189,7 @@ class QuestionaireTest extends TestCase
         $text = Question::factory()->create(['type' => 'free_text', 'allows_comment' => true]);
         $template->questions()->attach([$choice->id => ['position' => 1], $text->id => ['position' => 2]]);
         $options = QuestionOption::factory()->count(2)->for($choice)->create();
-        $url = route('questionaire.submit', ['code' => '012345']);
+        $url = route('questionnaire.submit', ['code' => '012345']);
 
         $this->post($url, [
             'answers' => [$choice->id => $options[0]->id, $text->id => 'Original answer'],
@@ -223,21 +242,21 @@ class QuestionaireTest extends TestCase
     #[DataProvider('invalidCodes')]
     public function test_invalid_codes_return_validation_errors(array $query): void
     {
-        $this->from(route('home'))->get(route('questionaire', $query))
+        $this->from(route('home'))->get(route('questionnaire', $query))
             ->assertRedirect(route('home'))->assertSessionHasErrors('code');
     }
 
     public function test_unknown_code_and_missing_template_return_not_found(): void
     {
-        $this->get(route('questionaire', ['code' => '999999']))->assertNotFound();
+        $this->get(route('questionnaire', ['code' => '999999']))->assertNotFound();
         FeedbackForm::factory()->create(['code' => '012345']);
-        $this->get(route('questionaire', ['code' => '012345']))->assertNotFound();
+        $this->get(route('questionnaire', ['code' => '012345']))->assertNotFound();
     }
 
     public function test_empty_questionnaire_has_no_submit_button(): void
     {
         $this->questionnaire();
-        $this->get(route('questionaire', ['code' => '012345']))->assertOk()
+        $this->get(route('questionnaire', ['code' => '012345']))->assertOk()
             ->assertSee('No questions available')->assertDontSee('Submit feedback')
             ->assertDontSee('id="incomplete-answers"', false);
     }
