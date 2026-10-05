@@ -63,7 +63,7 @@ class NavigationTest extends TestCase
             'role_id' => Role::where('name', 'admin')->firstOrFail()->id,
         ]);
 
-        foreach (['home', 'users', 'overview'] as $route) {
+        foreach (['home', 'users', 'overview', 'courses', 'questionnaires.index'] as $route) {
             $response = $this->actingAs($admin)->get(route($route))->assertOk()
                 ->assertSee(route('users'), false)->assertSee('Users');
             $this->assertActiveLink($response->getContent(), route($route));

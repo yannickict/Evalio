@@ -1,4 +1,4 @@
-<header class="bg-white border-bottom">
+<header class="sticky-top bg-white border-bottom">
     <nav class="navbar navbar-expand-md py-3" aria-label="Main navigation">
     <div class="container">
         <a class="navbar-brand text-success fw-bold fs-4 mb-0 me-4" href="{{ route('home') }}" aria-label="Evalio home">
@@ -17,6 +17,9 @@
                 <a href="{{ route('overview') }}"
                    @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('overview')])
                    @if (request()->routeIs('overview')) aria-current="page" @endif>Overview</a>
+                <a href="{{ route('courses') }}"
+                   @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('courses', 'courses.*')])
+                   @if (request()->routeIs('courses')) aria-current="page" @endif>Courses</a>
                 <a href="{{ route('questionnaires.index') }}"
                    @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('questionnaires.*')])
                    @if (request()->routeIs('questionnaires.index')) aria-current="page" @endif>Questionnaires</a>

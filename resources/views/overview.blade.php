@@ -38,7 +38,7 @@
             <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">
                 {{ $course_sessions->count() }} {{ $course_sessions->count() === 1 ? 'session' : 'sessions' }}
             </span>
-            <a class="btn btn-success rounded-3 ms-md-auto" href="{{ route('sessionscreate') }}">New session</a>
+            <a class="btn btn-success rounded-3 ms-auto" href="{{ route('sessionscreate') }}">New session</a>
         </div>
         <p class="text-body-secondary mb-0">All your course sessions, in one place.</p>
     </header>
@@ -49,9 +49,9 @@
     </div>
     @endif
 
-    <div class="row g-3 mb-4">
+    <div class="row g-4 mb-4">
         @foreach (['course' => 'Courses', 'instructor' => 'Instructors'] as $field => $label)
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6 col-xl-4">
             <label for="{{ $field }}-filter" class="form-label">{{ $label }}</label>
             <select id="{{ $field }}-filter" name="{{ $field }}" class="form-select">
                 <option value="">All {{ strtolower($label) }}</option>
@@ -141,14 +141,16 @@
                                 <dd class="text-break mb-0">{{ $course_session->course->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</dd>
                             </div>
                         </dl>
-                    </div>
-                    <div class="modal-footer px-4">
-                        <button class="btn btn-outline-secondary rounded-3" type="button" data-bs-dismiss="modal">Close</button>
                         @if ($course_session->course->questionnaireTemplate)
-                        @foreach ($course_session->feedbackForms->whereNotNull('code') as $form)
-                        <a class="btn btn-success rounded-3" href="{{ route('questionnaire', ['code' => $form->code]) }}">View questionnaire {{ $form->code }}</a>
-                        @endforeach
+                        <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 border-top pt-3 mt-4">
+                            @foreach ($course_session->feedbackForms->whereNotNull('code') as $form)
+                            <a class="btn btn-success rounded-3 text-break" href="{{ route('questionnaire', ['code' => $form->code]) }}">View questionnaire {{ $form->code }}</a>
+                            @endforeach
+                        </div>
                         @endif
+                    </div>
+                    <div class="modal-footer px-4 py-3">
+                        <button class="btn btn-outline-secondary rounded-3" type="button" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>

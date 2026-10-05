@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\SessionController;
@@ -25,6 +26,9 @@ Route::post('/questionnaire', [QuestionnaireController::class, 'submit'])
     ->name('questionnaire.submit');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses');
+    Route::view('/courses/create', 'courses.create')->name('courses.create');
+
     Route::view('/questionnaires', 'questionnaires.index')->name('questionnaires.index');
     Route::view('/questionnaires/create', 'questionnaires.create')->name('questionnaires.create');
 
