@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title') · Feedback</title>
+    <title>@yield('title') · Evalio</title>
     @vite('resources/css/app.css')
     <x-page-scrollbar />
 </head>
@@ -11,7 +11,7 @@
     <main class="container min-vh-100 d-flex align-items-center py-5">
         <div class="row justify-content-center w-100 mx-0">
             <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-                <a class="d-block mb-4 fw-bold text-success text-decoration-none" href="/">Feedback <span class="small fw-normal text-body-secondary">/ Course evaluations</span></a>
+                <a class="d-block mb-4 fw-bold text-success text-decoration-none" href="/">Evalio <span class="small fw-normal text-body-secondary">/ Course evaluations</span></a>
                 <section class="card border-0 rounded-4 shadow-sm p-4 p-sm-5" aria-labelledby="auth-title">
                     <h1 class="h3" id="auth-title">@yield('title')</h1>
                     <p class="text-body-secondary small mb-4">@yield('intro')</p>

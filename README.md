@@ -1,4 +1,4 @@
-# FeedbackForm
+# Evalio
 
 A Laravel web application for course-session feedback, with anonymous code-based questionnaires and authenticated administration.
 

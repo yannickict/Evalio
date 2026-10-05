@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Feedback · Course evaluations')
+@section('title', 'Evalio · Course evaluations')
 
 @section('content')
 <main class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">

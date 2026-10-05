@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'New session - Feedback')
+@section('title', 'New session - Evalio')
 
 @section('content')
 <main class="container py-5">

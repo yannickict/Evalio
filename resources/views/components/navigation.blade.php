@@ -1,8 +1,8 @@
 <header class="bg-white border-bottom">
     <nav class="navbar navbar-expand-md py-3" aria-label="Main navigation">
     <div class="container">
-        <a class="navbar-brand text-success fw-bold fs-4 mb-0 me-4" href="{{ route('home') }}" aria-label="Feedback home">
-            Feedback<span class="d-none d-lg-inline small fw-normal text-body-secondary fs-6 ms-3">Course evaluations</span>
+        <a class="navbar-brand text-success fw-bold fs-4 mb-0 me-4" href="{{ route('home') }}" aria-label="Evalio home">
+            Evalio<span class="d-none d-lg-inline small fw-normal text-body-secondary fs-6 ms-3">Course evaluations</span>
         </a>
             @auth
             <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse"

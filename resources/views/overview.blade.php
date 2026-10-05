@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Overview - Feedback')
+@section('title', 'Overview - Evalio')
 
 @section('content')
 <style>

@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "app/feedback-form",
+    "name": "app/evalio",
     "type": "project",
-    "description": "Feedback form application.",
+    "description": "Evalio course feedback application.",
     "keywords": [
         "laravel",
         "framework"

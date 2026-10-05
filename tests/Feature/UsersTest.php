@@ -89,7 +89,7 @@ class UsersTest extends TestCase
         $response = $this->actingAs($this->admin())->get(route('users'))
             ->assertOk()
             ->assertViewIs('users')
-            ->assertSee('<title>Users - Feedback</title>', false)
+            ->assertSee('<title>Users - Evalio</title>', false)
             ->assertSeeInOrder(['Users', 'Approve people', 'All users'])
             ->assertSeeInOrder([$older->email, $newer->email])
             ->assertSee($approved->email)
