@@ -9,18 +9,18 @@ Reviewed against source code on 5 October 2026. [[02 Project Requirements|Projec
 | Web application and SQL storage | Laravel, Blade, Eloquent and migrations | Production database/deployment configuration and complete SQL dump procedure |
 | Roles and least privilege | Instructor/editor/admin records; admin checks on user management | Enforce editor/admin access for session writes and questionnaire administration; restrict instructors to their own sessions/results |
 | Registration and approval | New instructor accounts are unapproved; admin approves and assigns roles; login requires approval | Forgot-password routes, forms and reset workflow |
-| Course management | Course model, unique name and seeded records | Course create/update UI and endpoints; duplicate detection beyond the unique constraint |
-| Course sessions | Create UI, course/instructor/date validation and unique generated number | Update/delete operations and feedback-code creation/distribution workflow |
+| Course management | Course model, unique name, seeded records and database-backed overview with session details; create page remains a placeholder | Course create/update UI and endpoints; duplicate detection beyond the unique constraint |
+| Course sessions | Create UI, course/instructor/date validation, unique generated number and at most one feedback form per session | Update/delete operations and feedback-code creation/distribution workflow |
 | Evaluation phase | Nullable `open`/`closed` column; status displayed | Automatic start-to-end-plus-14-days calculation, manual controls and enforcement on GET/POST feedback |
 | Anonymous evaluation (T-01) | Public code-based questionnaire; no participant foreign key on forms | Full anonymity assessment beyond domain storage; code lifecycle and access controls |
 | Cancel/back (T-02/T-03) | All questions appear on one page; no answer writes before POST | Explicit cancel interaction and any required navigation behavior |
-| Optional questions (T-04) | Server iterates only supplied answers | Remove browser `required` restrictions and define/validate abstentions consistently |
+| Optional questions (T-04) | Browser allows skipped answers; server accepts skipped/blank responses; feature tests cover this | Define consistent abstention counting and validate payloads; comment-only handling remains open |
 | Comments (T-05) | Comment fields and answer comment storage | Server checks for allowed comments, types and lengths; behavior for comment-only responses |
 | Review/edit (T-06/T-07) | Answers can be edited on the questionnaire page | Separate pre-submission answer overview and correction flow |
 | Final storage (T-08) | Answers are created on POST; forms exist beforehand | Define submitted-form lifecycle, atomic save and duplicate/replay handling |
 | Standard questionnaire | Seeder defines ten questions, options and template positions | Verify end-to-end behavior after changes |
 | Question configuration | Database content initialized from PHP seeder | Required separate configuration-file approach remains absent |
-| Optional template management (O-01–O-03) | Template/question/course relationships and placeholder pages | Persistent graphical editor, template administration and course assignment UI |
+| Optional template management (O-01–O-03) | Dynamic editor, draft preview, validated transactional template saving and database-backed library | Administrator authorization, configurable comments, editing/deleting saved templates and course assignment UI |
 | Evaluation and filtering | Session details; combined course/instructor card filters | Aggregate answer evaluation, individual-session filter/results and instructor ownership checks |
 | One-page A4 output | No evaluation print feature found | Printable compact A4 results |
 | Backups and CSV import | No application endpoints or workflows found | Administrator backup/restore procedure and specified CSV import |
@@ -39,6 +39,6 @@ Schema details are in [[05 Entity Relationship Model|Entity Relationship Model]]
 
 ## Existing verification coverage
 
-The PHP feature suite includes authentication, users, navigation, overview, session creation, domain models, seeding, questionnaire pages and answer persistence. JavaScript tests cover combined overview filters and questionnaire validation messages using mocked DOM objects and Bootstrap imports.
+The PHP feature suite includes authentication, users, navigation, overview, session creation, domain models, seeding, questionnaire pages and answer persistence. JavaScript tests cover combined overview filters and questionnaire-editor type refresh/scroll behavior using mocked browser objects and Bootstrap imports. PHP tests now also cover course pages, optional participant answers and questionnaire creation/validation.
 
-These tests are present in the repository; they were not executed during this documentation update. Current tests also encode incomplete behavior such as required questionnaire inputs and repeated submissions. Passing those tests alone would not establish that all project requirements are met.
+These tests are present in the repository; they were not executed during this documentation update. Current tests also encode repeated submissions appending answers to the same form; one form per session does not group answers into separate participant submissions. Passing those tests alone would not establish that all project requirements are met.

@@ -34,7 +34,12 @@ Paths and handler names below match the repository.
 | GET | `/overview` | `OverviewController::index` | Authenticated; user must have a role |
 | GET | `/session/create` | `SessionController::index` | Authenticated |
 | POST | `/session` | `SessionController::store` | Authenticated |
-| GET | `/questionnaires`, `/questionnaires/create` | Static Blade pages | Authenticated |
+| GET | `/courses` | `CourseController::index` | Authenticated; user must have a role |
+| GET | `/courses/create` | Static course creation placeholder | Authenticated |
+| GET | `/questionnaires` | `QuestionnaireController::library` | Authenticated |
+| GET | `/questionnaires/create` | `QuestionnaireController::create` | Authenticated |
+| POST | `/questionnaires/preview` | `QuestionnaireController::preview` | Authenticated; draft changes only |
+| POST | `/questionnaires` | `QuestionnaireController::store` | Authenticated; persistent template creation |
 | GET | `/users` | `UserController::index` | Administrator |
 | PATCH | `/users/{user}` | `UserController::update` | Administrator |
 | DELETE | `/users/{user}` | `UserController::destroy` | Administrator; cannot delete self |
@@ -55,7 +60,7 @@ Administrators can approve a pending account while assigning its role, change ap
 4. Submission sends `answers[question_id]` and `answers_comment[question_id]` to the same path using POST.
 5. The controller creates answer records on the existing form and redirects home with a one-time confirmation.
 
-The browser currently requires every answer. JavaScript displays a warning when native validation fails. There is no separate review step or draft storage. Opening the page does not create answer records; feedback forms and their codes already exist. Comments alone are not processed because submission iterates the answer array.
+Participant answers are now optional in the browser. Tests cover skipped questions and blank free-text submissions. The incomplete-answer JavaScript warning has been removed. There is no separate review step or draft storage. Opening the page does not create answer records; feedback forms and their codes already exist. Comments alone are not processed because submission iterates the answer array.
 
 Repeated submissions append answers to the same form. The code is not consumed, and there is no submitted flag. Submission currently lacks structured payload validation, template/option membership validation, evaluation-window enforcement and a transaction around the full answer set. See [[07 Implementation Status|Implementation Status]] for the resulting requirement gaps.
 
@@ -63,6 +68,16 @@ Repeated submissions append answers to the same form. The code is not consumed, 
 
 Session creation selects an existing course and approved instructor, validates dates and creates the session. The model generates `COURSE.0001`-style identifiers by scanning existing numbers. The unique database constraint prevents duplicate stored identifiers, but concurrent number generation has no locking/retry mechanism. Creation does not generate feedback forms or codes.
 
-The overview loads all sessions, their instructors, course templates and feedback forms. Cards show dates and status; modals expose details and existing feedback codes. Course and instructor selectors combine filters in JavaScript using exact IDs. Filtering hides cards already sent to the browser and does not provide server-side access control. No aggregate answer results are displayed.
+The overview loads all sessions, their instructors, course templates and each session's optional feedback form. The model exposes feedbackForm() as a has-one relation and the schema makes course_session_id unique in feedback_forms. Cards show dates and status; modals expose details and existing feedback codes. Course and instructor selectors combine filters in JavaScript using exact IDs. Filtering hides cards already sent to the browser and does not provide server-side access control. No aggregate answer results are displayed.
 
-The questionnaire list and creation pages are interface placeholders. There are no questionnaire write routes; sample editor controls and save functionality are disabled.
+## Courses
+
+The course overview loads every course with its questionnaire template, session count and sessions/instructors. It requires an authenticated user with a role but does not scope records by instructor. The course creation page remains a placeholder: template selection and save are disabled, and no course write endpoint exists.
+
+## Questionnaire editor and library
+
+The library lists persisted templates with question counts, newest first. The editor starts with one single-choice question and two options. Preview POST requests add/remove questions and options or refresh answer types without database writes. It retains at least one question and two single-choice options, with limits of 50 questions and 20 options per question. JavaScript automatically submits type changes and restores scroll/focus using sessionStorage; a refresh button remains available without JavaScript.
+
+Saving validates the template name, question text/type and single-choice options, then creates the template, ordered question pivot records and options within a database transaction. Limits are 255 characters for the name, 5,000 for question text and 1,000 per option; single-choice questions require at least two options. New questions always have allows_comment=false. Save redirects to the database-backed library with confirmation.
+
+All editor/library routes currently require authentication only. Administrator authorization, editing/deleting saved templates, configurable comments and course assignment UI remain unfinished. This editor preview concerns questionnaire design; it is not the participant answer-review step required before feedback submission.

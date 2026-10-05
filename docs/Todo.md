@@ -6,8 +6,8 @@ kanban-plugin: board
 
 ## Backlog
 
-- [ ] [Can · O-01] Implement persistent graphical questionnaire editor: add/edit/remove questions, options, types and comments; enforce administrator access.
-- [ ] [Can · O-02] Save and manage reusable questionnaire templates; replace placeholder list/create pages with working database-backed pages.
+- [ ] [Can · O-01] Complete questionnaire management: configurable comments, editing/deleting saved questions/templates and administrator authorization.
+- [ ] [Can · O-02] Add editing/deletion and management of existing saved templates; creation and library listing are implemented.
 - [ ] [Can · O-03] Add course UI for assigning questionnaire templates.
 - [ ] Preserve historical feedback through questionnaire snapshots/versioning or an explicit immutable-content policy.
 - [ ] Document production configuration and deployment, including database choice and runtime requirements.
@@ -26,7 +26,7 @@ kanban-plugin: board
 - [ ] [Must] Add editor/admin controls to manually open/close evaluation phases and define return to automatic mode.
 - [ ] [Must] Enforce evaluation phase on questionnaire access and submission; display effective status in overview.
 - [ ] [Must · T-02/T-03] Add explicit cancellation without saving and verify returning to earlier questions preserves draft answers.
-- [ ] [Must · T-04] Allow unanswered questions; align browser and server validation with abstentions and update tests that currently expect required answers.
+- [ ] Define and validate abstention counting and comment-only answer behavior for evaluations.
 - [ ] [Must · T-05] Validate optional comment types/lengths and allows_comment; define comment-only answer handling.
 - [ ] [Must · T-06/T-07] Add pre-submission overview of answers and editing from that overview.
 - [ ] [Must · T-08] Define completed-feedback lifecycle separately from pre-created coded forms; add submission state/time and handle empty submissions.
@@ -42,10 +42,13 @@ kanban-plugin: board
 - [ ] [Must] Review anonymity across application storage, logs and feedback-code distribution; avoid participant identity linkage.
 - [ ] Add meaningful feature tests for authorization, evaluation windows, optional answers, review, atomic submission, deletion, reset, CSV import and backups as these features are implemented.
 - [ ] Re-run PHP tests, formatting, static analysis and frontend build with a compatible runtime; available XAMPP PHP 8.2.4 cannot load installed dependencies requiring PHP 8.4+.
-- [ ] Confirm intentional removal of tests/js/questionnaire.test.js; restore/update coverage if questionnaire validation messages remain, then run JavaScript tests and include them in CI.
+- [ ] Run overview and questionnaire-editor JavaScript tests and include npm run test:js in CI.
 - [ ] Verify the full participant and administrator flows in the browser, including all ten standard questions and one-page A4 output.
 - [ ] Update implementation-status and architecture notes after the remaining features are completed.
 
+
+- [ ] [Should] Implement question/option management through a separate configuration file; standard content is still defined in the PHP seeder.
+- [ ] Add a forward migration and reconcile existing records for the one-feedback-form-per-session constraint; the original creation migration was changed.
 
 ## Doing
 
@@ -59,6 +62,12 @@ kanban-plugin: board
 ## Done
 
 **Complete**
+- [x] Build database-backed course overview with session counts, instructor/session details and template display; course creation remains unfinished.
+- [x] Implement dynamic questionnaire draft editor with add/remove questions/options, type refresh and scroll/focus restoration.
+- [x] Validate and save new questionnaire templates, ordered questions and options atomically; list persisted templates with question counts.
+- [x] Allow skipped participant answers and blank free-text responses; update feature coverage and remove incomplete-answer warning.
+- [x] Enforce at most one feedback form/code per session in the fresh-schema migration and expose the singular feedbackForm relation.
+- [x] Add course-page, questionnaire-creation and JavaScript questionnaire-editor tests; execution remains unverified in this documentation review.
 - [x] Set up Laravel, Blade, Bootstrap, JavaScript and Vite/Vite Plus application structure and dependency manifests.
 - [x] Define relational domain schema and Eloquent models for roles/users, courses/sessions, templates/questions/options, feedback forms and answers.
 - [x] Store instructor/editor/admin roles and permission flags.

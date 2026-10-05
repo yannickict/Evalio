@@ -44,7 +44,7 @@ There is no separate course `code` column. One course has many course sessions. 
 | `end_date` | Session end date |
 | `evaluation_status` | Nullable enum: `open` or `closed` |
 
-Each session belongs to one course and one instructor and has many feedback forms. If no session number is supplied, the model generates a number such as `COURSE.0001` by scanning existing numbers. Session creation validates that the instructor is approved and has the instructor role, and that the end date is not before the start date.
+Each session belongs to one course and one instructor and has at most one feedback form. If no session number is supplied, the model generates a number such as `COURSE.0001` by scanning existing numbers. Session creation validates that the instructor is approved and has the instructor role, and that the end date is not before the start date.
 
 The migration describes null status as automatic mode and explicit values as manual overrides. The current controller/model does not calculate the automatic date window or enforce it when feedback is accessed/submitted. The overview displays null as “Evaluation status not set”.
 
@@ -78,11 +78,11 @@ The primary key is `(questionnaire_template_id, question_id)`. A unique constrai
 
 ### Feedback Form
 
-`feedback_forms` stores `course_session_id` and a nullable unique six-character `code`. Public questionnaire access looks up a form using a six-digit code. A feedback form can exist before any answers are submitted; there is no submitted-state or submitted-at column.
+`feedback_forms` stores a unique `course_session_id` and a nullable unique six-character `code`. The unique session reference enforces at most one form/code per session. Public questionnaire access looks up a form using a six-digit code. A feedback form can exist before any answers are submitted; there is no submitted-state or submitted-at column.
 
 The form does not store a participant identity or a questionnaire-template reference. The questionnaire is resolved using `feedback_form -> course_session -> course -> questionnaire_template` at request time.
 
-`CourseSession::feedbackForms()` exposes the session-to-form relationship, while `Answer::feedbackForm()` exposes the answer-to-form relationship. The `FeedbackForm` model currently defines only `courseSession()`; it has no inverse `answers()` relation. Demo seeding creates coded forms in advance; the session creation controller does not create them.
+`CourseSession::feedbackForm()` (has-one) exposes the session-to-form relationship, while `Answer::feedbackForm()` exposes the answer-to-form relationship. The `FeedbackForm` model currently defines only `courseSession()`; it has no inverse `answers()` relation. Demo seeding creates coded forms in advance; the session creation controller does not create them.
 
 ### Answer
 
@@ -109,7 +109,7 @@ erDiagram
     QUESTIONNAIRE_TEMPLATES ||--o{ QUESTIONNAIRE_TEMPLATE_QUESTION : contains
     QUESTIONS ||--o{ QUESTIONNAIRE_TEMPLATE_QUESTION : included
     QUESTIONS ||--o{ QUESTION_OPTIONS : offers
-    COURSE_SESSIONS ||--o{ FEEDBACK_FORMS : receives
+    COURSE_SESSIONS ||--o| FEEDBACK_FORMS : receives
     FEEDBACK_FORMS ||--o{ ANSWERS : contains
     QUESTIONS ||--o{ ANSWERS : answered
     QUESTION_OPTIONS o|--o{ ANSWERS : selected

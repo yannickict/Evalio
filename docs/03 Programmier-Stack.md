@@ -28,13 +28,13 @@ Related notes: [[01 Documentation Index|Documentation Index]], [[04 Application 
 
 ## Backend
 
-Routes in `routes/web.php` map requests to controllers or Blade views. Controllers handle registration, login/logout, user administration, session creation, the overview and questionnaire submission. Eloquent models represent domain records and migrations define tables and constraints.
+Routes in `routes/web.php` map requests to controllers or Blade views. Controllers handle registration, login/logout, user administration, session creation, the course/session overview, questionnaire editor/template saving and participant submission. Eloquent models represent domain records and migrations define tables and constraints.
 
 Authentication uses Laravel's authentication/session facilities. Login requires `is_approved = true` and is throttled. Administrator checks are explicit in `UserController`. Authentication and role authorization are separate: session creation currently requires authentication without an editor/admin check, and the overview loads all sessions for authenticated users with a role.
 
 ## Frontend
 
-Blade templates live in `resources/views`. `resources/js/app.js` imports Bootstrap modal, collapse and dropdown components, handles questionnaire validation messages and filters overview cards by course and instructor. Filtering occurs in the browser after sessions have been loaded; it does not limit the records returned by the server.
+Blade templates live in `resources/views`. `resources/js/app.js` imports Bootstrap modal, collapse and dropdown components, refreshes questionnaire-editor answer types with scroll/focus restoration and filters overview cards by course and instructor. Filtering occurs in the browser after sessions have been loaded; it does not limit the records returned by the server.
 
 ## Database and questionnaire content
 

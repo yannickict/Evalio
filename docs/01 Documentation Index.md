@@ -1,6 +1,6 @@
 # Evalio Documentation
 
-Repository reviewed: `C:\Users\yanni\Documents\FeedbackForm`  
+Repository reviewed: `C:\Users\yanni\Documents\Evalio`  
 Documentation updated: 5 October 2026
 
 - [[02 Project Requirements|Project Requirements]] — intended functionality and priorities. Only the selected stack has been updated.

@@ -6,7 +6,7 @@ Source review: 5 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack
 
 Use PHP compatible with Composer's `^8.3` constraint, Composer, Node.js/npm and an SQLite-capable PHP installation for the default local database. The GitHub Actions workflow uses PHP 8.4, Composer v2 and Node 22. Install exact dependencies from the lockfiles.
 
-Run commands from the project root, currently `C:\Users\yanni\Documents\FeedbackForm`.
+Run commands from the project root, currently `C:\Users\yanni\Documents\Evalio`.
 
 ## Fresh local installation
 
@@ -32,7 +32,7 @@ On a dedicated local demo database:
 php artisan db:seed
 ```
 
-`DatabaseSeeder` runs `RoleSeeder` and `QuestionnaireSeeder`, then `DemoSeeder` only in `local` or `testing` environments. The demo seeder creates an approved `admin@example.com` account with password `password`, five approved instructors, three additional unapproved users, five courses, fifteen sessions and three feedback forms per session with random six-digit codes.
+`DatabaseSeeder` runs `RoleSeeder` and `QuestionnaireSeeder`, then `DemoSeeder` only in `local` or `testing` environments. The demo seeder creates an approved `admin@example.com` account with password `password`, five approved instructors, three additional unapproved users, five courses, fifteen sessions and one feedback form per session with random six-digit codes.
 
 The demo credentials are for local demonstration. Re-running the demo seeder resets the demo administrator's password and adds more factory-generated records; it is not an idempotent reset. The standard questionnaire seeder updates shared question content and rebuilds its template pivot. Seeding is therefore a data mutation, not a routine application startup step.
 
@@ -61,3 +61,7 @@ This starts the Laravel server, queue listener and frontend development server t
 The GitHub Actions workflow runs `composer setup` and `composer ci:check` on pushes to `main` and pull requests. Setup builds frontend assets, but the workflow currently does not explicitly run `npm run test:js`.
 
 No test or build was run as part of this source-based documentation update. This note is a local development guide; the repository does not yet provide application backup, CSV import or a production deployment workflow.
+
+## Existing database compatibility
+
+The unique feedback_forms.course_session_id constraint was added to the original domain creation migration; there is no follow-up migration in the current tree. An existing database that already ran that migration will not gain the constraint just by running php artisan migrate. Plan a forward migration/data reconciliation for existing data. Rebuilding a disposable local database is an alternative, but destroys that database's contents.
