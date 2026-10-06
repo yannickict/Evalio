@@ -12,7 +12,7 @@ use Illuminate\Support\ViewErrorBag;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
-class SessionControllerTest extends TestCase
+class CourseSessionCreationTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,7 +24,7 @@ class SessionControllerTest extends TestCase
 
     public function test_guests_cannot_view_or_create_sessions(): void
     {
-        $this->get(route('sessionscreate'))->assertRedirect(route('login'));
+        $this->get(route('sessions.create'))->assertRedirect(route('login'));
         $this->post(route('sessions.store'), [])->assertRedirect(route('login'));
         $this->assertDatabaseCount('course_sessions', 0);
     }
@@ -38,7 +38,7 @@ class SessionControllerTest extends TestCase
         $editor = User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]);
         $instructor = User::factory()->approved()->create(['first_name' => 'Aaron', 'last_name' => '<script>alert(1)</script>']);
 
-        $this->actingAs($viewer)->get(route('sessionscreate'))
+        $this->actingAs($viewer)->get(route('sessions.create'))
             ->assertOk()
             ->assertViewHas('courses', fn ($courses) => $courses->modelKeys() === [$alpha->id, $zulu->id])
             ->assertViewHas('instructors', fn ($users) => $users->modelKeys() === [$instructor->id, $viewer->id])
@@ -51,7 +51,7 @@ class SessionControllerTest extends TestCase
     public function test_empty_form_shows_missing_course_and_instructor_options(): void
     {
         $viewer = User::factory()->create();
-        $this->actingAs($viewer)->get(route('sessionscreate'))->assertOk()
+        $this->actingAs($viewer)->get(route('sessions.create'))->assertOk()
             ->assertSee('No courses available')->assertSee('No instructors available');
     }
 
@@ -60,7 +60,7 @@ class SessionControllerTest extends TestCase
         $viewer = User::factory()->approved()->create();
         $this->actingAs($viewer)->withSession([
             '_old_input' => ['start_date' => '2026-10-05', 'end_date' => '2026-10-07'],
-        ])->get(route('sessionscreate'))->assertOk()
+        ])->get(route('sessions.create'))->assertOk()
             ->assertSee('value="2026-10-05"', false)
             ->assertSee('value="2026-10-07"', false);
         $this->view('pages.sessions.create', [
@@ -86,7 +86,7 @@ class SessionControllerTest extends TestCase
             'end_date' => '2026-10-05',
             'course_session_number' => 'INJECTED',
             'evaluation_status' => 'closed',
-        ])->assertRedirect(route('overview'))->assertSessionHasNoErrors()
+        ])->assertRedirect(route('sessions.index'))->assertSessionHasNoErrors()
             ->assertSessionHas('status', 'Session created.');
 
         $session = CourseSession::sole();
@@ -111,9 +111,9 @@ class SessionControllerTest extends TestCase
         ];
         $data[$field] = $value;
 
-        $this->actingAs($instructor)->from(route('sessionscreate'))
+        $this->actingAs($instructor)->from(route('sessions.create'))
             ->post(route('sessions.store'), $data)
-            ->assertRedirect(route('sessionscreate'))->assertSessionHasErrors($field);
+            ->assertRedirect(route('sessions.create'))->assertSessionHasErrors($field);
         $this->assertDatabaseCount('course_sessions', 0);
     }
 

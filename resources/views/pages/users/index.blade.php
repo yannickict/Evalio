@@ -17,8 +17,8 @@
             <x-ui.validation-errors :errors="$errors" class="rounded-3" heading="Please check your changes." />
 
             <x-users.list id="pending-users" heading-id="approval-title" title="Approve people" class="mb-5">
-                <x-slot:count>{{ $non_approved_users->count() }} pending</x-slot:count>
-                @forelse ($non_approved_users as $user)
+                <x-slot:count>{{ $pendingUsers->count() }} pending</x-slot:count>
+                @forelse ($pendingUsers as $user)
                 <x-users.pending-row :user="$user" :roles="$roles" />
                 @empty
                 <div class="p-5 text-center">
@@ -29,8 +29,8 @@
                 @endforelse
             </x-users.list>
             <x-users.list id="all-users" heading-id="users-title" title="All users">
-                <x-slot:count>{{ $approved_users->count() }} {{ $approved_users->count() === 1 ? 'user' : 'users' }}</x-slot:count>
-                @forelse ($approved_users as $user)
+                <x-slot:count>{{ $approvedUsers->count() }} {{ $approvedUsers->count() === 1 ? 'user' : 'users' }}</x-slot:count>
+                @forelse ($approvedUsers as $user)
                 <x-users.approved-row :user="$user" :roles="$roles" />
                 @empty
                 <div class="p-5 text-center">

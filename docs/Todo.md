@@ -31,8 +31,8 @@ kanban-plugin: board
 - [ ] [Must · T-06/T-07] Add pre-submission overview of answers and editing from that overview.
 - [ ] [Must · T-08] Define completed-feedback lifecycle separately from pre-created coded forms; add submission state/time and handle empty submissions.
 - [ ] [Must · T-08] Save final submission atomically in a database transaction; prevent duplicate/replayed submissions according to the chosen lifecycle.
-- [ ] [Must] Validate submission code, payload arrays, answer types and lengths on the server.
-- [ ] [Must] Validate questions belong to the form's assigned template and selected options belong to their questions.
+- [x] [Must] Validate submission code, payload arrays, answer types and lengths on the server.
+- [x] [Must] Validate questions belong to the form's assigned template and selected options belong to their questions.
 - [ ] [Must] Build evaluation results for individual sessions: option totals/distributions, free-text answers and comments; define how abstentions are counted.
 - [ ] [Should] Add session and instructor result filters, including combinations; filter actual evaluation results with server authorization.
 - [ ] [Must] Implement a compact printable evaluation on one A4 page.

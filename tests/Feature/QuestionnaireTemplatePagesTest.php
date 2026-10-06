@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class QuestionnairePagesTest extends TestCase
+class QuestionnaireTemplatePagesTest extends TestCase
 {
     use RefreshDatabase;
 

@@ -73,7 +73,7 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
     </dl>
     @if ($courseSession->course->questionnaireTemplate && $courseSession->feedbackForm?->code !== null)
     <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 border-top pt-3 mt-4">
-        <a class="btn btn-success rounded-3 text-break" href="{{ route('questionnaire', ['code' => $courseSession->feedbackForm->code]) }}">View questionnaire</a>
+        <a class="btn btn-success rounded-3 text-break" href="{{ route('feedback.show', ['code' => $courseSession->feedbackForm->code]) }}">View questionnaire</a>
     </div>
     @endif
 </x-ui.modal>

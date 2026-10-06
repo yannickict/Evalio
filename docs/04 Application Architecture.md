@@ -1,15 +1,20 @@
 # Application Architecture
 
-Source review: 5 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack]], [[05 Entity Relationship Model|Entity Relationship Model]], [[07 Implementation Status|Implementation Status]].
+Source review: 6 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack]], [[05 Entity Relationship Model|Entity Relationship Model]], [[07 Implementation Status|Implementation Status]].
 
 ## Structure
 
 The application uses Laravel with server-rendered Blade pages. `routes/web.php` defines web endpoints; controllers in `app/Http/Controllers` process requests; Eloquent models in `app/Models` access the relational database. Migrations in `database/migrations` define constraints. Vite builds `resources/css/app.css` and `resources/js/app.js`.
 
+Validation lives in `app/Http/Requests`; questionnaire draft manipulation lives in `app/Support/QuestionnaireDraft.php`. Views are grouped into `pages`, `components`, and `layouts`. Route names use resource prefixes (`courses.index`, `sessions.create`, `users.index`, `feedback.show`), while existing URLs remain unchanged.
+
 ```mermaid
 flowchart LR
     Browser --> Routes[Web routes]
-    Routes --> Controllers
+    Routes --> Requests[Form Requests: validate input]
+    Requests --> Controllers
+    Controllers --> Support[Support: questionnaire draft logic]
+    Support --> Controllers
     Controllers --> Models[Eloquent models]
     Models --> Database[SQL database]
     Controllers --> Blade[Blade views]
@@ -18,33 +23,43 @@ flowchart LR
     Assets --> Browser
 ```
 
+## Requests and supporting logic
+
+`app/Http/Requests` contains Laravel Form Request classes. Laravel validates these requests before running the controller action that receives them. Each class defines the accepted fields and their rules; `after()` callbacks handle checks that need related records. For example, `StoreCourseSessionRequest` checks that the course and instructor exist, the dates are valid, and the instructor is approved and has the instructor role. Invalid web form input redirects back with validation errors and previous input. Controllers access the validated fields through `$request->validated()`.
+
+The request classes cover registration, login, user role updates, session creation, questionnaire drafts and saving, and public feedback. `QuestionnaireRequest` shares the editor's common rules with its preview and save requests. `FeedbackCodeRequest` validates the query-string code and resolves the existing form and template; its submission subclass also validates answers, options and comments. Endpoint authorization remains in route middleware and shared gates.
+
+`app/Support` contains supporting application logic that does not handle HTTP directly. Currently, `QuestionnaireDraft` creates the initial empty questionnaire and applies editor actions: adding or removing questions and options, refreshing answer types, and enforcing draft limits. It accepts validated data and returns an updated draft without writing to the database. Invalid draft actions raise validation errors that Laravel displays on the form.
+
+For an editor preview, the flow is: `PreviewQuestionnaireRequest` validates input, `QuestionnaireTemplateController::preview` passes it to `QuestionnaireDraft::apply`, and the controller renders the editor with the updated draft. For a save action, the request validates input and the controller uses models to persist it, then returns a redirect. This keeps controllers focused on coordinating the request and response.
+
 ## Route map
 
 Paths and handler names below match the repository.
 
-| Method | Path | Handler | Access in current code |
-|---|---|---|---|
-| GET | `/` | `home` view | Public |
-| GET | `/register`, `/login` | Registration/login views | Public |
-| POST | `/register` | `AuthController::register` | Public |
-| POST | `/login` | `AuthController::login` | Public; throttle `5,1` |
-| POST | `/logout` | `AuthController::logout` | Authenticated |
-| GET | `/questionnaire?code=…` | `QuestionnaireController::index` | Public; six-digit code lookup |
-| POST | `/questionnaire?code=…` | `QuestionnaireController::submit` | Public; existing form lookup |
-| GET | `/overview` | `OverviewController::index` | Authenticated; user must have a role |
-| GET | `/session/create` | `SessionController::index` | Authenticated |
-| POST | `/session` | `SessionController::store` | Authenticated |
-| GET | `/courses` | `CourseController::index` | Authenticated; user must have a role |
-| GET | `/courses/create` | Static course creation placeholder | Authenticated |
-| GET | `/questionnaires` | `QuestionnaireController::library` | Authenticated |
-| GET | `/questionnaires/create` | `QuestionnaireController::create` | Authenticated |
-| POST | `/questionnaires/preview` | `QuestionnaireController::preview` | Authenticated; draft changes only |
-| POST | `/questionnaires` | `QuestionnaireController::store` | Authenticated; persistent template creation |
-| GET | `/users` | `UserController::index` | Administrator |
-| PATCH | `/users/{user}` | `UserController::update` | Administrator |
-| DELETE | `/users/{user}` | `UserController::destroy` | Administrator; cannot delete self |
+| Method | Path                      | Handler                                    | Access in current code                      |
+| ------ | ------------------------- | ------------------------------------------ | ------------------------------------------- |
+| GET    | `/`                       | `pages.home.index` view                    | Public                                      |
+| GET    | `/register`, `/login`     | Registration/login views                   | Public                                      |
+| POST   | `/register`               | `AuthController::register`                 | Public                                      |
+| POST   | `/login`                  | `AuthController::login`                    | Public; throttle `5,1`                      |
+| POST   | `/logout`                 | `AuthController::logout`                   | Authenticated                               |
+| GET    | `/questionnaire?code=…`   | `FeedbackResponseController::show`         | Public; six-digit code lookup               |
+| POST   | `/questionnaire?code=…`   | `FeedbackResponseController::store`        | Public; existing form lookup                |
+| GET    | `/overview`               | `CourseSessionController::index`           | Authenticated; user must have a role        |
+| GET    | `/session/create`         | `CourseSessionController::create`          | Authenticated                               |
+| POST   | `/session`                | `CourseSessionController::store`           | Authenticated                               |
+| GET    | `/courses`                | `CourseController::index`                  | Authenticated; user must have a role        |
+| GET    | `/courses/create`         | Static course creation placeholder         | Authenticated                               |
+| GET    | `/questionnaires`         | `QuestionnaireTemplateController::index`   | Authenticated                               |
+| GET    | `/questionnaires/create`  | `QuestionnaireTemplateController::create`  | Authenticated                               |
+| POST   | `/questionnaires/preview` | `QuestionnaireTemplateController::preview` | Authenticated; draft changes only           |
+| POST   | `/questionnaires`         | `QuestionnaireTemplateController::store`   | Authenticated; persistent template creation |
+| GET    | `/users`                  | `UserController::index`                    | Administrator                               |
+| PATCH  | `/users/{user}`           | `UserController::update`                   | Administrator                               |
+| DELETE | `/users/{user}`           | `UserController::destroy`                  | Administrator; cannot delete self           |
 
-Web forms use CSRF tokens. Authorization checks are currently in controllers and navigation views; role permission columns do not constitute comprehensive endpoint authorization.
+Web forms use CSRF tokens. Shared `view-course-lists` and `manage-users` gates are applied through route middleware; the navigation uses the same user-management gate. Self-deletion remains guarded in the controller. Role permission columns do not constitute comprehensive endpoint authorization.
 
 ## Registration and administration
 
@@ -62,7 +77,7 @@ Administrators can approve a pending account while assigning its role, change ap
 
 Participant answers are now optional in the browser. Tests cover skipped questions and blank free-text submissions. The incomplete-answer JavaScript warning has been removed. There is no separate review step or draft storage. Opening the page does not create answer records; feedback forms and their codes already exist. Comments alone are not processed because submission iterates the answer array.
 
-Repeated submissions append answers to the same form. The code is not consumed, and there is no submitted flag. Submission currently lacks structured payload validation, template/option membership validation, evaluation-window enforcement and a transaction around the full answer set. See [[07 Implementation Status|Implementation Status]] for the resulting requirement gaps.
+Repeated submissions append answers to the same form. The code is not consumed, and there is no submitted flag. Form Requests validate the query code, payload arrays, answer types and lengths, question/template membership, option/question membership and whether comments are allowed. Answer writes use one database transaction. Evaluation-window enforcement remains unfinished. See [[07 Implementation Status|Implementation Status]] for the resulting requirement gaps.
 
 ## Sessions and overview
 

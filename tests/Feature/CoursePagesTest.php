@@ -21,7 +21,7 @@ class CoursePagesTest extends TestCase
 
     public function test_course_pages_require_authentication(): void
     {
-        $this->get(route('courses'))->assertRedirect(route('login'));
+        $this->get(route('courses.index'))->assertRedirect(route('login'));
         $this->get(route('courses.create'))->assertRedirect(route('login'));
     }
 
@@ -30,7 +30,7 @@ class CoursePagesTest extends TestCase
         $user = User::factory()->approved()->create();
         $user->setRelation('role', null);
 
-        $this->actingAs($user)->get(route('courses'))->assertForbidden();
+        $this->actingAs($user)->get(route('courses.index'))->assertForbidden();
     }
 
     public function test_courses_show_counts_questionnaires_and_session_details(): void
@@ -40,7 +40,7 @@ class CoursePagesTest extends TestCase
         $emptyCourse = Course::factory()->create();
         $session = CourseSession::factory()->create(['course_id' => $course->id]);
 
-        $this->actingAs(User::factory()->approved()->create())->get(route('courses'))
+        $this->actingAs(User::factory()->approved()->create())->get(route('courses.index'))
             ->assertOk()->assertViewIs('pages.courses.index')
             ->assertViewHas('courses', fn ($courses) => $courses->firstWhere('id', $course->id)->sessions_count === 1
                 && $courses->firstWhere('id', $emptyCourse->id)->sessions_count === 0)
@@ -55,9 +55,9 @@ class CoursePagesTest extends TestCase
     public function test_empty_library_and_creation_preview_are_available(): void
     {
         $this->actingAs(User::factory()->approved()->create());
-        $this->get(route('courses'))->assertOk()->assertSee('No courses yet');
+        $this->get(route('courses.index'))->assertOk()->assertSee('No courses yet');
         $this->get(route('courses.create'))->assertOk()->assertViewIs('pages.courses.create')
-            ->assertSee(route('courses'), false)->assertSee('Course name')
+            ->assertSee(route('courses.index'), false)->assertSee('Course name')
             ->assertSee('Saving courses will be available soon.');
     }
 }

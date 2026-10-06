@@ -25,14 +25,14 @@ Reviewed against source code on 5 October 2026. [[02 Project Requirements|Projec
 | One-page A4 output | No evaluation print feature found | Printable compact A4 results |
 | Backups and CSV import | No application endpoints or workflows found | Administrator backup/restore procedure and specified CSV import |
 | Deletion | Admin user deletion with assignment guard; database FK rules | Admin course/session/feedback-form deletion workflows |
-| Validation/security | Auth/session handling, login throttling, escaped Blade output, CSRF and selected input validation | Comprehensive role authorization and feedback submission validation |
+| Validation/security | Auth/session handling, login throttling, escaped Blade output, CSRF, shared authorization gates and validated atomic feedback submission | Comprehensive role authorization and evaluation-window enforcement |
 
 ## Data interpretation and integrity
 
 - Multiple submissions currently append answers for the same form/question, including identical retries. The existing feature test explicitly expects this behavior; it does not establish compliance with one completed evaluation per form.
 - A form has no template snapshot or submission timestamp. Later template assignments or edits can change the interpretation of historical feedback.
 - Database foreign keys validate existence, but do not enforce that a selected option belongs to the submitted question or that the question belongs to the assigned template.
-- A failed answer write can leave earlier writes from the same request stored because the submission loop has no transaction.
+- Feedback submission validates question/option membership and saves the complete answer set in a transaction; a failed write rolls back all answers from that request.
 - Permission flags exist on roles, but overview access checks only for a role and loads all sessions. Client filters cannot enforce instructor ownership.
 
 Schema details are in [[05 Entity Relationship Model|Entity Relationship Model]]; request behavior is in [[04 Application Architecture|Application Architecture]].
@@ -42,3 +42,5 @@ Schema details are in [[05 Entity Relationship Model|Entity Relationship Model]]
 The PHP feature suite includes authentication, users, navigation, overview, session creation, domain models, seeding, questionnaire pages and answer persistence. JavaScript tests cover combined overview filters and questionnaire-editor type refresh/scroll behavior using mocked browser objects and Bootstrap imports. PHP tests now also cover course pages, optional participant answers and questionnaire creation/validation.
 
 These tests are present in the repository; they were not executed during this documentation update. Current tests also encode repeated submissions appending answers to the same form; one form per session does not group answers into separate participant submissions. Passing those tests alone would not establish that all project requirements are met.
+
+Backend cleanup verification on 6 October 2026: PHP feature tests, PHPStan, Pint, the frontend build and JavaScript tests passed using a temporary PHP 8.4 runtime. Regression tests cover unrelated questions/options, disabled comments, malformed payloads, and transaction rollback.

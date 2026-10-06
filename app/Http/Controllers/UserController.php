@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -13,39 +13,34 @@ class UserController extends Controller
 {
     public function index(): View
     {
-        abort_unless(Auth::user()?->role?->name === 'admin', 403);
-
-        $non_approved_users = User::where('is_approved', false)
+        $pendingUsers = User::where('is_approved', false)
             ->orderBy('created_at')
             ->get();
 
-        $approved_users = User::where('is_approved', true)
+        $approvedUsers = User::where('is_approved', true)
             ->with('role')
             ->orderBy('created_at')
             ->get();
 
         return view('pages.users.index', [
-            'approved_users' => $approved_users,
-            'non_approved_users' => $non_approved_users,
+            'approvedUsers' => $approvedUsers,
+            'pendingUsers' => $pendingUsers,
             'roles' => Role::orderBy('name')->get(),
         ]);
     }
 
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
-        abort_unless(Auth::user()?->role?->name === 'admin', 403);
         $wasApproved = $user->is_approved;
 
-        $data = $request->validate([
-            'role_id' => ['required', 'integer', 'exists:roles,id'],
-        ]);
+        $data = $request->validated();
 
         $user->role_id = $data['role_id'];
         $user->is_approved = true;
         $user->save();
 
         $destination = $user->is(Auth::user()) && $user->role()->first()?->name !== 'admin'
-            ? 'home' : 'users';
+            ? 'home' : 'users.index';
 
         return redirect()->route($destination)
             ->with('status', $wasApproved ? 'User role updated.' : 'User approved and role assigned.');
@@ -53,17 +48,16 @@ class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
-        abort_unless(Auth::user()?->role?->name === 'admin', 403);
         abort_if($user->is(Auth::user()), 403);
 
         if ($user->courseSessions()->exists()) {
-            return redirect()->route('users')->withErrors([
+            return redirect()->route('users.index')->withErrors([
                 'user' => 'This user is assigned to course sessions. Reassign those sessions to another instructor before deleting this user.',
             ]);
         }
 
         $user->delete();
 
-        return redirect()->route('users')->with('status', $user->is_approved ? 'User deleted.' : 'Pending registration deleted.');
+        return redirect()->route('users.index')->with('status', $user->is_approved ? 'User deleted.' : 'Pending registration deleted.');
     }
 }

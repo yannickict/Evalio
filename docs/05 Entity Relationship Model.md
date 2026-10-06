@@ -96,7 +96,7 @@ The form does not store a participant identity or a questionnaire-template refer
 
 Single-choice writes set `question_option_id` and leave `answer_text` null. Free-text writes set `answer_text` and leave `question_option_id` null. The controller also stores supplied comments. There are no `feedback_responses` or `response_options` tables.
 
-The table has a non-unique index on `(feedback_form_id, question_id)`. Repeated submissions can therefore create multiple answers for the same form/question. Foreign keys establish record existence, but do not establish that an option belongs to its answer's question or that the question belongs to the form's template. The current submission controller does not validate those memberships or wrap all answer writes in one transaction.
+The table has a non-unique index on `(feedback_form_id, question_id)`. Repeated submissions can therefore create multiple answers for the same form/question. Foreign keys establish record existence, but do not establish that an option belongs to its answer's question or that the question belongs to the form's template. The feedback Form Request validates both memberships, and the response controller wraps all answer writes in one transaction.
 
 ## Relationships
 

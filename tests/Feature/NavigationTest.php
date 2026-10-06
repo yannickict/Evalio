@@ -34,7 +34,7 @@ class NavigationTest extends TestCase
                 'role_id' => Role::where('name', $role)->firstOrFail()->id,
             ]);
             $response = $this->actingAs($user)->get(route('home'))->assertOk()
-                ->assertSee(route('overview'), false)->assertSee('Overview')->assertSee('Log out')->assertDontSee('Users');
+                ->assertSee(route('sessions.index'), false)->assertSee('Overview')->assertSee('Log out')->assertDontSee('Users');
             $this->assertActiveLink($response->getContent(), route('home'));
         }
     }
@@ -54,7 +54,7 @@ class NavigationTest extends TestCase
         $xpath = new \DOMXPath($document);
 
         $this->assertCount(1, $xpath->query('//main/section/*[@role="status" and @aria-live="polite"]'));
-        $this->assertCount(1, $xpath->query('//*[@role="status"]/following-sibling::*//form[@action="'.route('questionnaire').'"]'));
+        $this->assertCount(1, $xpath->query('//*[@role="status"]/following-sibling::*//form[@action="'.route('feedback.show').'"]'));
     }
 
     public function test_admin_navigation_marks_only_the_current_page_active(): void
@@ -63,9 +63,9 @@ class NavigationTest extends TestCase
             'role_id' => Role::where('name', 'admin')->firstOrFail()->id,
         ]);
 
-        foreach (['home', 'users', 'overview', 'courses', 'questionnaires.index'] as $route) {
+        foreach (['home', 'users.index', 'sessions.index', 'courses.index', 'questionnaires.index'] as $route) {
             $response = $this->actingAs($admin)->get(route($route))->assertOk()
-                ->assertSee(route('users'), false)->assertSee('Users');
+                ->assertSee(route('users.index'), false)->assertSee('Users');
             $this->assertActiveLink($response->getContent(), route($route));
         }
     }
@@ -106,6 +106,6 @@ class NavigationTest extends TestCase
             $this->assertCount(1, $xpath->query($form.'/button[@type="submit" and normalize-space(.)="Log out"]'));
         }
         $this->assertCount(1, $xpath->query($desktopProfile.'/button[@id="profile-menu-toggle" and @type="button" and @data-bs-toggle="dropdown" and @aria-expanded="false" and @aria-label]'));
-        $this->assertCount(1, $xpath->query('//form[@method="GET" and @action="'.route('questionnaire').'"]//input[@name="code" and @required]'));
+        $this->assertCount(1, $xpath->query('//form[@method="GET" and @action="'.route('feedback.show').'"]//input[@name="code" and @required]'));
     }
 }

@@ -9,9 +9,9 @@
         <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
             <h1 class="h2 fw-bold mb-0">Overview</h1>
             <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">
-                {{ $course_sessions->count() }} {{ $course_sessions->count() === 1 ? 'session' : 'sessions' }}
+                {{ $courseSessions->count() }} {{ $courseSessions->count() === 1 ? 'session' : 'sessions' }}
             </span>
-            <a class="btn btn-success rounded-3 ms-auto" href="{{ route('sessionscreate') }}">New session</a>
+            <a class="btn btn-success rounded-3 ms-auto" href="{{ route('sessions.create') }}">New session</a>
         </div>
         <p class="text-body-secondary mb-0">All your course sessions, in one place.</p>
     </header>
@@ -33,7 +33,7 @@
     </div>
 
     <div class="row g-4">
-        @forelse ($course_sessions as $course_session)
+        @forelse ($courseSessions as $course_session)
         <x-sessions.card :course-session="$course_session" />
         @empty
         <div class="col-12">

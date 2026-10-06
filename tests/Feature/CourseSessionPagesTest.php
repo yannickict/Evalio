@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
-class OverviewTest extends TestCase
+class CourseSessionPagesTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,7 +24,7 @@ class OverviewTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get(route('overview'))->assertRedirect(route('login'));
+        $this->get(route('sessions.index'))->assertRedirect(route('login'));
     }
 
     public function test_user_without_a_role_cannot_view_overview(): void
@@ -32,7 +32,7 @@ class OverviewTest extends TestCase
         $user = User::factory()->approved()->create();
         $user->setRelation('role', null);
 
-        $this->actingAs($user)->get(route('overview'))->assertForbidden();
+        $this->actingAs($user)->get(route('sessions.index'))->assertForbidden();
     }
 
     /** @return array<string, array{string}> */
@@ -52,7 +52,7 @@ class OverviewTest extends TestCase
             'role_id' => Role::where('name', $role)->firstOrFail()->id,
         ]);
 
-        $this->actingAs($user)->get(route('overview'))->assertOk()
+        $this->actingAs($user)->get(route('sessions.index'))->assertOk()
             ->assertViewIs('pages.sessions.index')->assertSee('No course sessions yet');
     }
 
@@ -75,7 +75,7 @@ class OverviewTest extends TestCase
             'end_date' => today()->subDays(8),
         ]);
 
-        $this->actingAs($instructor)->get(route('overview'))->assertOk()
+        $this->actingAs($instructor)->get(route('sessions.index'))->assertOk()
             ->assertSee('Laravel basics')->assertSee('Alex Example')
             ->assertSee('Training questionnaire')->assertSee('10 Jan 2026')->assertSee('12 Jan 2026')
             ->assertSee($closed->course_session_number)->assertSee('3 sessions')
@@ -92,7 +92,7 @@ class OverviewTest extends TestCase
     {
         $session = CourseSession::factory()->create(['evaluation_status' => 'closed']);
 
-        $this->actingAs(User::factory()->approved()->create())->get(route('overview'))
+        $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))
             ->assertOk()->assertSee($session->course_session_number)->assertSee('No questionnaire assigned');
     }
 
@@ -101,7 +101,7 @@ class OverviewTest extends TestCase
         $newer = CourseSession::factory()->create(['evaluation_status' => 'closed', 'created_at' => now()]);
         $older = CourseSession::factory()->create(['evaluation_status' => 'closed', 'created_at' => now()->subDay()]);
 
-        $this->actingAs(User::factory()->approved()->create())->get(route('overview'))->assertOk()
+        $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))->assertOk()
             ->assertSee('2 sessions')
             ->assertSeeInOrder([$older->course_session_number, $newer->course_session_number]);
     }
@@ -111,7 +111,7 @@ class OverviewTest extends TestCase
         $course = Course::factory()->create(['name' => '<script>alert("course")</script>']);
         CourseSession::factory()->for($course)->create(['evaluation_status' => 'closed']);
 
-        $this->actingAs(User::factory()->approved()->create())->get(route('overview'))
+        $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))
             ->assertOk()->assertSee($course->name)->assertDontSee($course->name, false);
     }
 
@@ -126,7 +126,7 @@ class OverviewTest extends TestCase
         CourseSession::factory()->for($zulu)->for($zoe, 'instructor')->create(['evaluation_status' => 'open']);
         CourseSession::factory()->for($alpha)->for($alice, 'instructor')->count(2)->create();
 
-        $response = $this->actingAs($viewer)->get(route('overview'))->assertOk()
+        $response = $this->actingAs($viewer)->get(route('sessions.index'))->assertOk()
             ->assertViewHas('courses', fn ($courses) => $courses->pluck('id')->all() === [$alpha->id, $zulu->id])
             ->assertViewHas('instructors', fn ($instructors) => $instructors->pluck('id')->all() === [$alice->id, $zoe->id]);
         $document = new \DOMDocument;
@@ -151,13 +151,13 @@ class OverviewTest extends TestCase
     public function test_empty_overview_has_empty_filters_and_single_session_uses_singular_count(): void
     {
         $user = User::factory()->approved()->create();
-        $this->actingAs($user)->get(route('overview'))->assertOk()
+        $this->actingAs($user)->get(route('sessions.index'))->assertOk()
             ->assertSee('0 sessions')->assertSee('No course sessions yet')
             ->assertViewHas('courses', fn ($courses) => $courses->isEmpty())
             ->assertViewHas('instructors', fn ($instructors) => $instructors->isEmpty());
 
         CourseSession::factory()->create(['evaluation_status' => 'open']);
-        $this->get(route('overview'))->assertOk()->assertSee('1 session')
+        $this->get(route('sessions.index'))->assertOk()->assertSee('1 session')
             ->assertDontSee('1 sessions')->assertDontSee('No course sessions yet');
     }
 
@@ -171,7 +171,7 @@ class OverviewTest extends TestCase
         FeedbackForm::factory()->for($noCode, 'courseSession')->create(['code' => null]);
         $noTemplate = CourseSession::factory()->create(['evaluation_status' => 'closed']);
         FeedbackForm::factory()->for($noTemplate, 'courseSession')->create(['code' => '111111']);
-        $response = $this->actingAs(User::factory()->approved()->create())->get(route('overview'))->assertOk();
+        $response = $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))->assertOk();
         $document = new \DOMDocument;
         @$document->loadHTML($response->getContent());
         $xpath = new \DOMXPath($document);
@@ -183,7 +183,7 @@ class OverviewTest extends TestCase
             $this->assertCount(1, $xpath->query('//*[@id="'.$id.'"]//h2[@id="session-title-'.$session->id.'"]'));
             $this->assertCount($session->is($available) ? 1 : 0, $xpath->query('//*[@id="'.$id.'"]//a'));
         }
-        $response->assertSee(route('questionnaire', ['code' => '012345']), false);
-        $response->assertDontSee(route('questionnaire', ['code' => '111111']), false);
+        $response->assertSee(route('feedback.show', ['code' => '012345']), false);
+        $response->assertDontSee(route('feedback.show', ['code' => '111111']), false);
     }
 }

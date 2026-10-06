@@ -14,20 +14,20 @@
                 <a href="{{ route('home') }}"
                    @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('home')])
                    @if (request()->routeIs('home')) aria-current="page" @endif>Home</a>
-                <a href="{{ route('overview') }}"
-                   @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('overview')])
-                   @if (request()->routeIs('overview')) aria-current="page" @endif>Overview</a>
-                <a href="{{ route('courses') }}"
-                   @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('courses', 'courses.*')])
-                   @if (request()->routeIs('courses')) aria-current="page" @endif>Courses</a>
+                <a href="{{ route('sessions.index') }}"
+                   @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('sessions.index')])
+                   @if (request()->routeIs('sessions.index')) aria-current="page" @endif>Overview</a>
+                <a href="{{ route('courses.index') }}"
+                   @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('courses.*')])
+                   @if (request()->routeIs('courses.index')) aria-current="page" @endif>Courses</a>
                 <a href="{{ route('questionnaires.index') }}"
                    @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('questionnaires.*')])
                    @if (request()->routeIs('questionnaires.index')) aria-current="page" @endif>Questionnaires</a>
-                @if (auth()->user()->role?->name === 'admin')
-                    <a href="{{ route('users') }}"
-                       @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('users*')])
-                       @if (request()->routeIs('users*')) aria-current="page" @endif>Users</a>
-                @endif
+                @can('manage-users')
+                    <a href="{{ route('users.index') }}"
+                       @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('users.*')])
+                       @if (request()->routeIs('users.index')) aria-current="page" @endif>Users</a>
+                @endcan
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="d-md-none border-top mt-3 pt-3">
                     @csrf

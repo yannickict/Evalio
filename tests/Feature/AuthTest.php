@@ -109,13 +109,13 @@ class AuthTest extends TestCase
     {
         $user = $this->approvedAdmin();
 
-        $this->get(route('users'))->assertRedirect(route('login'));
+        $this->get(route('users.index'))->assertRedirect(route('login'));
 
         $this->post('/login', ['email' => $user->email, 'password' => 'password'])
-            ->assertRedirect(route('users'));
+            ->assertRedirect(route('users.index'));
 
         $this->assertAuthenticatedAs($user);
-        $this->get(route('users'))->assertOk();
+        $this->get(route('users.index'))->assertOk();
     }
 
     public function test_wrong_password_is_rejected_and_not_flashed_to_session(): void
@@ -182,7 +182,7 @@ class AuthTest extends TestCase
         $this->app['session']->flush();
         Auth::forgetGuards();
 
-        $this->withCookie($cookieName, $cookie->getValue())->get(route('users'))->assertOk();
+        $this->withCookie($cookieName, $cookie->getValue())->get(route('users.index'))->assertOk();
 
         $this->assertAuthenticatedAs($user);
         $this->assertTrue($this->webGuard()->viaRemember());
@@ -222,14 +222,14 @@ class AuthTest extends TestCase
         $this->assertNotSame($oldToken, $user->fresh()->remember_token);
 
         Auth::forgetGuards();
-        $this->withCookie($cookieName, $cookie->getValue())->get(route('users'))
+        $this->withCookie($cookieName, $cookie->getValue())->get(route('users.index'))
             ->assertRedirect(route('login'));
         $this->assertGuest();
     }
 
     public function test_guests_cannot_access_protected_routes(): void
     {
-        $this->get(route('users'))->assertRedirect(route('login'));
+        $this->get(route('users.index'))->assertRedirect(route('login'));
         $this->post('/logout')->assertRedirect(route('login'));
     }
 

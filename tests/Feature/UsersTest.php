@@ -32,7 +32,7 @@ class UsersTest extends TestCase
         if ($hasPendingUsers) {
             User::factory()->create();
         }
-        $response = $this->actingAs($this->admin())->get(route('users'))->assertOk();
+        $response = $this->actingAs($this->admin())->get(route('users.index'))->assertOk();
         $document = new \DOMDocument;
         @$document->loadHTML($response->getContent());
         $xpath = new \DOMXPath($document);
@@ -56,7 +56,7 @@ class UsersTest extends TestCase
     {
         $pending = User::factory()->create();
 
-        $this->get(route('users'))->assertRedirect(route('login'));
+        $this->get(route('users.index'))->assertRedirect(route('login'));
         $this->patch(route('users.update', $pending))->assertRedirect(route('login'));
         $this->delete(route('users.destroy', $pending))->assertRedirect(route('login'));
         $this->assertDatabaseHas('users', ['id' => $pending->id, 'is_approved' => false]);
@@ -70,7 +70,7 @@ class UsersTest extends TestCase
             $actor = User::factory()->approved()->create([
                 'role_id' => Role::where('name', $role)->firstOrFail()->id,
             ]);
-            $this->actingAs($actor)->get(route('users'))->assertForbidden();
+            $this->actingAs($actor)->get(route('users.index'))->assertForbidden();
             $this->patch(route('users.update', $pending), [
                 'role_id' => Role::where('name', 'admin')->firstOrFail()->id,
             ])->assertForbidden();
@@ -86,7 +86,7 @@ class UsersTest extends TestCase
         $older = User::factory()->create(['created_at' => now()->subDay()]);
         $approved = User::factory()->approved()->create();
 
-        $response = $this->actingAs($this->admin())->get(route('users'))
+        $response = $this->actingAs($this->admin())->get(route('users.index'))
             ->assertOk()
             ->assertViewIs('pages.users.index')
             ->assertSee('<title>Users - Evalio</title>', false)
@@ -113,7 +113,7 @@ class UsersTest extends TestCase
 
     public function test_admin_sees_empty_state(): void
     {
-        $this->actingAs($this->admin())->get(route('users'))
+        $this->actingAs($this->admin())->get(route('users.index'))
             ->assertOk()->assertSee('No users waiting for approval.');
     }
 
@@ -123,7 +123,7 @@ class UsersTest extends TestCase
         $newer = User::factory()->approved()->create(['created_at' => now()->subDay()]);
         $older = User::factory()->approved()->create(['created_at' => now()->subDays(2)]);
 
-        $this->actingAs($admin)->get(route('users'))->assertOk()
+        $this->actingAs($admin)->get(route('users.index'))->assertOk()
             ->assertSeeInOrder([$older->email, $newer->email, $admin->email]);
     }
 
@@ -133,7 +133,7 @@ class UsersTest extends TestCase
         $actor->setRelation('role', null);
         $pending = User::factory()->create();
 
-        $this->actingAs($actor)->get(route('users'))->assertForbidden();
+        $this->actingAs($actor)->get(route('users.index'))->assertForbidden();
         $this->patch(route('users.update', $pending), ['role_id' => $actor->role_id])->assertForbidden();
         $this->delete(route('users.destroy', $pending))->assertForbidden();
         $this->assertDatabaseHas('users', ['id' => $pending->id, 'is_approved' => false]);
@@ -151,21 +151,21 @@ class UsersTest extends TestCase
             'email' => 'changed@example.com',
             'password' => 'changed-password',
             'is_approved' => false,
-        ])->assertRedirect(route('users'))->assertSessionHasNoErrors();
+        ])->assertRedirect(route('users.index'))->assertSessionHasNoErrors();
 
         $this->assertSame($original, $pending->fresh()->only(array_keys($original)));
         $this->assertTrue($pending->fresh()->is_approved);
-        $this->get(route('users'))->assertSee('User approved and role assigned.');
+        $this->get(route('users.index'))->assertSee('User approved and role assigned.');
     }
 
     public function test_invalid_role_error_is_visible_after_redirect_and_user_stays_pending(): void
     {
         $pending = User::factory()->create();
-        $this->actingAs($this->admin())->from(route('users'))
+        $this->actingAs($this->admin())->from(route('users.index'))
             ->patch(route('users.update', $pending), ['role_id' => 999999])
-            ->assertRedirect(route('users'));
+            ->assertRedirect(route('users.index'));
 
-        $response = $this->get(route('users'))->assertOk();
+        $response = $this->get(route('users.index'))->assertOk();
         $response->assertSee('role="alert"', false)->assertSee('Please check your changes.');
         $this->assertStringContainsString($pending->email, $this->sectionHtml($response->getContent(), 'pending-users'));
         $this->assertFalse($pending->fresh()->is_approved);
@@ -178,13 +178,13 @@ class UsersTest extends TestCase
         $role = Role::where('name', $roleName)->firstOrFail();
 
         $this->actingAs($this->admin())->patch(route('users.update', $pending), ['role_id' => $role->id])
-            ->assertRedirect(route('users'))->assertSessionHasNoErrors()->assertSessionHas('status');
+            ->assertRedirect(route('users.index'))->assertSessionHasNoErrors()->assertSessionHas('status');
         $this->assertDatabaseHas('users', [
             'id' => $pending->id,
             'is_approved' => true,
             'role_id' => $role->id,
         ]);
-        $response = $this->get(route('users'))->assertOk()->assertSee($pending->email);
+        $response = $this->get(route('users.index'))->assertOk()->assertSee($pending->email);
         $this->assertStringNotContainsString($pending->email, $this->sectionHtml($response->getContent(), 'pending-users'));
 
         $this->post(route('logout'));
@@ -201,7 +201,7 @@ class UsersTest extends TestCase
         ]);
         $admin = $this->admin();
 
-        $response = $this->actingAs($admin)->get(route('users'))->assertOk();
+        $response = $this->actingAs($admin)->get(route('users.index'))->assertOk();
         $html = $this->sectionHtml($response->getContent(), 'all-users');
         $this->assertStringNotContainsString($pending->email, $html);
         $this->assertStringContainsString('Editor', $html);
@@ -217,7 +217,7 @@ class UsersTest extends TestCase
     {
         $admin = $this->admin();
 
-        $response = $this->actingAs($admin)->get(route('users'))->assertOk()
+        $response = $this->actingAs($admin)->get(route('users.index'))->assertOk()
             ->assertSee('No users waiting for approval.')->assertDontSee('No users yet.');
 
         $html = $this->sectionHtml($response->getContent(), 'all-users');
@@ -230,7 +230,7 @@ class UsersTest extends TestCase
         $user = User::factory()->create(['name' => '<script>alert(1)</script>']);
         $approved = User::factory()->approved()->create(['name' => '<script>alert(2)</script>']);
 
-        $this->actingAs($this->admin())->get(route('users'))->assertOk()
+        $this->actingAs($this->admin())->get(route('users.index'))->assertOk()
             ->assertSee($user->name)
             ->assertDontSee($user->name, false)
             ->assertSee($approved->name)
@@ -276,9 +276,9 @@ class UsersTest extends TestCase
     {
         $pending = User::factory()->create();
 
-        $this->actingAs($this->admin())->from(route('users'))
+        $this->actingAs($this->admin())->from(route('users.index'))
             ->patch(route('users.update', $pending), $data)
-            ->assertRedirect(route('users'))->assertSessionHasErrors('role_id');
+            ->assertRedirect(route('users.index'))->assertSessionHasErrors('role_id');
 
         $this->assertDatabaseHas('users', [
             'id' => $pending->id,
@@ -290,7 +290,7 @@ class UsersTest extends TestCase
     public function test_each_pending_user_has_a_matching_modal_and_role_form(): void
     {
         $pending = User::factory()->count(2)->create();
-        $response = $this->actingAs($this->admin())->get(route('users'))->assertOk();
+        $response = $this->actingAs($this->admin())->get(route('users.index'))->assertOk();
         $document = new \DOMDocument;
         @$document->loadHTML($response->getContent());
         $xpath = new \DOMXPath($document);
@@ -329,9 +329,9 @@ class UsersTest extends TestCase
         $pending = User::factory()->create();
 
         $this->actingAs($this->admin())->delete(route('users.destroy', $pending))
-            ->assertRedirect(route('users'))->assertSessionHas('status');
+            ->assertRedirect(route('users.index'))->assertSessionHas('status');
         $this->assertDatabaseMissing('users', ['id' => $pending->id]);
-        $this->get(route('users'))->assertOk()
+        $this->get(route('users.index'))->assertOk()
             ->assertSee('Pending registration deleted.')->assertDontSee($pending->email);
     }
 
@@ -342,7 +342,7 @@ class UsersTest extends TestCase
 
         $this->actingAs($this->admin())->patch(route('users.update', $approved), [
             'role_id' => $role->id,
-        ])->assertRedirect(route('users'))->assertSessionHas('status', 'User role updated.');
+        ])->assertRedirect(route('users.index'))->assertSessionHas('status', 'User role updated.');
 
         $this->assertDatabaseHas('users', ['id' => $approved->id, 'is_approved' => true, 'role_id' => $role->id]);
     }
@@ -373,7 +373,7 @@ class UsersTest extends TestCase
         $user = User::factory()->approved()->create();
 
         $this->actingAs($this->admin())->delete(route('users.destroy', $user))
-            ->assertRedirect(route('users'))->assertSessionHas('status', 'User deleted.');
+            ->assertRedirect(route('users.index'))->assertSessionHas('status', 'User deleted.');
 
         $this->assertModelMissing($user);
     }
@@ -384,7 +384,7 @@ class UsersTest extends TestCase
         $session = CourseSession::factory()->create(['instructor_id' => $user->id]);
 
         $this->actingAs($this->admin())->delete(route('users.destroy', $user))
-            ->assertRedirect(route('users'))->assertSessionHasErrors('user');
+            ->assertRedirect(route('users.index'))->assertSessionHasErrors('user');
 
         $this->assertModelExists($user);
         $this->assertModelExists($session);
@@ -402,7 +402,7 @@ class UsersTest extends TestCase
     {
         $admin = $this->admin();
         $user = User::factory()->approved()->create();
-        $response = $this->actingAs($admin)->get(route('users'))->assertOk();
+        $response = $this->actingAs($admin)->get(route('users.index'))->assertOk();
         $document = new \DOMDocument;
         @$document->loadHTML($response->getContent());
         $xpath = new \DOMXPath($document);

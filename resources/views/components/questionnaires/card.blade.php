@@ -18,4 +18,6 @@
         </div>
     </article>
 </div>
-<x-ui.modal id="questionnaire-{{ $template->id }}" label="Questionnaire {{ $template->name }}" />
+<x-ui.modal id="questionnaire-{{ $template->id }}" label="Questionnaire {{ $template->name }}" >
+    {{ $template }}
+</x-ui.modal>

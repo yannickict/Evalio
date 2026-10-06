@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-12 col-lg-9 col-xl-8">
             <header class="mb-4">
-                <a href="{{ route('overview') }}" class="link-secondary text-decoration-none small d-inline-block mb-4">
+                <a href="{{ route('sessions.index') }}" class="link-secondary text-decoration-none small d-inline-block mb-4">
                     <span aria-hidden="true">&larr;</span> Back to overview
                 </a>
                 <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
@@ -66,7 +66,7 @@
                 <div class="card-footer bg-transparent border-top px-4 px-md-5 py-4">
                     <div class="d-flex justify-content-end">
                         <div class="d-flex gap-2">
-                            <a href="{{ route('overview') }}" class="btn btn-outline-secondary rounded-3">Cancel</a>
+                            <a href="{{ route('sessions.index') }}" class="btn btn-outline-secondary rounded-3">Cancel</a>
                             <button type="submit" class="btn btn-success rounded-3">
                                 Create session
                             </button>

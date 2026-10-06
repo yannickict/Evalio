@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-12 col-lg-9 col-xl-8">
             <header class="mb-4">
-                <a href="{{ route('courses') }}" class="link-secondary text-decoration-none small d-inline-block mb-4">
+                <a href="{{ route('courses.index') }}" class="link-secondary text-decoration-none small d-inline-block mb-4">
                     <span aria-hidden="true">&larr;</span> Back to courses
                 </a>
                 <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
@@ -33,7 +33,7 @@
 
             <p id="course-save-note" class="small text-body-secondary">Saving courses will be available soon.</p>
             <div class="d-flex justify-content-end flex-wrap gap-2">
-                <a href="{{ route('courses') }}" class="btn btn-outline-secondary rounded-3">Cancel</a>
+                <a href="{{ route('courses.index') }}" class="btn btn-outline-secondary rounded-3">Cancel</a>
                 <button type="button" class="btn btn-success rounded-3" disabled aria-describedby="course-save-note">Create course</button>
             </div>
         </div>

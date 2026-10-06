@@ -18,7 +18,7 @@
 
             <x-ui.validation-errors :errors="$errors" class="rounded-3" heading="Please check your answers." />
             <form method="POST" id="questionnaire-form"
-                action="{{ route('questionnaire.submit', ['code' => request()->query('code')]) }}">
+                action="{{ route('feedback.store', ['code' => request()->query('code')]) }}">
                 @csrf
                 @forelse ($questions as $question)
                 <x-questionnaires.response-question :question="$question" :number="$loop->iteration" />
