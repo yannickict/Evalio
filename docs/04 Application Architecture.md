@@ -89,7 +89,7 @@ The overview loads all sessions, their instructors, course templates and each se
 
 ## Automatic evaluation status
 
-`evaluations:update-statuses` runs hourly through Laravel's scheduler in `EVALUATION_TIMEZONE` (default `Europe/Zurich`). It opens sessions whose start date is today and closes sessions whose end date was exactly 14 days ago. Closing happens on the fourteenth day, not after that day finishes. Other dates are left unchanged, so manual changes are preserved outside the boundary days. A full missed boundary day requires a manual status update; this command does not restore date-based status on later dates.
+`evaluations:update-statuses` runs hourly through Laravel's scheduler in `EVALUATION_TIMEZONE` (default `Europe/Zurich`). It opens sessions whose start date is today and closes sessions whose end date was exactly 14 days ago. Closing happens on the fourteenth day, not after that day finishes. Sessions with an unset (`null`) status also open if their start date has passed and their closing deadline has not arrived. This handles late-created sessions and missed opening runs without reopening manually closed sessions on later dates. Missed closing days still require a manual status update.
 
 Both the scheduled command and the authorized manual update use `app/Actions/SetEvaluationStatus.php`. Matching statuses are ignored. Status changes and access codes are saved in one transaction with a session row lock: opening creates the form if needed and generates a unique six-digit code, while closing clears only the code. Code collisions are retried. Neither transition deletes answers. Manual changes on a boundary day can be superseded by a subsequent hourly run on that same day.
 

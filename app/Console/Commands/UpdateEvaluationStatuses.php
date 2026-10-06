@@ -11,7 +11,7 @@ class UpdateEvaluationStatuses extends Command
 {
     protected $signature = 'evaluations:update-statuses';
 
-    protected $description = 'Open evaluations on their start date and close them 14 days after their end date';
+    protected $description = 'Open due and unset evaluations, and close them 14 days after their end date';
 
     public function handle(SetEvaluationStatus $setStatus): int
     {
@@ -23,10 +23,15 @@ class UpdateEvaluationStatuses extends Command
         CourseSession::query()
             ->where(function ($query) use ($startDate, $endDate): void {
                 $query->whereDate('start_date', $startDate)->orWhereDate('end_date', $endDate);
+                $query->orWhere(function ($query) use ($startDate, $endDate): void {
+                    $query->whereNull('evaluation_status')
+                        ->whereDate('start_date', '<=', $startDate)
+                        ->whereDate('end_date', '>', $endDate);
+                });
             })
-            ->chunkById(100, function ($sessions) use ($setStatus, $startDate, &$changed): void {
+            ->chunkById(100, function ($sessions) use ($setStatus, $endDate, &$changed): void {
                 foreach ($sessions as $session) {
-                    $status = $session->start_date->toDateString() === $startDate ? 'open' : 'closed';
+                    $status = $session->end_date->toDateString() === $endDate ? 'closed' : 'open';
 
                     if ($setStatus->handle($session, $status)) {
                         $changed++;

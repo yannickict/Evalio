@@ -41,12 +41,19 @@ class DemoSeeder extends Seeder
                         ->create([
                             'start_date' => today()->addDays($days),
                             'end_date' => today()->addDays($days + 2),
-                            'evaluation_status' => $days < 0 ? 'closed' : null,
+                            'evaluation_status' => match (true) {
+                                $days < 0 => 'closed',
+                                $days === 0 => 'open',
+                                default => null,
+                            },
                         ]);
 
-                    do {
-                        $code = (string) random_int(100000, 999999);
-                    } while (FeedbackForm::where('code', $code)->exists());
+                    $code = null;
+                    if ($session->evaluation_status === 'open') {
+                        do {
+                            $code = (string) random_int(100000, 999999);
+                        } while (FeedbackForm::where('code', $code)->exists());
+                    }
                     FeedbackForm::factory()->for($session)->create(['code' => $code]);
                 }
             }

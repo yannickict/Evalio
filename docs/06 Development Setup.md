@@ -59,7 +59,7 @@ For example, a Linux cron entry is:
 
 On Windows, use the host's PHP executable, pass `artisan schedule:run` as arguments, set the project folder as the working directory, and repeat the task every minute.
 
-The evaluation command runs on the hour and uses `EVALUATION_TIMEZONE=Europe/Zurich` by default. It acts only on session start dates and end dates plus 14 days, so the scheduler must run during those calendar days. On other days it leaves manual status choices unchanged. Repeated runs skip evaluations already in the requested state.
+The evaluation command runs on the hour and uses `EVALUATION_TIMEZONE=Europe/Zurich` by default. It opens on session start dates and closes on end dates plus 14 days. Sessions with an unset (`null`) status also open later within that evaluation window. Manually closed sessions remain closed on later dates. The scheduler must run on the closing calendar day for automatic closure. Repeated runs skip evaluations already in the requested state.
 
 To inspect the registered schedule or run today's boundary updates manually:
 

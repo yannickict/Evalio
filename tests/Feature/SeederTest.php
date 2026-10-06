@@ -40,14 +40,21 @@ class SeederTest extends TestCase
         $this->assertSame('admin', $admin->role->name);
         $this->assertTrue(Hash::check('password', $admin->password));
 
-        $codes = FeedbackForm::pluck('code');
-        $this->assertCount(15, $codes);
-        $this->assertCount(15, $codes->unique());
+        $codes = FeedbackForm::whereNotNull('code')->pluck('code');
+        $this->assertCount(5, $codes);
+        $this->assertCount(5, $codes->unique());
         foreach ($codes as $code) {
             $this->assertMatchesRegularExpression('/^[1-9][0-9]{5}$/', $code);
         }
 
         $this->assertDatabaseCount('feedback_forms', 15);
+        foreach (CourseSession::with('feedbackForm')->get() as $session) {
+            if ($session->evaluation_status === 'open') {
+                $this->assertNotNull($session->feedbackForm->code);
+            } else {
+                $this->assertNull($session->feedbackForm->code);
+            }
+        }
         $this->assertSame(
             array_map(fn (int $number) => sprintf('COURSE.%04d', $number), range(1, 15)),
             CourseSession::orderBy('id')->pluck('course_session_number')->all(),
@@ -68,7 +75,7 @@ class SeederTest extends TestCase
         foreach ($sessions as $session) {
             $this->assertTrue($session->end_date->lt(today()));
             $this->assertNotNull($session->feedbackForm);
-            $this->assertNotNull($session->feedbackForm->code);
+            $this->assertNull($session->feedbackForm->code);
             $questions = $session->course->questionnaireTemplate->questions;
             $this->assertCount(10, $questions);
             $this->assertTrue($questions->contains('type', 'free_text'));

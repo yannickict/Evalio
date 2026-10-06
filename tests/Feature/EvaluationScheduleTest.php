@@ -52,6 +52,28 @@ class EvaluationScheduleTest extends TestCase
         $this->artisan('evaluations:update-statuses')->expectsOutput('Updated 0 evaluation statuses.')->assertSuccessful();
     }
 
+    public function test_unset_sessions_open_late_within_the_window_but_not_after_the_deadline(): void
+    {
+        $active = CourseSession::factory()->create([
+            'start_date' => '2026-10-01', 'end_date' => '2026-10-09', 'evaluation_status' => null,
+        ]);
+        $ended = CourseSession::factory()->create([
+            'start_date' => '2026-09-20', 'end_date' => '2026-09-23', 'evaluation_status' => null,
+        ]);
+        $expired = CourseSession::factory()->create([
+            'start_date' => '2026-09-19', 'end_date' => '2026-09-21', 'evaluation_status' => null,
+        ]);
+
+        $this->artisan('evaluations:update-statuses')->expectsOutput('Updated 2 evaluation statuses.')->assertSuccessful();
+        foreach ([$active, $ended] as $session) {
+            $this->assertSame('open', $session->fresh()->evaluation_status);
+            $this->assertMatchesRegularExpression('/^\d{6}$/', $session->feedbackForm()->sole()->code);
+        }
+        $this->assertNull($expired->fresh()->evaluation_status);
+        $this->assertNull($expired->feedbackForm);
+        $this->artisan('evaluations:update-statuses')->expectsOutput('Updated 0 evaluation statuses.')->assertSuccessful();
+    }
+
     public function test_sessions_on_other_dates_keep_their_manual_statuses(): void
     {
         $future = CourseSession::factory()->create(['start_date' => '2026-10-07', 'end_date' => '2026-10-09']);
