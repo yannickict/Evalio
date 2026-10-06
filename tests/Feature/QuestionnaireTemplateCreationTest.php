@@ -24,7 +24,7 @@ class QuestionnaireTemplateCreationTest extends TestCase
         $this->post(route('questionnaires.store'), [
             'name' => 'Course feedback',
             'questions' => [
-                ['text' => 'Your rating?', 'type' => 'single_choice', 'options' => ['Good', 'Bad']],
+                ['text' => 'Your rating?', 'type' => 'single_choice', 'options' => ['Good', 'Bad'], 'allows_comment' => '1'],
                 ['text' => 'Any suggestions?', 'type' => 'free_text', 'options' => ['', '']],
             ],
         ])->assertRedirect(route('questionnaires.index'))->assertSessionHas('status', 'Questionnaire saved.');
@@ -35,6 +35,8 @@ class QuestionnaireTemplateCreationTest extends TestCase
         $this->assertSame([1, 2], $template->questions->pluck('pivot.position')->all());
         $this->assertSame(['Good', 'Bad'], $template->questions[0]->options->pluck('option_text')->all());
         $this->assertCount(0, $template->questions[1]->options);
+        $this->assertTrue($template->questions[0]->allows_comment);
+        $this->assertFalse($template->questions[1]->allows_comment);
         $this->get(route('questionnaires.index'))->assertOk()->assertSee('Course feedback')->assertSee('2 questions');
     }
 

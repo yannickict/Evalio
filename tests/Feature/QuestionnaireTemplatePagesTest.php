@@ -32,8 +32,8 @@ class QuestionnaireTemplatePagesTest extends TestCase
     {
         $this->withoutVite();
         $questions = [
-            ['text' => 'First question', 'type' => 'single_choice', 'options' => ['Yes', 'No']],
-            ['text' => 'Second question', 'type' => 'single_choice', 'options' => ['Good', 'Bad']],
+            ['text' => 'First question', 'type' => 'single_choice', 'options' => ['Yes', 'No'], 'allows_comment' => true],
+            ['text' => 'Second question', 'type' => 'single_choice', 'options' => ['Good', 'Bad'], 'allows_comment' => false],
         ];
         $expected = $questions;
         $expected[1]['options'][] = '';
@@ -50,7 +50,7 @@ class QuestionnaireTemplatePagesTest extends TestCase
     {
         $this->withoutVite();
         $this->actingAs(User::factory()->approved()->create());
-        $question = ['text' => '<script>alert(1)</script>', 'type' => 'free_text', 'options' => ['Yes', 'No']];
+        $question = ['text' => '<script>alert(1)</script>', 'type' => 'free_text', 'options' => ['Yes', 'No'], 'allows_comment' => true];
         $draft = ['name' => 'Draft', 'questions' => [$question]];
 
         $response = $this->post(route('questionnaires.preview'), $draft + ['action' => 'refresh'])
@@ -66,7 +66,7 @@ class QuestionnaireTemplatePagesTest extends TestCase
 
         $this->post(route('questionnaires.preview'), $draft + ['action' => 'add_question'])
             ->assertOk()->assertViewHas('draft', [
-                'name' => 'Draft', 'questions' => [$question, ['text' => '', 'type' => 'single_choice', 'options' => ['', '']]],
+                'name' => 'Draft', 'questions' => [$question, ['text' => '', 'type' => 'single_choice', 'options' => ['', ''], 'allows_comment' => false]],
             ]);
         $this->assertDatabaseCount('questionnaire_templates', 0);
         $this->assertDatabaseCount('questions', 0);
@@ -94,9 +94,9 @@ class QuestionnaireTemplatePagesTest extends TestCase
         $this->withoutVite();
         $this->actingAs(User::factory()->approved()->create());
         $questions = [
-            ['text' => 'First', 'type' => 'single_choice', 'options' => ['Yes', 'Maybe', 'No']],
-            ['text' => 'Second', 'type' => 'free_text', 'options' => ['', '']],
-            ['text' => 'Third', 'type' => 'single_choice', 'options' => ['Good', 'Bad']],
+            ['text' => 'First', 'type' => 'single_choice', 'options' => ['Yes', 'Maybe', 'No'], 'allows_comment' => true],
+            ['text' => 'Second', 'type' => 'free_text', 'options' => ['', ''], 'allows_comment' => false],
+            ['text' => 'Third', 'type' => 'single_choice', 'options' => ['Good', 'Bad'], 'allows_comment' => false],
         ];
 
         $this->post(route('questionnaires.preview'), [

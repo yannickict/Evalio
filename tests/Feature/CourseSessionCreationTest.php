@@ -31,7 +31,9 @@ class CourseSessionCreationTest extends TestCase
 
     public function test_form_lists_sorted_courses_and_only_approved_instructors(): void
     {
-        $viewer = User::factory()->approved()->create(['first_name' => 'Zulu']);
+        $viewer = User::factory()->approved()->create([
+            'first_name' => 'Zulu', 'role_id' => Role::where('name', 'admin')->sole()->id,
+        ]);
         $zulu = Course::factory()->create(['name' => 'Zulu']);
         $alpha = Course::factory()->create(['name' => 'Alpha']);
         $pending = User::factory()->create();
@@ -41,7 +43,7 @@ class CourseSessionCreationTest extends TestCase
         $this->actingAs($viewer)->get(route('sessions.create'))
             ->assertOk()
             ->assertViewHas('courses', fn ($courses) => $courses->modelKeys() === [$alpha->id, $zulu->id])
-            ->assertViewHas('instructors', fn ($users) => $users->modelKeys() === [$instructor->id, $viewer->id])
+            ->assertViewHas('instructors', fn ($users) => $users->modelKeys() === [$instructor->id])
             ->assertDontSee($pending->email)
             ->assertDontSee($editor->name)
             ->assertSee(e($instructor->name), false)

@@ -27,6 +27,20 @@ class StoreCourseSessionRequest extends FormRequest
                 return;
             }
 
+            $user = $this->user();
+
+            if (
+                $user->role?->name === 'instructor'
+                && (int) $this->input('instructor_id') !== $user->id
+            ) {
+                $validator->errors()->add(
+                    'instructor_id',
+                    'You can only create sessions for yourself.'
+                );
+
+                return;
+            }
+
             if (! User::approvedInstructors()->whereKey($this->input('instructor_id'))->exists()) {
                 $validator->errors()->add('instructor_id', 'Choose an approved instructor.');
             }

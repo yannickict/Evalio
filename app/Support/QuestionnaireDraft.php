@@ -6,13 +6,13 @@ use Illuminate\Validation\ValidationException;
 
 class QuestionnaireDraft
 {
-    /** @return array{text: string, type: string, options: list<string>} */
+    /** @return array{text: string, type: string, options: list<string>, allows_comment: bool} */
     public static function emptyQuestion(): array
     {
-        return ['text' => '', 'type' => 'single_choice', 'options' => ['', '']];
+        return ['text' => '', 'type' => 'single_choice', 'options' => ['', ''], 'allows_comment' => false];
     }
 
-    /** @return array{name: string, questions: list<array{text: string, type: string, options: list<string>}>} */
+    /** @return array{name: string, questions: list<array{text: string, type: string, options: list<string>, allows_comment: bool}>} */
     public static function empty(): array
     {
         return ['name' => '', 'questions' => [self::emptyQuestion()]];
@@ -30,6 +30,7 @@ class QuestionnaireDraft
                 fn (array $question) => [
                     'text' => $question['text'] ?? '',
                     'type' => $question['type'],
+                    'allows_comment' => (bool) ($question['allows_comment'] ?? false),
                     'options' => array_values(
                         $question['options'] ?? ['', '']
                     ),

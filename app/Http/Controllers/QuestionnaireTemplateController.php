@@ -41,7 +41,7 @@ class QuestionnaireTemplateController extends Controller
                 $question = Question::create([
                     'question_text' => trim($questionData['text']),
                     'type' => $questionData['type'],
-                    'allows_comment' => false,
+                    'allows_comment' => (bool) ($questionData['allows_comment'] ?? false),
                 ]);
                 $template->questions()->attach($question->id, ['position' => $index + 1]);
 

@@ -40,10 +40,17 @@ class CourseSessionController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $courses = Course::orderBy('name')->get();
-        $instructors = User::approvedInstructors()
+
+        $query = User::approvedInstructors();
+
+        if ($request->user()->role?->name === 'instructor') {
+            $query->whereKey($request->user()->id);
+        }
+
+        $instructors = $query
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->get();

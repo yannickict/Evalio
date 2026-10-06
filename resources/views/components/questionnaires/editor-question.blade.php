@@ -74,5 +74,16 @@
             value="{{ $option }}">
         @endforeach
         @endif
+        <div class="border-top mt-4 pt-3">
+            <input type="hidden" name="questions[{{ $index }}][allows_comment]" value="0">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                    id="question-{{ $index }}-comment" name="questions[{{ $index }}][allows_comment]" value="1"
+                    @checked($question['allows_comment'] ?? false)
+                    aria-describedby="question-{{ $index }}-comment-hint">
+                <label class="form-check-label fw-medium" for="question-{{ $index }}-comment">Allow an optional comment</label>
+            </div>
+            <p class="small text-body-secondary mt-1 mb-0" id="question-{{ $index }}-comment-hint">Participants can add a comment alongside their answer to this question.</p>
+        </div>
     </div>
 </section>
