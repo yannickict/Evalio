@@ -34,7 +34,7 @@ class NavigationTest extends TestCase
                 'role_id' => Role::where('name', $role)->firstOrFail()->id,
             ]);
             $response = $this->actingAs($user)->get(route('home'))->assertOk()
-                ->assertSee(route('sessions.index'), false)->assertSee('Overview')->assertSee('Log out')->assertDontSee('Users');
+                ->assertSee(route('sessions.index'), false)->assertSee('Sessions')->assertSee('Log out')->assertDontSee('Users');
             $this->assertActiveLink($response->getContent(), route('home'));
         }
     }

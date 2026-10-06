@@ -17,6 +17,9 @@
                 aria-label="View course details for {{ $course->name }}">
                 View course <span aria-hidden="true">&rarr;</span>
             </button>
+            <a class="btn btn-outline-success btn-sm rounded-3 position-relative z-2 mt-3 ms-2"
+               href="{{ route('sessions.create', ['course_id' => $course->id]) }}"
+               aria-label="Create session for {{ $course->name }}">Create session</a>
         </div>
     </article>
 </div>
@@ -32,6 +35,8 @@
     <div class="d-flex align-items-center gap-2 mb-3">
         <h3 class="h5 mb-0">Sessions</h3>
         <span class="badge rounded-pill bg-success-subtle text-success-emphasis">{{ $course->sessions_count }}</span>
+        <a class="btn btn-outline-success btn-sm rounded-3 ms-auto"
+           href="{{ route('sessions.create', ['course_id' => $course->id]) }}">Create session</a>
     </div>
     <ul class="list-group list-group-flush">
         @forelse ($course->sessions->sortBy('start_date') as $courseSession)

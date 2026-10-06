@@ -15,6 +15,8 @@
 
     <x-ui.status-alert />
 
+    <x-ui.setup-guide current="questionnaires" />
+
     <div class="row g-4">
         @forelse ($templates as $template)
         <x-questionnaires.card :template="$template" />

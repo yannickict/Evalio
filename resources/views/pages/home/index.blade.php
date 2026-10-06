@@ -3,7 +3,7 @@
 @section('title', 'Evalio · Course evaluations')
 
 @section('content')
-<main class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+<main class="container flex-grow-1 d-flex flex-column align-items-center justify-content-center py-5">
     <section class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 text-center" aria-labelledby="entry-title">
         @if (session('status'))
         <div class="d-flex align-items-center gap-3 bg-success-subtle text-success-emphasis border border-success-subtle rounded-4 p-4 mb-4 text-start" role="status" aria-live="polite">
@@ -29,6 +29,7 @@
             <button class="btn btn-success btn-lg w-100 rounded-3 mt-3" type="submit">Open questionnaire</button>
             </form>
             <p class="text-body-secondary small mt-3 mb-0" id="code-hint">No account needed.</p>
+            <x-ui.setup-guide :home="true" />
         </div>
     </section>
 </main>

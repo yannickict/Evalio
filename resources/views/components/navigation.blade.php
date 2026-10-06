@@ -15,8 +15,8 @@
                    @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('home')])
                    @if (request()->routeIs('home')) aria-current="page" @endif>Home</a>
                 <a href="{{ route('sessions.index') }}"
-                   @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('sessions.index')])
-                   @if (request()->routeIs('sessions.index')) aria-current="page" @endif>Overview</a>
+                   @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('sessions.*')])
+                   @if (request()->routeIs('sessions.index')) aria-current="page" @endif>Sessions</a>
                 <a href="{{ route('courses.index') }}"
                    @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('courses.*')])
                    @if (request()->routeIs('courses.index')) aria-current="page" @endif>Courses</a>

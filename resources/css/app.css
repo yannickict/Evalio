@@ -5,6 +5,40 @@
     height: 3rem;
 }
 
+.workflow-guide-icon {
+    width: 2rem;
+    height: 2rem;
+    font-weight: 600;
+}
+
+.workflow-guide-toggle {
+    border-radius: .75rem;
+    transition: background-color .2s ease;
+}
+
+.workflow-guide-toggle:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.workflow-guide-toggle:focus-visible {
+    outline: 2px solid var(--bs-success);
+    outline-offset: 2px;
+}
+
+.workflow-guide-chevron {
+    transition: transform .25s ease;
+}
+
+.workflow-guide-toggle[aria-expanded="true"] .workflow-guide-chevron {
+    transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .workflow-guide-toggle, .workflow-guide-chevron {
+        transition: none;
+    }
+}
+
 .editor-remove:disabled {
     color: var(--bs-secondary-color);
     background-color: var(--bs-secondary-bg);

@@ -8,7 +8,7 @@
         <div class="col-12 col-lg-9 col-xl-8">
             <header class="mb-4">
                 <a href="{{ route('sessions.index') }}" class="link-secondary text-decoration-none small d-inline-block mb-4">
-                    <span aria-hidden="true">&larr;</span> Back to overview
+                    <span aria-hidden="true">&larr;</span> Back to sessions
                 </a>
                 <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
                 <h1 class="h2 fw-bold mb-2">New session</h1>
@@ -26,9 +26,9 @@
                             <div class="col-md-6">
                                 <label for="session-course" class="form-label fw-medium">Course</label>
                                 <select id="session-course" name="course_id" class="form-select" required>
-                                    <option value="" @selected(! old('course_id')) disabled>Select a course</option>
+                                    <option value="" @selected(! old('course_id', request()->query('course_id'))) disabled>Select a course</option>
                                     @forelse ($courses as $course)
-                                    <option value="{{ $course->id }}" @selected(old('course_id') == $course->id)>{{ $course->name }}</option>
+                                    <option value="{{ $course->id }}" @selected(old('course_id', request()->query('course_id')) == $course->id)>{{ $course->name }}</option>
                                     @empty
                                     <option disabled>No courses available</option>
                                     @endforelse

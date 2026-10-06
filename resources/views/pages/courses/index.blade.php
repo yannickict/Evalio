@@ -18,6 +18,8 @@
 
     <x-ui.status-alert />
 
+    <x-ui.setup-guide current="courses" />
+
     <div class="row g-4">
         @forelse ($courses as $course)
         <x-courses.card :course="$course" />
@@ -25,7 +27,8 @@
         <div class="col-12">
             <div class="card border-0 rounded-4 shadow-sm p-4 p-md-5 text-center">
                 <h2 class="h5">No courses yet</h2>
-                <p class="text-body-secondary mb-0">Your courses will appear here once they are created.</p>
+                <p class="text-body-secondary mb-3">Create a questionnaire first, then assign it when you create a course.</p>
+                <a class="link-success fw-semibold" href="{{ route('questionnaires.index') }}">Choose or create a questionnaire &rarr;</a>
             </div>
         </div>
         @endforelse
