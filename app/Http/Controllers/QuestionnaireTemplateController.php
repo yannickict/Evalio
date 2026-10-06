@@ -15,8 +15,13 @@ class QuestionnaireTemplateController extends Controller
 {
     public function index(): View
     {
+        $templates = QuestionnaireTemplate::with('questions.options')
+            ->withCount('questions')
+            ->latest()
+            ->get();
+
         return view('pages.questionnaires.index', [
-            'templates' => QuestionnaireTemplate::withCount('questions')->latest()->get(),
+            'templates' => $templates,
         ]);
     }
 

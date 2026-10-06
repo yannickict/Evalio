@@ -18,6 +18,4 @@
         </div>
     </article>
 </div>
-<x-ui.modal id="questionnaire-{{ $template->id }}" label="Questionnaire {{ $template->name }}" >
-    {{ $template }}
-</x-ui.modal>
+<x-questionnaires.preview-modal :template="$template" />
