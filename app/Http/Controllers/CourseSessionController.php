@@ -9,8 +9,8 @@ use App\Models\Course;
 use App\Models\CourseSession;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class CourseSessionController extends Controller
 {

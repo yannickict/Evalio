@@ -75,7 +75,7 @@ class CourseSessionPagesTest extends TestCase
             'end_date' => today()->subDays(8),
         ]);
 
-        $this->actingAs($instructor)->get(route('sessions.index'))->assertOk()
+        $this->actingAs($this->admin())->get(route('sessions.index'))->assertOk()
             ->assertSee('Laravel basics')->assertSee('Alex Example')
             ->assertSee('Training questionnaire')->assertSee('10 Jan 2026')->assertSee('12 Jan 2026')
             ->assertSee($closed->course_session_number)->assertSee('3 sessions')
@@ -92,7 +92,7 @@ class CourseSessionPagesTest extends TestCase
     {
         $session = CourseSession::factory()->create(['evaluation_status' => 'closed']);
 
-        $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))
+        $this->actingAs($this->admin())->get(route('sessions.index'))
             ->assertOk()->assertSee($session->course_session_number)->assertSee('No questionnaire assigned');
     }
 
@@ -101,7 +101,7 @@ class CourseSessionPagesTest extends TestCase
         $newer = CourseSession::factory()->create(['evaluation_status' => 'closed', 'created_at' => now()]);
         $older = CourseSession::factory()->create(['evaluation_status' => 'closed', 'created_at' => now()->subDay()]);
 
-        $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))->assertOk()
+        $this->actingAs($this->admin())->get(route('sessions.index'))->assertOk()
             ->assertSee('2 sessions')
             ->assertSeeInOrder([$older->course_session_number, $newer->course_session_number]);
     }
@@ -111,7 +111,7 @@ class CourseSessionPagesTest extends TestCase
         $course = Course::factory()->create(['name' => '<script>alert("course")</script>']);
         CourseSession::factory()->for($course)->create(['evaluation_status' => 'closed']);
 
-        $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))
+        $this->actingAs($this->admin())->get(route('sessions.index'))
             ->assertOk()->assertSee($course->name)->assertDontSee($course->name, false);
     }
 
@@ -122,7 +122,7 @@ class CourseSessionPagesTest extends TestCase
         $alice = User::factory()->approved()->create(['first_name' => 'Alice', 'last_name' => 'Example']);
         $zoe = User::factory()->approved()->create(['first_name' => 'Zoe', 'last_name' => 'Example']);
         Course::factory()->create(['name' => 'Unused course']);
-        $viewer = User::factory()->approved()->create();
+        $viewer = $this->admin();
         CourseSession::factory()->for($zulu)->for($zoe, 'instructor')->create(['evaluation_status' => 'open']);
         CourseSession::factory()->for($alpha)->for($alice, 'instructor')->count(2)->create();
 
@@ -150,7 +150,7 @@ class CourseSessionPagesTest extends TestCase
 
     public function test_empty_overview_has_empty_filters_and_single_session_uses_singular_count(): void
     {
-        $user = User::factory()->approved()->create();
+        $user = $this->admin();
         $this->actingAs($user)->get(route('sessions.index'))->assertOk()
             ->assertSee('0 sessions')->assertSee('No course sessions yet')
             ->assertViewHas('courses', fn ($courses) => $courses->isEmpty())
@@ -171,7 +171,7 @@ class CourseSessionPagesTest extends TestCase
         FeedbackForm::factory()->for($noCode, 'courseSession')->create(['code' => null]);
         $noTemplate = CourseSession::factory()->create(['evaluation_status' => 'closed']);
         FeedbackForm::factory()->for($noTemplate, 'courseSession')->create(['code' => '111111']);
-        $response = $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))->assertOk();
+        $response = $this->actingAs($this->admin())->get(route('sessions.index'))->assertOk();
         $document = new \DOMDocument;
         @$document->loadHTML($response->getContent());
         $xpath = new \DOMXPath($document);
@@ -185,5 +185,55 @@ class CourseSessionPagesTest extends TestCase
         }
         $response->assertSee(route('feedback.show', ['code' => '012345']), false);
         $response->assertDontSee(route('feedback.show', ['code' => '111111']), false);
+    }
+
+    public function test_instructors_only_see_their_own_sessions_and_filter_options(): void
+    {
+        $instructor = User::factory()->approved()->create();
+        $own = CourseSession::factory()->for($instructor, 'instructor')->create();
+        $other = CourseSession::factory()->create();
+
+        $this->actingAs($instructor)->get(route('sessions.index'))->assertOk()
+            ->assertSee($own->course_session_number)
+            ->assertDontSee($other->course_session_number)
+            ->assertDontSee($other->course->name)
+            ->assertDontSee($other->instructor->name)
+            ->assertViewHas('courseSessions', fn ($sessions) => $sessions->modelKeys() === [$own->id])
+            ->assertViewHas('courses', fn ($courses) => $courses->pluck('id')->all() === [$own->course_id])
+            ->assertViewHas('instructors', fn ($instructors) => $instructors->pluck('id')->all() === [$instructor->id]);
+    }
+
+    public function test_instructor_without_assigned_sessions_sees_empty_overview(): void
+    {
+        CourseSession::factory()->create();
+
+        $this->actingAs(User::factory()->approved()->create())->get(route('sessions.index'))
+            ->assertOk()->assertSee('No course sessions yet')
+            ->assertViewHas('courseSessions', fn ($sessions) => $sessions->isEmpty());
+    }
+
+    /** @return array<string, array{string}> */
+    public static function managementRoles(): array
+    {
+        return ['admin' => ['admin'], 'editor' => ['editor']];
+    }
+
+    #[DataProvider('managementRoles')]
+    public function test_admins_and_editors_see_sessions_for_all_instructors(string $role): void
+    {
+        $sessions = CourseSession::factory()->count(2)->create();
+        $viewer = User::factory()->approved()->create([
+            'role_id' => Role::where('name', $role)->firstOrFail()->id,
+        ]);
+
+        $this->actingAs($viewer)->get(route('sessions.index'))->assertOk()
+            ->assertViewHas('courseSessions', fn ($visible) => $visible->modelKeys() === $sessions->modelKeys());
+    }
+
+    private function admin(): User
+    {
+        return User::factory()->approved()->create([
+            'role_id' => Role::where('name', 'admin')->firstOrFail()->id,
+        ]);
     }
 }
