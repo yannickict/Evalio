@@ -181,7 +181,7 @@ class CourseSessionPagesTest extends TestCase
             $this->assertCount(1, $xpath->query('//article//button[@type="button" and @data-bs-toggle="modal" and @data-bs-target="#'.$id.'"]'));
             $this->assertCount(1, $xpath->query('//div[@id="'.$id.'" and @aria-labelledby="session-title-'.$session->id.'"]'));
             $this->assertCount(1, $xpath->query('//*[@id="'.$id.'"]//h2[@id="session-title-'.$session->id.'"]'));
-            $this->assertCount($session->is($available) ? 1 : 0, $xpath->query('//*[@id="'.$id.'"]//a'));
+            $this->assertCount($session->is($available) ? 1 : 0, $xpath->query('//*[@id="'.$id.'"]//a[starts-with(@href, "'.route('feedback.show').'")]'));
         }
         $response->assertSee(route('feedback.show', ['code' => '012345']), false);
         $response->assertDontSee(route('feedback.show', ['code' => '111111']), false);

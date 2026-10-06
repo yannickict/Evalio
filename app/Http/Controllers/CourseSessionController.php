@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\SetEvaluationStatus;
 use App\Http\Requests\StoreCourseSessionRequest;
+use App\Http\Requests\UpdateCourseSessionRequest;
 use App\Http\Requests\UpdateEvaluationStatusRequest;
 use App\Models\Course;
 use App\Models\CourseSession;
@@ -69,6 +70,14 @@ class CourseSessionController extends Controller
         return redirect()->route('sessions.index')->with('status', 'Session created.');
     }
 
+    public function edit(CourseSession $courseSession): View
+    {
+        return view('pages.sessions.edit', [
+            'courseSession' => $courseSession->load(['course', 'questionnaireTemplate', 'instructor']),
+            'instructors' => User::approvedInstructors()->orderBy('first_name')->orderBy('last_name')->get(),
+        ]);
+    }
+
     public function updateEvaluationStatus(
         UpdateEvaluationStatusRequest $request,
         CourseSession $courseSession,
@@ -82,5 +91,12 @@ class CourseSessionController extends Controller
             ->with('status', $data['evaluation_status'] === 'open'
                 ? 'Evaluation opened.'
                 : 'Evaluation closed.');
+    }
+
+    public function update(UpdateCourseSessionRequest $request, CourseSession $courseSession): RedirectResponse
+    {
+        $courseSession->update($request->validated());
+
+        return redirect()->route('sessions.index')->with('status', 'Session updated.');
     }
 }

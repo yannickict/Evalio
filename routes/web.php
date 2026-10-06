@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
     Route::name('sessions.')->controller(CourseSessionController::class)->group(function () {
         Route::get('/overview', 'index')->middleware('can:view-course-lists')->name('index');
         Route::get('/session/create', 'create')->name('create');
+        Route::get('/session/{courseSession}/edit', 'edit')->middleware('can:edit-sessions')->name('edit');
+        Route::patch('/session/{courseSession}', 'update')->middleware('can:edit-sessions')->name('update');
         Route::post('/session', 'store')->name('store');
         Route::patch('/session/{courseSession}/evaluation', 'updateEvaluationStatus')
             ->middleware('can:manage-evaluations')
