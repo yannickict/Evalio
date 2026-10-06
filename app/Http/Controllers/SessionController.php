@@ -21,7 +21,7 @@ class SessionController extends Controller
             ->orderBy('last_name')
             ->get();
 
-        return view('sessions.create', [
+        return view('pages.sessions.create', [
             'courses' => $courses,
             'instructors' => $instructors,
         ]);

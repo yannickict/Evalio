@@ -36,3 +36,29 @@
         overscroll-behavior-y: contain;
     }
 }
+
+.course-card,
+.questionnaire-card {
+    border-top: .25rem solid var(--bs-success) !important;
+}
+
+.course-card,
+.session-card,
+.questionnaire-card {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+:is(.course-card, .session-card, .questionnaire-card):is(:hover, :focus-within) {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .12) !important;
+}
+
+:is(.course-card, .session-card, .questionnaire-card):focus-within {
+    outline: 2px solid var(--bs-success);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .course-card, .session-card, .questionnaire-card { transition: none; }
+    :is(.course-card, .session-card, .questionnaire-card):is(:hover, :focus-within) { transform: none; }
+}

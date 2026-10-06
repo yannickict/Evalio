@@ -24,7 +24,7 @@ class UserController extends Controller
             ->orderBy('created_at')
             ->get();
 
-        return view('users', [
+        return view('pages.users.index', [
             'approved_users' => $approved_users,
             'non_approved_users' => $non_approved_users,
             'roles' => Role::orderBy('name')->get(),

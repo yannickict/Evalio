@@ -19,7 +19,7 @@ class OverviewController extends Controller
         $courses = $course_sessions->pluck('course')->unique('id')->sortBy('name')->values();
         $instructors = $course_sessions->pluck('instructor')->unique('id')->sortBy('name')->values();
 
-        return view('overview', [
+        return view('pages.sessions.index', [
             'course_sessions' => $course_sessions,
             'courses' => $courses,
             'instructors' => $instructors,

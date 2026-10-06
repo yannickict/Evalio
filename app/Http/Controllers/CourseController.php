@@ -15,6 +15,6 @@ class CourseController extends Controller
         $courses = Course::with(['questionnaireTemplate', 'sessions.instructor'])->withCount('sessions')->orderBy('created_at')
             ->get();
 
-        return view('courses', ['courses' => $courses]);
+        return view('pages.courses.index', ['courses' => $courses]);
     }
 }

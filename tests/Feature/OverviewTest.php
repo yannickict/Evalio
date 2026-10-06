@@ -53,7 +53,7 @@ class OverviewTest extends TestCase
         ]);
 
         $this->actingAs($user)->get(route('overview'))->assertOk()
-            ->assertViewIs('overview')->assertSee('No course sessions yet');
+            ->assertViewIs('pages.sessions.index')->assertSee('No course sessions yet');
     }
 
     public function test_all_sessions_are_shown_with_their_details_and_evaluation_statuses(): void

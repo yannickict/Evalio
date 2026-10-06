@@ -41,7 +41,7 @@ class CoursePagesTest extends TestCase
         $session = CourseSession::factory()->create(['course_id' => $course->id]);
 
         $this->actingAs(User::factory()->approved()->create())->get(route('courses'))
-            ->assertOk()->assertViewIs('courses')
+            ->assertOk()->assertViewIs('pages.courses.index')
             ->assertViewHas('courses', fn ($courses) => $courses->firstWhere('id', $course->id)->sessions_count === 1
                 && $courses->firstWhere('id', $emptyCourse->id)->sessions_count === 0)
             ->assertSee($course->name)->assertSee($template->name)
@@ -56,7 +56,7 @@ class CoursePagesTest extends TestCase
     {
         $this->actingAs(User::factory()->approved()->create());
         $this->get(route('courses'))->assertOk()->assertSee('No courses yet');
-        $this->get(route('courses.create'))->assertOk()->assertViewIs('courses.create')
+        $this->get(route('courses.create'))->assertOk()->assertViewIs('pages.courses.create')
             ->assertSee(route('courses'), false)->assertSee('Course name')
             ->assertSee('Saving courses will be available soon.');
     }

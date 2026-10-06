@@ -8,9 +8,9 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home')->name('home');
-Route::view('/register', 'register')->name('register');
-Route::view('/login', 'login')->name('login');
+Route::view('/', 'pages.home.index')->name('home');
+Route::view('/register', 'pages.auth.register')->name('register');
+Route::view('/login', 'pages.auth.login')->name('login');
 
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 
@@ -27,7 +27,7 @@ Route::post('/questionnaire', [QuestionnaireController::class, 'submit'])
 
 Route::middleware('auth')->group(function () {
     Route::get('/courses', [CourseController::class, 'index'])->name('courses');
-    Route::view('/courses/create', 'courses.create')->name('courses.create');
+    Route::view('/courses/create', 'pages.courses.create')->name('courses.create');
 
     Route::get('/questionnaires', [QuestionnaireController::class, 'library'])->name('questionnaires.index');
     Route::post('/questionnaires', [QuestionnaireController::class, 'store'])->name('questionnaires.store');

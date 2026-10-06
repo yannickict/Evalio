@@ -15,16 +15,7 @@
                 <section class="card border-0 rounded-4 shadow-sm p-4 p-sm-5" aria-labelledby="auth-title">
                     <h1 class="h3" id="auth-title">@yield('title')</h1>
                     <p class="text-body-secondary small mb-4">@yield('intro')</p>
-                    @if ($errors->any())
-                        <div class="alert alert-danger small" role="alert">
-                            <p class="fw-semibold">Please check the following:</p>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                    <x-ui.validation-errors :errors="$errors" class="small" heading="Please check the following:" heading-class="fw-semibold" />
                     @yield('content')
                 </section>
                 <p class="text-center text-body-secondary small mt-4">@yield('footer')</p>

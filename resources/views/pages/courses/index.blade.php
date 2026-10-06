@@ -1,0 +1,32 @@
+@extends('layouts.app')
+
+@section('title', 'Courses - Evalio')
+
+@section('content')
+<main class="container py-5">
+    <header class="mb-4">
+        <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
+        <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
+            <h1 class="h2 fw-bold mb-0">Courses</h1>
+            <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">
+                {{ $courses->count() }} {{ $courses->count() === 1 ? 'course' : 'courses' }}
+            </span>
+            <a class="btn btn-success rounded-3 ms-auto" href="{{ route('courses.create') }}">New course</a>
+        </div>
+        <p class="text-body-secondary mb-0">Your courses, session counts, and assigned questionnaires.</p>
+    </header>
+
+    <div class="row g-4">
+        @forelse ($courses as $course)
+        <x-courses.card :course="$course" />
+        @empty
+        <div class="col-12">
+            <div class="card border-0 rounded-4 shadow-sm p-4 p-md-5 text-center">
+                <h2 class="h5">No courses yet</h2>
+                <p class="text-body-secondary mb-0">Your courses will appear here once they are created.</p>
+            </div>
+        </div>
+        @endforelse
+    </div>
+</main>
+@endsection

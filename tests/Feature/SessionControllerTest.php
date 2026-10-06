@@ -63,7 +63,7 @@ class SessionControllerTest extends TestCase
         ])->get(route('sessionscreate'))->assertOk()
             ->assertSee('value="2026-10-05"', false)
             ->assertSee('value="2026-10-07"', false);
-        $this->view('sessions.create', [
+        $this->view('pages.sessions.create', [
             'courses' => collect(),
             'instructors' => collect(),
             'errors' => (new ViewErrorBag)->put('default', new MessageBag([

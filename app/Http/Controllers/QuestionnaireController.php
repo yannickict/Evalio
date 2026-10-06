@@ -16,7 +16,7 @@ class QuestionnaireController extends Controller
 {
     public function library(): View
     {
-        return view('questionnaires.index', [
+        return view('pages.questionnaires.index', [
             'templates' => QuestionnaireTemplate::withCount('questions')->latest()->get(),
         ]);
     }
@@ -77,7 +77,7 @@ class QuestionnaireController extends Controller
 
         abort_if($template === null, 404, 'No questionnaire assigned.');
 
-        return view('questionnaire', [
+        return view('pages.questionnaires.respond', [
             'questions' => $template->questions()
                 ->get(),
         ]);
@@ -119,7 +119,7 @@ class QuestionnaireController extends Controller
 
     public function create(): View
     {
-        return view('questionnaires.create', [
+        return view('pages.questionnaires.create', [
             'draft' => [
                 'name' => '',
                 'questions' => [
@@ -223,6 +223,6 @@ class QuestionnaireController extends Controller
             $draft['questions'][$questionIndex]['options'] = array_values($draft['questions'][$questionIndex]['options']);
         }
 
-        return view('questionnaires.create', ['draft' => $draft]);
+        return view('pages.questionnaires.create', ['draft' => $draft]);
     }
 }

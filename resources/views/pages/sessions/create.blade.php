@@ -14,15 +14,7 @@
                 <h1 class="h2 fw-bold mb-2">New session</h1>
                 <p class="text-body-secondary mb-0">Choose the course, instructor, and dates for your session.</p>
             </header>
-            @if ($errors->any())
-            <div class="alert alert-danger" role="alert">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
+            <x-ui.validation-errors :errors="$errors" />
             <form method="POST" action="{{ route('sessions.store') }}" class="card border-0 rounded-4 shadow-sm">
                 @csrf
                 <div class="card-body p-4 p-md-5">

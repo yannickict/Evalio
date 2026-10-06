@@ -39,7 +39,7 @@ class QuestionnaireTest extends TestCase
         $unrelated = Question::factory()->create(['question_text' => 'Unrelated question']);
         $template->questions()->attach([$last->id => ['position' => 2], $first->id => ['position' => 1]]);
 
-        $this->get(route('questionnaire', ['code' => '012345']))->assertOk()->assertViewIs('questionnaire')
+        $this->get(route('questionnaire', ['code' => '012345']))->assertOk()->assertViewIs('pages.questionnaires.respond')
             ->assertSeeInOrder([$first->question_text, $last->question_text])->assertDontSee($unrelated->question_text);
     }
 
