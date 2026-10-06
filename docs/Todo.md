@@ -52,7 +52,8 @@ kanban-plugin: board
 
 ## Doing
 
-- [ ] [Must] Implement course creation and editing with server validation.
+- [x] [Must] Implement course creation with questionnaire assignment and server validation.
+- [ ] [Must] Implement course editing with server validation.
 
 
 ## Testing
@@ -62,7 +63,7 @@ kanban-plugin: board
 ## Done
 
 **Complete**
-- [x] Build database-backed course overview with session counts, instructor/session details and template display; course creation remains unfinished.
+- [x] Build database-backed course overview with session counts, instructor/session details and template display.
 - [x] Implement dynamic questionnaire draft editor with add/remove questions/options, type refresh and scroll/focus restoration.
 - [x] Validate and save new questionnaire templates, ordered questions and options atomically; list persisted templates with question counts.
 - [x] Allow skipped participant answers and blank free-text responses; update feature coverage and remove incomplete-answer warning.

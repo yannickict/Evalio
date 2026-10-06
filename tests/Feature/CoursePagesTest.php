@@ -52,12 +52,13 @@ class CoursePagesTest extends TestCase
             ->assertSee(route('courses.create'), false);
     }
 
-    public function test_empty_library_and_creation_preview_are_available(): void
+    public function test_empty_library_and_course_creation_form_are_available(): void
     {
         $this->actingAs(User::factory()->approved()->create());
         $this->get(route('courses.index'))->assertOk()->assertSee('No courses yet');
         $this->get(route('courses.create'))->assertOk()->assertViewIs('pages.courses.create')
             ->assertSee(route('courses.index'), false)->assertSee('Course name')
-            ->assertSee('Saving courses will be available soon.');
+            ->assertSee('No questionnaires available.')
+            ->assertSee(route('questionnaires.create'), false);
     }
 }

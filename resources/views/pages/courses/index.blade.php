@@ -16,6 +16,8 @@
         <p class="text-body-secondary mb-0">Your courses, session counts, and assigned questionnaires.</p>
     </header>
 
+    <x-ui.status-alert />
+
     <div class="row g-4">
         @forelse ($courses as $course)
         <x-courses.card :course="$course" />

@@ -9,7 +9,7 @@ Reviewed against source code on 5 October 2026. [[02 Project Requirements|Projec
 | Web application and SQL storage | Laravel, Blade, Eloquent and migrations | Production database/deployment configuration and complete SQL dump procedure |
 | Roles and least privilege | Instructor/editor/admin records; admin checks on user management | Enforce editor/admin access for session writes and questionnaire administration; restrict instructors to their own sessions/results |
 | Registration and approval | New instructor accounts are unapproved; admin approves and assigns roles; login requires approval | Forgot-password routes, forms and reset workflow |
-| Course management | Course model, unique name, seeded records and database-backed overview with session details; create page remains a placeholder | Course create/update UI and endpoints; duplicate detection beyond the unique constraint |
+| Course management | Course model, unique name validation, seeded records, database-backed overview and course creation with questionnaire assignment | Course update UI and endpoint |
 | Course sessions | Create UI, course/instructor/date validation, unique generated number and at most one feedback form per session | Update/delete operations and feedback-code creation/distribution workflow |
 | Evaluation phase | Nullable `open`/`closed` column; status displayed | Automatic start-to-end-plus-14-days calculation, manual controls and enforcement on GET/POST feedback |
 | Anonymous evaluation (T-01) | Public code-based questionnaire; no participant foreign key on forms | Full anonymity assessment beyond domain storage; code lifecycle and access controls |
@@ -20,7 +20,7 @@ Reviewed against source code on 5 October 2026. [[02 Project Requirements|Projec
 | Final storage (T-08) | Answers are created on POST; forms exist beforehand | Define submitted-form lifecycle, atomic save and duplicate/replay handling |
 | Standard questionnaire | Seeder defines ten questions, options and template positions | Verify end-to-end behavior after changes |
 | Question configuration | Database content initialized from PHP seeder | Required separate configuration-file approach remains absent |
-| Optional template management (O-01–O-03) | Dynamic editor, draft preview, validated transactional template saving and database-backed library | Administrator authorization, configurable comments, editing/deleting saved templates and course assignment UI |
+| Optional template management (O-01–O-03) | Dynamic editor, draft preview, validated transactional template saving and database-backed library | Administrator authorization, configurable comments and editing/deleting saved templates |
 | Evaluation and filtering | Session details; combined course/instructor card filters | Aggregate answer evaluation, individual-session filter/results and instructor ownership checks |
 | One-page A4 output | No evaluation print feature found | Printable compact A4 results |
 | Backups and CSV import | No application endpoints or workflows found | Administrator backup/restore procedure and specified CSV import |

@@ -50,7 +50,8 @@ Paths and handler names below match the repository.
 | GET    | `/session/create`         | `CourseSessionController::create`          | Authenticated                               |
 | POST   | `/session`                | `CourseSessionController::store`           | Authenticated                               |
 | GET    | `/courses`                | `CourseController::index`                  | Authenticated; user must have a role        |
-| GET    | `/courses/create`         | Static course creation placeholder         | Authenticated                               |
+| GET | `/courses/create` | `CourseController::create` | Authenticated |
+| POST | `/courses` | `CourseController::store` | Authenticated; validated course creation |
 | GET    | `/questionnaires`         | `QuestionnaireTemplateController::index`   | Authenticated                               |
 | GET    | `/questionnaires/create`  | `QuestionnaireTemplateController::create`  | Authenticated                               |
 | POST   | `/questionnaires/preview` | `QuestionnaireTemplateController::preview` | Authenticated; draft changes only           |
@@ -87,7 +88,7 @@ The overview loads all sessions, their instructors, course templates and each se
 
 ## Courses
 
-The course overview loads every course with its questionnaire template, session count and sessions/instructors. It requires an authenticated user with a role but does not scope records by instructor. The course creation page remains a placeholder: template selection and save are disabled, and no course write endpoint exists.
+The course overview loads every course with its questionnaire template, session count and sessions/instructors. It requires an authenticated user with a role but does not scope records by instructor. The course creation page lists questionnaires alphabetically and restores the name and selected questionnaire after validation errors. `StoreCourseRequest` requires a unique name of up to 255 characters and an existing questionnaire template. Saving creates the course and redirects to the course list with confirmation. When no questionnaires exist, the form disables creation and links to the questionnaire editor. Course creation does not create sessions; course editing remains unfinished.
 
 ## Questionnaire editor and library
 
@@ -95,4 +96,4 @@ The library lists persisted templates with question counts, newest first. The ed
 
 Saving validates the template name, question text/type and single-choice options, then creates the template, ordered question pivot records and options within a database transaction. Limits are 255 characters for the name, 5,000 for question text and 1,000 per option; single-choice questions require at least two options. New questions always have allows_comment=false. Save redirects to the database-backed library with confirmation.
 
-All editor/library routes currently require authentication only. Administrator authorization, editing/deleting saved templates, configurable comments and course assignment UI remain unfinished. This editor preview concerns questionnaire design; it is not the participant answer-review step required before feedback submission.
+All editor/library routes currently require authentication only. Administrator authorization, editing/deleting saved templates, configurable comments and changing existing course assignments remain unfinished. This editor preview concerns questionnaire design; it is not the participant answer-review step required before feedback submission.

@@ -21,9 +21,10 @@ Route::prefix('questionnaire')->name('feedback.')->controller(FeedbackResponseCo
 });
 
 Route::middleware('auth')->group(function () {
-    Route::prefix('courses')->name('courses.')->group(function () {
-        Route::get('/', [CourseController::class, 'index'])->middleware('can:view-course-lists')->name('index');
-        Route::view('/create', 'pages.courses.create')->name('create');
+    Route::prefix('courses')->name('courses.')->controller(CourseController::class)->group(function () {
+        Route::get('/', 'index')->middleware('can:view-course-lists')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
     });
 
     Route::prefix('questionnaires')->name('questionnaires.')->controller(QuestionnaireTemplateController::class)->group(function () {
