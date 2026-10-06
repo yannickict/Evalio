@@ -50,12 +50,17 @@ Paths and handler names below match the repository.
 | GET    | `/session/create`         | `CourseSessionController::create`          | Authenticated                               |
 | POST   | `/session`                | `CourseSessionController::store`           | Authenticated                               |
 | GET    | `/courses`                | `CourseController::index`                  | Authenticated; user must have a role        |
-| GET | `/courses/create` | `CourseController::create` | Authenticated |
-| POST | `/courses` | `CourseController::store` | Authenticated; validated course creation |
+| GET | `/courses/create` | `CourseController::create` | Admin/editor |
+| POST | `/courses` | `CourseController::store` | Admin/editor; validated course creation |
+| GET | `/courses/{course}/edit` | `CourseController::edit` | Admin/editor |
+| PATCH | `/courses/{course}` | `CourseController::update` | Admin/editor; validated update |
+| GET | `/session/{courseSession}/edit` | `CourseSessionController::edit` | Admin/editor |
+| PATCH | `/session/{courseSession}` | `CourseSessionController::update` | Admin/editor; instructor/date update |
+| PATCH | `/session/{courseSession}/evaluation` | `CourseSessionController::updateEvaluationStatus` | Admin/editor |
 | GET    | `/questionnaires`         | `QuestionnaireTemplateController::index`   | Authenticated                               |
-| GET    | `/questionnaires/create`  | `QuestionnaireTemplateController::create`  | Authenticated                               |
-| POST   | `/questionnaires/preview` | `QuestionnaireTemplateController::preview` | Authenticated; draft changes only           |
-| POST   | `/questionnaires`         | `QuestionnaireTemplateController::store`   | Authenticated; persistent template creation |
+| GET    | `/questionnaires/create`  | `QuestionnaireTemplateController::create`  | Admin/editor                               |
+| POST   | `/questionnaires/preview` | `QuestionnaireTemplateController::preview` | Admin/editor; draft changes only           |
+| POST   | `/questionnaires`         | `QuestionnaireTemplateController::store`   | Admin/editor; persistent template creation |
 | GET    | `/users`                  | `UserController::index`                    | Administrator                               |
 | PATCH  | `/users/{user}`           | `UserController::update`                   | Administrator                               |
 | DELETE | `/users/{user}`           | `UserController::destroy`                  | Administrator; cannot delete self           |
@@ -103,12 +108,18 @@ The evaluation update route uses the `manage-evaluations` gate for administrator
 
 ## Courses
 
-The course overview loads every course with its questionnaire template, session count and sessions/instructors. It requires an authenticated user with a role but does not scope records by instructor. The course creation page lists questionnaires alphabetically and restores the name and selected questionnaire after validation errors. `StoreCourseRequest` requires a unique name of up to 255 characters and an existing questionnaire template. Saving creates the course and redirects to the course list with confirmation. When no questionnaires exist, the form disables creation and links to the questionnaire editor. Course creation does not create sessions; course editing remains unfinished.
+The course overview lists courses with their default questionnaire and visible session counts/details. Instructors see only their own sessions within each course; admins/editors see all. Course creation and editing are restricted to admins/editors. Both pages reuse `components/courses/form-fields.blade.php`, restore old input and validate unique names and existing templates. Updates ignore the course's own name for uniqueness and change only the default for new sessions. Course modals link to session creation with the course selected and to visible session details.
 
 ## Questionnaire editor and library
 
 The library lists persisted templates with question counts, newest first. The editor starts with one single-choice question and two options. Preview POST requests add/remove questions and options or refresh answer types without database writes. It retains at least one question and two single-choice options, with limits of 50 questions and 20 options per question. JavaScript automatically submits type changes and restores scroll/focus using sessionStorage; a refresh button remains available without JavaScript.
 
-Saving validates the template name, question text/type and single-choice options, then creates the template, ordered question pivot records and options within a database transaction. Limits are 255 characters for the name, 5,000 for question text and 1,000 per option; single-choice questions require at least two options. New questions always have allows_comment=false. Save redirects to the database-backed library with confirmation.
+Saving validates the template name, question text/type, optional comment setting and single-choice options, then creates the template, ordered question pivot records and options within a database transaction. Limits are 255 characters for the name, 5,000 for question text and 1,000 per option; single-choice questions require at least two options. Optional comments default to disabled and can be enabled per question. Save redirects to the database-backed library with confirmation.
 
-All editor/library routes currently require authentication only. Administrator authorization, editing/deleting saved templates, configurable comments and changing existing course assignments remain unfinished. This editor preview concerns questionnaire design; it is not the participant answer-review step required before feedback submission.
+The library requires authentication. Creation, draft refresh and saving additionally require `create-questionnaires` (admins/editors). Editing/deleting saved templates and template versioning remain unfinished. This editor preview concerns questionnaire design; it is not the participant answer-review step required before feedback submission.
+
+## Shared forms and permissions
+
+Course forms share their name/template fields. Session forms share instructor and date fields; course/template are read-only on edit. `CourseSessionRequest` validates approved instructors and date ordering; its creation subclass adds course validation and instructor self-assignment enforcement, while its update subclass accepts only instructor/dates. Session updates require `edit-sessions` and preserve template, course, number and evaluation status. Date edits do not immediately recalculate evaluation status; the scheduled process uses the saved dates.
+
+Role names are the authorization source of truth. `User::hasRole()` supplies shared role checks, while gates retain separate names for creating/editing courses/questionnaires/sessions, session filters, workflow guidance, user administration and evaluation controls. Unused boolean role permission columns were removed from the original schema for fresh migration.

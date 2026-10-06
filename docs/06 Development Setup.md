@@ -34,7 +34,7 @@ On a dedicated local demo database:
 php artisan db:seed
 ```
 
-`DatabaseSeeder` runs `RoleSeeder` and `QuestionnaireSeeder`, then `DemoSeeder` only in `local` or `testing` environments. The demo seeder creates an approved `admin@example.com` account with password `password`, five approved instructors, three additional unapproved users, five courses, fifteen sessions and one feedback form per session with random six-digit codes.
+`DatabaseSeeder` runs `RoleSeeder` and `QuestionnaireSeeder`, then `DemoSeeder` only in `local` or `testing` environments. The demo seeder creates an approved `admin@example.com` account with password `password`, five approved instructors, three additional unapproved users, five courses, fifteen sessions and one feedback form per session. Only open sessions receive random six-digit codes; closed/future sessions have null codes. Unused role permission columns were removed from the original role-table migration, so fresh migration uses role names and gates only.
 
 The demo credentials are for local demonstration. Re-running the demo seeder resets the demo administrator's password and adds more factory-generated records; it is not an idempotent reset. The standard questionnaire seeder updates shared question content and rebuilds its template pivot. Seeding is therefore a data mutation, not a routine application startup step.
 

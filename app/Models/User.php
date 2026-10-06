@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function hasRole(string ...$roles): bool
+    {
+        return in_array($this->role?->name, $roles, true);
+    }
+
     /** @return HasMany<CourseSession, $this> */
     public function courseSessions(): HasMany
     {

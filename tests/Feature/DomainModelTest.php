@@ -47,19 +47,18 @@ class DomainModelTest extends TestCase
         $this->assertFalse($other->allows_comment);
     }
 
-    public function test_role_permissions_are_boolean_and_membership_tracks_users(): void
+    public function test_role_membership_tracks_users_and_checks_role_names(): void
     {
-        $role = Role::factory()->create([
-            'name' => 'custom', 'see_overview' => 1, 'update' => 0,
-            'delete' => 1, 'assign_roles' => 0, 'approve_registrations' => 1,
-        ]);
+        $role = Role::factory()->create(['name' => 'custom']);
         $user = User::factory()->create(['role_id' => $role->id]);
 
         $this->assertTrue($role->users()->sole()->is($user));
         $this->assertTrue($user->role->is($role));
-        foreach (['see_overview' => true, 'update' => false, 'delete' => true, 'assign_roles' => false, 'approve_registrations' => true] as $permission => $expected) {
-            $this->assertSame($expected, $role->$permission);
-        }
+        $this->assertTrue($user->hasRole('custom'));
+        $this->assertTrue($user->hasRole('admin', 'custom'));
+        $this->assertFalse($user->hasRole('admin', 'editor'));
+        $user->setRelation('role', null);
+        $this->assertFalse($user->hasRole('custom'));
     }
 
     public function test_user_name_normalizes_whitespace_and_hides_credentials(): void

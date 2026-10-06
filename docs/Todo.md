@@ -75,7 +75,7 @@ kanban-plugin: board
 - [x] Add course-page, questionnaire-creation and JavaScript questionnaire-editor tests; execution remains unverified in this documentation review.
 - [x] Set up Laravel, Blade, Bootstrap, JavaScript and Vite/Vite Plus application structure and dependency manifests.
 - [x] Define relational domain schema and Eloquent models for roles/users, courses/sessions, templates/questions/options, feedback forms and answers.
-- [x] Store instructor/editor/admin roles and permission flags.
+- [x] Store instructor/editor/admin roles; authorize through role-name gates.
 - [x] Implement registration with name/email/password validation, hashed passwords, default instructor role and unapproved account state.
 - [x] Implement approval-gated login, login throttling, session regeneration and logout.
 - [x] Implement administrator user approval, role assignment/change and user deletion with self-deletion and assigned-session guards.

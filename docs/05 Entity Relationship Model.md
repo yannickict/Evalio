@@ -18,7 +18,7 @@ All main entity tables have an `id` primary key and Laravel `created_at`/`update
 
 `roles` defines application roles. The application uses `instructor`, `editor` and `admin` names.
 
-The table also stores boolean `see_overview`, `update`, `delete`, `assign_roles` and `approve_registrations` flags. Migrations and `RoleSeeder` enable overview/update for editors and administrators, and deletion/role assignment/approval for administrators. Current controller authorization does not consistently consult these flags; the overview accepts any user with a role.
+Role names are the authorization source of truth. Gates use `User::hasRole()` for shared checks. The unused boolean permission flags were removed from the original migration; `RoleSeeder` maintains the three default role names without changing their IDs.
 
 `users` stores `role_id`, `first_name`, `last_name`, unique `email`, hashed `password`, and `is_approved`, alongside authentication fields such as `email_verified_at` and `remember_token`. The `User` model exposes `name` as a computed combination of first and last name, rather than a separate name column. Password hashing is handled through the model's hashed cast.
 
@@ -47,7 +47,7 @@ There is no separate course `code` column. One course has many course sessions. 
 
 Each session belongs to one course and one instructor and has at most one feedback form. If no session number is supplied, the model generates a number such as `COURSE.0001` by scanning existing numbers. Session creation validates that the instructor is approved and has the instructor role, and that the end date is not before the start date.
 
-The migration describes null status as automatic mode and explicit values as manual overrides. The current controller/model does not calculate the automatic date window or enforce it when feedback is accessed/submitted. The overview displays null as “Evaluation status not set”.
+The overview displays null as “Evaluation status not set”. The hourly command opens on the start date, catches up unset sessions during the evaluation window, and closes on end date plus 14 days. Manually closed sessions stay closed on later dates. Feedback access and submission require an open status.
 
 ### Questionnaire Template
 
@@ -83,7 +83,7 @@ The primary key is `(questionnaire_template_id, question_id)`. A unique constrai
 
 The form does not store a participant identity or its own questionnaire-template reference. The questionnaire is resolved using `feedback_form -> course_session -> questionnaire_template` at request time. There is no fallback to the course's current template. The session foreign key restricts deletion of assigned templates; it does not freeze questions or options.
 
-`CourseSession::feedbackForm()` (has-one) exposes the session-to-form relationship, while `Answer::feedbackForm()` exposes the answer-to-form relationship. The `FeedbackForm` model currently defines only `courseSession()`; it has no inverse `answers()` relation. Demo seeding creates coded forms in advance; the session creation controller does not create them.
+`CourseSession::feedbackForm()` (has-one) exposes the session-to-form relationship, while `Answer::feedbackForm()` exposes the answer-to-form relationship. The `FeedbackForm` model currently defines only `courseSession()`; it has no inverse `answers()` relation. Demo seeding creates forms for every session and codes only for open evaluations. Session creation does not create forms; opening an evaluation creates its form/code as needed.
 
 ### Answer
 

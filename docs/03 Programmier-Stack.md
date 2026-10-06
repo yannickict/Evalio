@@ -30,7 +30,7 @@ Related notes: [[01 Documentation Index|Documentation Index]], [[04 Application 
 
 Routes in `routes/web.php` map requests to controllers or Blade views. Controllers handle registration, login/logout, user administration, session creation, the course/session overview, questionnaire editor/template saving and participant submission. Eloquent models represent domain records and migrations define tables and constraints.
 
-Authentication uses Laravel's authentication/session facilities. Login requires `is_approved = true` and is throttled. Administrator checks are explicit in `UserController`. Authentication and role authorization are separate: session creation currently requires authentication without an editor/admin check, and the overview loads all sessions for authenticated users with a role.
+Authentication uses Laravel's authentication/session facilities. Login requires `is_approved = true` and is throttled. Named gates use role names through `User::hasRole()`. Administrators manage users; administrators/editors create courses/questionnaires and edit courses/sessions. Instructors can create sessions only for themselves and see only their own sessions in session lists and course modals.
 
 ## Frontend
 

@@ -13,11 +13,6 @@ class RoleFactory extends Factory
     {
         return [
             'name' => fake()->unique()->word(),
-            'see_overview' => false,
-            'update' => false,
-            'delete' => false,
-            'assign_roles' => false,
-            'approve_registrations' => false,
         ];
     }
 }

@@ -105,17 +105,14 @@ class SeederTest extends TestCase
         $this->assertDatabaseHas('feedback_forms', ['id' => $session->id, 'code' => null]);
     }
 
-    public function test_role_seeding_is_repeatable_and_preserves_permissions(): void
+    public function test_role_seeding_is_repeatable_and_preserves_role_ids(): void
     {
         $this->seed(RoleSeeder::class);
+        $roles = Role::orderBy('id')->pluck('name', 'id')->all();
         $this->seed(RoleSeeder::class);
         $this->assertDatabaseCount('roles', 3);
 
-        foreach (Role::all() as $role) {
-            $this->assertSame($role->name === 'admin', $role->approve_registrations);
-            $this->assertSame($role->name === 'admin', $role->assign_roles);
-            $this->assertSame($role->name !== 'instructor', $role->see_overview);
-        }
+        $this->assertSame($roles, Role::orderBy('id')->pluck('name', 'id')->all());
     }
 
     public function test_questionnaire_seeding_is_repeatable_and_preserves_question_order(): void

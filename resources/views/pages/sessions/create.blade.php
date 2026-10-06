@@ -35,33 +35,12 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="session-instructor" class="form-label fw-medium">Instructor</label>
-                                <select id="session-instructor" name="instructor_id" class="form-select" required>
-                                    <option value="" @selected(! old('instructor_id')) disabled>Select an instructor</option>
-                                    @forelse ($instructors as $instructor)
-                                    <option value="{{ $instructor->id }}" @selected(old('instructor_id') == $instructor->id)>{{ $instructor->name }}</option>
-                                    @empty
-                                    <option disabled>No instructors available</option>
-                                    @endforelse
-                                </select>
+                                <x-sessions.instructor-field :instructors="$instructors" />
                             </div>
                         </div>
                     </section>
 
-                    <section aria-labelledby="course-dates-heading">
-                        <h2 id="course-dates-heading" class="h5 fw-semibold mb-1">Course dates</h2>
-                        <p class="small text-body-secondary mb-4">Choose when the course starts and ends.</p>
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label for="session-start-date" class="form-label fw-medium">Start date</label>
-                                <input id="session-start-date" name="start_date" value="{{ old('start_date') }}" type="date" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="session-end-date" class="form-label fw-medium">End date</label>
-                                <input id="session-end-date" name="end_date" value="{{ old('end_date') }}" type="date" class="form-control" required>
-                            </div>
-                        </div>
-                    </section>
+                    <x-sessions.date-fields />
                 </div>
                 <div class="card-footer bg-transparent border-top px-4 px-md-5 py-4">
                     <div class="d-flex justify-content-end">

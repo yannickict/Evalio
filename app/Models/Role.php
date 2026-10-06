@@ -8,17 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'see_overview', 'update', 'delete', 'assign_roles', 'approve_registrations'])]
+#[Fillable(['name'])]
 class Role extends Model
 {
     /** @use HasFactory<RoleFactory> */
     use HasFactory;
-
-    /** @return array<string, string> */
-    protected function casts(): array
-    {
-        return ['see_overview' => 'boolean', 'update' => 'boolean', 'delete' => 'boolean', 'assign_roles' => 'boolean', 'approve_registrations' => 'boolean'];
-    }
 
     /** @return HasMany<User, $this> */
     public function users(): HasMany

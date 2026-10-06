@@ -33,31 +33,10 @@
                                 <dd class="fw-medium text-break mb-0">{{ $courseSession->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</dd>
                             </div>
                         </dl>
-                        <label for="session-instructor" class="form-label fw-medium">Instructor</label>
-                        <select id="session-instructor" name="instructor_id" class="form-select" required>
-                            @if (! $instructors->contains('id', $courseSession->instructor_id))
-                            <option value="{{ $courseSession->instructor_id }}" selected disabled>{{ $courseSession->instructor->name }} (currently unavailable)</option>
-                            @endif
-                            @foreach ($instructors as $instructor)
-                            <option value="{{ $instructor->id }}" @selected(old('instructor_id', $courseSession->instructor_id) == $instructor->id)>{{ $instructor->name }}</option>
-                            @endforeach
-                        </select>
+                        <x-sessions.instructor-field :instructors="$instructors" :course-session="$courseSession" />
                     </section>
 
-                    <section aria-labelledby="course-dates-heading">
-                        <h2 id="course-dates-heading" class="h5 fw-semibold mb-1">Course dates</h2>
-                        <p class="small text-body-secondary mb-4">Evaluations open on the start date and close 14 days after the end date.</p>
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label for="session-start-date" class="form-label fw-medium">Start date</label>
-                                <input id="session-start-date" name="start_date" value="{{ old('start_date', $courseSession->start_date->toDateString()) }}" type="date" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="session-end-date" class="form-label fw-medium">End date</label>
-                                <input id="session-end-date" name="end_date" value="{{ old('end_date', $courseSession->end_date->toDateString()) }}" type="date" class="form-control" required>
-                            </div>
-                        </div>
-                    </section>
+                    <x-sessions.date-fields :course-session="$courseSession" />
                 </div>
                 <div class="card-footer bg-transparent border-top px-4 px-md-5 py-4">
                     <div class="d-flex justify-content-end gap-2">

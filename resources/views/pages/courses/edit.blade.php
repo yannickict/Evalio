@@ -22,25 +22,7 @@
                 @csrf
                 @method('PATCH')
                 <div class="card-body p-4 p-md-5">
-                    <section aria-labelledby="course-details-heading" class="mb-4 pb-4 border-bottom">
-                        <h2 id="course-details-heading" class="h5 fw-semibold mb-1">Course details</h2>
-                        <p class="small text-body-secondary mb-4">Choose a name that makes this course easy to find.</p>
-                        <label for="course-name" class="form-label fw-medium">Course name</label>
-                        <input id="course-name" name="name" type="text" class="form-control"
-                            value="{{ old('name', $course->name) }}" maxlength="255" required>
-                    </section>
-
-                    <section aria-labelledby="course-questionnaire-heading">
-                        <h2 id="course-questionnaire-heading" class="h5 fw-semibold mb-1">Feedback questionnaire</h2>
-                        <p class="small text-body-secondary mb-4">Choose the questionnaire participants will use to evaluate this course.</p>
-                        <label for="course-questionnaire" class="form-label fw-medium">Assigned questionnaire</label>
-                        <select id="course-questionnaire" name="questionnaire_template_id" class="form-select" required @disabled($templates->isEmpty())>
-                            <option value="" @selected(! old('questionnaire_template_id', $course->questionnaire_template_id)) disabled>Select a questionnaire</option>
-                            @foreach ($templates as $template)
-                                <option value="{{ $template->id }}" @selected(old('questionnaire_template_id', $course->questionnaire_template_id) == $template->id)>{{ $template->name }}</option>
-                            @endforeach
-                        </select>
-                    </section>
+                    <x-courses.form-fields :templates="$templates" :course="$course" />
                 </div>
                 <div class="card-footer bg-transparent border-top px-4 px-md-5 py-4">
                     <div class="d-flex justify-content-end gap-2">
