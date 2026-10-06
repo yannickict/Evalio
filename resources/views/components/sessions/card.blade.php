@@ -2,9 +2,9 @@
 
 @php
 $statusLabel = match ($courseSession->evaluation_status) {
-    'open' => 'Evaluation open',
-    'closed' => 'Evaluation closed',
-    default => 'Evaluation status not set',
+'open' => 'Evaluation open',
+'closed' => 'Evaluation closed',
+default => 'Evaluation status not set',
 };
 $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secondary';
 @endphp
@@ -71,9 +71,25 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
             <dd class="text-break mb-0">{{ $courseSession->course->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</dd>
         </div>
     </dl>
-    @if ($courseSession->course->questionnaireTemplate && $courseSession->feedbackForm?->code !== null)
     <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 border-top pt-3 mt-4">
+        @if ($courseSession->evaluation_status === 'open' && $courseSession->course->questionnaireTemplate && $courseSession->feedbackForm?->code !== null)
         <a class="btn btn-success rounded-3 text-break" href="{{ route('feedback.show', ['code' => $courseSession->feedbackForm->code]) }}">View questionnaire</a>
+        @endif
+        @can('manage-evaluations')
+        <form method="POST"
+            action="{{ route('sessions.evaluation.update', $courseSession) }}">
+            @csrf
+            @method('PATCH')
+
+            <input type="hidden" name="evaluation_status"
+                value="{{ $courseSession->evaluation_status === 'open' ? 'closed' : 'open' }}">
+
+            <button type="submit" class="btn btn-outline-success rounded-3">
+                {{ $courseSession->evaluation_status === 'open'
+                ? 'Close evaluation'
+                : 'Open evaluation' }}
+            </button>
+        </form>
+        @endcan
     </div>
-    @endif
 </x-ui.modal>

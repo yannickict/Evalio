@@ -38,6 +38,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/overview', 'index')->middleware('can:view-course-lists')->name('index');
         Route::get('/session/create', 'create')->name('create');
         Route::post('/session', 'store')->name('store');
+        Route::patch('/session/{courseSession}/evaluation', 'updateEvaluationStatus')
+            ->middleware('can:manage-evaluations')
+            ->name('evaluation.update');
     });
 
     Route::prefix('users')->name('users.')->middleware('can:manage-users')->controller(UserController::class)->group(function () {

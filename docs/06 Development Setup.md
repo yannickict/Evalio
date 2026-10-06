@@ -36,7 +36,7 @@ php artisan db:seed
 
 The demo credentials are for local demonstration. Re-running the demo seeder resets the demo administrator's password and adds more factory-generated records; it is not an idempotent reset. The standard questionnaire seeder updates shared question content and rebuilds its template pivot. Seeding is therefore a data mutation, not a routine application startup step.
 
-Log in as the demo administrator and open Overview to find existing feedback codes. Participants enter a code on the home page without logging in. New sessions created through the UI have no generated feedback codes yet.
+Log in as the demo administrator and open Overview to find existing feedback codes. Participants enter a code on the home page without logging in. New sessions receive an access code when their evaluation is opened manually or by the scheduled start-date job. Closed evaluations reject access even if a legacy/demo record still contains a code.
 
 ## Start development
 
@@ -44,7 +44,31 @@ Log in as the demo administrator and open Overview to find existing feedback cod
 composer dev
 ```
 
-This starts the Laravel server, queue listener and frontend development server through Concurrently. The example application URL is `http://localhost:8000`.
+This starts the Laravel server, queue listener, Laravel scheduler worker and frontend development server through Concurrently. The example application URL is `http://localhost:8000`.
+
+
+## Evaluation scheduler
+
+`composer dev` includes `php artisan schedule:work`; if you start the web and frontend servers separately, run that worker in another terminal. In production, configure cron or Windows Task Scheduler to run `php artisan schedule:run` every minute from the project root. Each production invocation finishes after checking the schedule; PHP does not need a permanently running web request.
+
+For example, a Linux cron entry is:
+
+```cron
+* * * * * cd /absolute/path/to/Evalio && /absolute/path/to/php artisan schedule:run >> /dev/null 2>&1
+```
+
+On Windows, use the host's PHP executable, pass `artisan schedule:run` as arguments, set the project folder as the working directory, and repeat the task every minute.
+
+The evaluation command runs on the hour and uses `EVALUATION_TIMEZONE=Europe/Zurich` by default. It acts only on session start dates and end dates plus 14 days, so the scheduler must run during those calendar days. On other days it leaves manual status choices unchanged. Repeated runs skip evaluations already in the requested state.
+
+To inspect the registered schedule or run today's boundary updates manually:
+
+```powershell
+php artisan schedule:list
+php artisan evaluations:update-statuses
+```
+
+The second command updates records and access codes in your configured database; it is not a read-only check.
 
 ## Verification
 

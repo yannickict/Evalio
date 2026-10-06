@@ -165,7 +165,7 @@ class CourseSessionPagesTest extends TestCase
     {
         $template = QuestionnaireTemplate::factory()->create();
         $course = Course::factory()->for($template, 'questionnaireTemplate')->create();
-        $available = CourseSession::factory()->for($course)->create(['evaluation_status' => 'closed']);
+        $available = CourseSession::factory()->for($course)->create(['evaluation_status' => 'open']);
         FeedbackForm::factory()->for($available, 'courseSession')->create(['code' => '012345']);
         $noCode = CourseSession::factory()->for($course)->create(['evaluation_status' => 'closed']);
         FeedbackForm::factory()->for($noCode, 'courseSession')->create(['code' => null]);

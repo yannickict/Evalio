@@ -27,7 +27,7 @@ class FeedbackResponseTest extends TestCase
     {
         $template = QuestionnaireTemplate::factory()->create();
         $course = Course::factory()->for($template, 'questionnaireTemplate')->create();
-        FeedbackForm::factory()->for(CourseSession::factory()->for($course), 'courseSession')->create(['code' => '012345']);
+        FeedbackForm::factory()->for(CourseSession::factory()->for($course)->state(['evaluation_status' => 'open']), 'courseSession')->create(['code' => '012345']);
 
         return $template;
     }
@@ -134,7 +134,7 @@ class FeedbackResponseTest extends TestCase
     {
         $template = $this->questionnaire();
         $first = FeedbackForm::where('code', '012345')->firstOrFail();
-        $secondSession = CourseSession::factory()->create(['course_id' => $first->courseSession->course_id]);
+        $secondSession = CourseSession::factory()->create(['course_id' => $first->courseSession->course_id, 'evaluation_status' => 'open']);
         $second = FeedbackForm::factory()->for($secondSession, 'courseSession')->create(['code' => '654321']);
         $question = Question::factory()->create(['type' => 'free_text']);
         $template->questions()->attach($question, ['position' => 1]);
@@ -304,7 +304,7 @@ class FeedbackResponseTest extends TestCase
     public function test_submission_validates_query_code_and_missing_template(): void
     {
         $this->post(route('feedback.store', ['code' => 'invalid']))->assertSessionHasErrors('code');
-        FeedbackForm::factory()->create(['code' => '012345']);
+        FeedbackForm::factory()->for(CourseSession::factory()->state(['evaluation_status' => 'open']), 'courseSession')->create(['code' => '012345']);
         $this->post(route('feedback.store', ['code' => '012345']))->assertNotFound();
         $this->assertDatabaseCount('answers', 0);
     }
@@ -355,7 +355,7 @@ class FeedbackResponseTest extends TestCase
     public function test_unknown_code_and_missing_template_return_not_found(): void
     {
         $this->get(route('feedback.show', ['code' => '999999']))->assertNotFound();
-        FeedbackForm::factory()->create(['code' => '012345']);
+        FeedbackForm::factory()->for(CourseSession::factory()->state(['evaluation_status' => 'open']), 'courseSession')->create(['code' => '012345']);
         $this->get(route('feedback.show', ['code' => '012345']))->assertNotFound();
     }
 

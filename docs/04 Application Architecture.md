@@ -78,13 +78,22 @@ Administrators can approve a pending account while assigning its role, change ap
 
 Participant answers are now optional in the browser. Tests cover skipped questions and blank free-text submissions. The incomplete-answer JavaScript warning has been removed. There is no separate review step or draft storage. Opening the page does not create answer records; feedback forms and their codes already exist. Comments alone are not processed because submission iterates the answer array.
 
-Repeated submissions append answers to the same form. The code is not consumed, and there is no submitted flag. Form Requests validate the query code, payload arrays, answer types and lengths, question/template membership, option/question membership and whether comments are allowed. Answer writes use one database transaction. Evaluation-window enforcement remains unfinished. See [[07 Implementation Status|Implementation Status]] for the resulting requirement gaps.
+Repeated submissions append answers to the same form. The code is not consumed, and there is no submitted flag. Form Requests validate the query code, payload arrays, answer types and lengths, question/template membership, option/question membership and whether comments are allowed. Answer writes use one database transaction. Both questionnaire access and submission require an open evaluation. Closing clears its access code while preserving the feedback form and collected answers. See [[07 Implementation Status|Implementation Status]] for the resulting requirement gaps.
 
 ## Sessions and overview
 
-Session creation selects an existing course and approved instructor, validates dates and creates the session. The model generates `COURSE.0001`-style identifiers by scanning existing numbers. The unique database constraint prevents duplicate stored identifiers, but concurrent number generation has no locking/retry mechanism. Creation does not generate feedback forms or codes.
+Session creation selects an existing course and approved instructor, validates dates and creates the session. The model generates `COURSE.0001`-style identifiers by scanning existing numbers. The unique database constraint prevents duplicate stored identifiers, but concurrent number generation has no locking/retry mechanism. Creation does not immediately generate feedback forms or codes; opening an evaluation does.
 
 The overview loads all sessions, their instructors, course templates and each session's optional feedback form. The model exposes feedbackForm() as a has-one relation and the schema makes course_session_id unique in feedback_forms. Cards show dates and status; modals expose details and existing feedback codes. Course and instructor selectors combine filters in JavaScript using exact IDs. Filtering hides cards already sent to the browser and does not provide server-side access control. No aggregate answer results are displayed.
+
+
+## Automatic evaluation status
+
+`evaluations:update-statuses` runs hourly through Laravel's scheduler in `EVALUATION_TIMEZONE` (default `Europe/Zurich`). It opens sessions whose start date is today and closes sessions whose end date was exactly 14 days ago. Closing happens on the fourteenth day, not after that day finishes. Other dates are left unchanged, so manual changes are preserved outside the boundary days. A full missed boundary day requires a manual status update; this command does not restore date-based status on later dates.
+
+Both the scheduled command and the authorized manual update use `app/Actions/SetEvaluationStatus.php`. Matching statuses are ignored. Status changes and access codes are saved in one transaction with a session row lock: opening creates the form if needed and generates a unique six-digit code, while closing clears only the code. Code collisions are retried. Neither transition deletes answers. Manual changes on a boundary day can be superseded by a subsequent hourly run on that same day.
+
+The evaluation update route uses the `manage-evaluations` gate for administrators and editors. `composer dev` starts `schedule:work` alongside the server and frontend. Production hosts must run `php artisan schedule:run` every minute; see [[06 Development Setup|Development Setup]].
 
 ## Courses
 

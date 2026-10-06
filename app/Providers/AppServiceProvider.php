@@ -17,5 +17,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('view-course-lists', fn (User $user): bool => $user->role !== null);
         Gate::define('manage-users', fn (User $user): bool => $user->role?->name === 'admin');
+        Gate::define(
+            'manage-evaluations',
+            fn (User $user): bool => in_array($user->role?->name, ['admin', 'editor'], true)
+        );
     }
 }

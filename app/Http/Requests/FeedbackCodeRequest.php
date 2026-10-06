@@ -24,9 +24,13 @@ class FeedbackCodeRequest extends FormRequest
 
     public function form(): FeedbackForm
     {
-        return $this->feedbackForm ??= FeedbackForm::with('courseSession.course.questionnaireTemplate.questions.options')
+        $form = $this->feedbackForm ??= FeedbackForm::with('courseSession.course.questionnaireTemplate.questions.options')
             ->where('code', $this->query('code'))
             ->firstOrFail();
+
+        abort_unless($form->courseSession->evaluation_status === 'open', 403, 'This evaluation is closed.');
+
+        return $form;
     }
 
     public function template(): QuestionnaireTemplate

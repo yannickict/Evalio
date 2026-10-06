@@ -11,7 +11,7 @@ Reviewed against source code on 5 October 2026. [[02 Project Requirements|Projec
 | Registration and approval | New instructor accounts are unapproved; admin approves and assigns roles; login requires approval | Forgot-password routes, forms and reset workflow |
 | Course management | Course model, unique name validation, seeded records, database-backed overview and course creation with questionnaire assignment | Course update UI and endpoint |
 | Course sessions | Create UI, course/instructor/date validation, unique generated number and at most one feedback form per session | Update/delete operations and feedback-code creation/distribution workflow |
-| Evaluation phase | Nullable `open`/`closed` column; status displayed | Automatic start-to-end-plus-14-days calculation, manual controls and enforcement on GET/POST feedback |
+| Evaluation phase | Hourly start-date opening and closing on end date plus 14 days, authorized manual controls, code lifecycle and status checks on GET/POST feedback | Production scheduler setup and operational monitoring |
 | Anonymous evaluation (T-01) | Public code-based questionnaire; no participant foreign key on forms | Full anonymity assessment beyond domain storage; code lifecycle and access controls |
 | Cancel/back (T-02/T-03) | All questions appear on one page; no answer writes before POST | Explicit cancel interaction and any required navigation behavior |
 | Optional questions (T-04) | Browser allows skipped answers; server accepts skipped/blank responses; feature tests cover this | Define consistent abstention counting and validate payloads; comment-only handling remains open |
@@ -25,7 +25,7 @@ Reviewed against source code on 5 October 2026. [[02 Project Requirements|Projec
 | One-page A4 output | No evaluation print feature found | Printable compact A4 results |
 | Backups and CSV import | No application endpoints or workflows found | Administrator backup/restore procedure and specified CSV import |
 | Deletion | Admin user deletion with assignment guard; database FK rules | Admin course/session/feedback-form deletion workflows |
-| Validation/security | Auth/session handling, login throttling, escaped Blade output, CSRF, shared authorization gates and validated atomic feedback submission | Comprehensive role authorization and evaluation-window enforcement |
+| Validation/security | Auth/session handling, login throttling, escaped Blade output, CSRF, shared authorization gates and validated atomic feedback submission | Comprehensive role authorization and production scheduler setup |
 
 ## Data interpretation and integrity
 

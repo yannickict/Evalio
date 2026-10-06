@@ -24,7 +24,7 @@ kanban-plugin: board
 - [ ] Implement feedback-form/code creation and distribution for newly created sessions; define code reuse and expiry behavior.
 - [ ] [Must] Calculate automatic evaluation window: opens at session start, closes 14 days after session end; verify date/time boundaries.
 - [ ] [Must] Add editor/admin controls to manually open/close evaluation phases and define return to automatic mode.
-- [ ] [Must] Enforce evaluation phase on questionnaire access and submission; display effective status in overview.
+- [x] [Must] Enforce evaluation status on questionnaire access and submission; display status in overview.
 - [ ] [Must · T-02/T-03] Add explicit cancellation without saving and verify returning to earlier questions preserves draft answers.
 - [ ] Define and validate abstention counting and comment-only answer behavior for evaluations.
 - [ ] [Must · T-05] Validate optional comment types/lengths and allows_comment; define comment-only answer handling.
@@ -52,6 +52,8 @@ kanban-plugin: board
 
 ## Doing
 
+- [ ] Configure the production host to run Laravel scheduling every minute.
+
 - [x] [Must] Implement course creation with questionnaire assignment and server validation.
 - [ ] [Must] Implement course editing with server validation.
 
@@ -61,6 +63,8 @@ kanban-plugin: board
 
 
 ## Done
+
+- [x] Automatically open evaluations on their start date and close them on end date plus 14 days; preserve manual changes on other dates.
 
 **Complete**
 - [x] Build database-backed course overview with session counts, instructor/session details and template display.
