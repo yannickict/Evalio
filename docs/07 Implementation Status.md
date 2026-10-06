@@ -30,7 +30,7 @@ Reviewed against source code on 5 October 2026. [[02 Project Requirements|Projec
 ## Data interpretation and integrity
 
 - Multiple submissions currently append answers for the same form/question, including identical retries. The existing feature test explicitly expects this behavior; it does not establish compliance with one completed evaluation per form.
-- A form has no template snapshot or submission timestamp. Later template assignments or edits can change the interpretation of historical feedback.
+- Sessions now save their questionnaire template on creation; course default changes affect only new sessions. The column is defined in the original session-table migration and assumes fresh migration. This does not freeze question/option content: template versioning and protection against editing used questions remain unfinished. Forms still have no submission timestamp.
 - Database foreign keys validate existence, but do not enforce that a selected option belongs to the submitted question or that the question belongs to the assigned template.
 - Feedback submission validates question/option membership and saves the complete answer set in a transaction; a failed write rolls back all answers from that request.
 - Permission flags exist on roles, but overview access checks only for a role and loads all sessions. Client filters cannot enforce instructor ownership.

@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-users', fn (User $user): bool => $user->role?->name === 'admin');
         Gate::define('create-courses', fn (User $user): bool => in_array($user->role?->name, ['admin', 'editor'], true));
         Gate::define('create-questionnaires', fn (User $user): bool => in_array($user->role?->name, ['admin', 'editor'], true));
+        Gate::define('edit-courses', fn (User $user): bool => in_array($user->role?->name, ['admin', 'editor'], true));
+        Gate::define('edit-sessions', fn (User $user): bool => in_array($user->role?->name, ['admin', 'editor'], true));
+        Gate::define('edit-questionnaires', fn (User $user): bool => in_array($user->role?->name, ['admin', 'editor'], true));
         Gate::define(
             'view-session-filters',
             fn (User $user): bool => in_array($user->role?->name, ['admin', 'editor'], true)

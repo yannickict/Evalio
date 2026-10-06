@@ -26,6 +26,8 @@ Skip environment copying, key generation and database-file creation when these a
 
 ## Demo data
 
+The session-template column is defined in the original domain-table creation migration, with no follow-up migration or backfill. Use `php artisan migrate:fresh --seed` when rebuilding your disposable local database; this deletes existing data. New sessions copy the course default at creation; feedback uses the session's saved template. This does not freeze template questions/options.
+
 On a dedicated local demo database:
 
 ```powershell

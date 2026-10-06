@@ -25,6 +25,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('instructor_id')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('questionnaire_template_id')->nullable()->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->string('course_session_number')->unique();
             $table->date('start_date');
             $table->date('end_date');

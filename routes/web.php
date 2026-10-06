@@ -25,6 +25,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', 'index')->middleware('can:view-course-lists')->name('index');
         Route::get('/create', 'create')->middleware('can:create-courses')->name('create');
         Route::post('/', 'store')->middleware('can:create-courses')->name('store');
+        Route::get('/{course}/edit', 'edit')->middleware('can:edit-courses')->name('edit');
+        Route::patch('/{course}', 'update')->middleware('can:edit-courses')->name('update');
     });
 
     Route::prefix('questionnaires')->name('questionnaires.')->controller(QuestionnaireTemplateController::class)->group(function () {

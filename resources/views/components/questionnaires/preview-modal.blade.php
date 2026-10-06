@@ -1,6 +1,6 @@
 @props(['template'])
 
-<x-ui.modal id="questionnaire-{{ $template->id }}" labelledby="questionnaire-title-{{ $template->id }}">
+<x-ui.modal id="questionnaire-{{ $template->id }}" labelledby="questionnaire-title-{{ $template->id }}" edit-permission="edit-questionnaires">
     <x-slot:header>
         <div class="pe-3">
             <p class="small text-success fw-semibold mb-1">Questionnaire preview</p>

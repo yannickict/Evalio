@@ -1,6 +1,6 @@
 # Entity Relationship Model
 
-This document describes the implemented database schema as of 5 October 2026. Project requirements describe the intended functionality separately.
+This document describes the implemented database schema as of 6 October 2026. Project requirements describe the intended functionality separately.
 
 Related: [[01 Documentation Index|Documentation Index]], [[04 Application Architecture|Application Architecture]] and [[07 Implementation Status|Implementation Status]].
 
@@ -29,7 +29,7 @@ A role has many users. A user belongs to a role and can be assigned as instructo
 | Field | Meaning |
 |---|---|
 | `name` | Unique course name |
-| `questionnaire_template_id` | Nullable reference to the assigned questionnaire template |
+| `questionnaire_template_id` | Nullable default questionnaire template for new sessions |
 
 There is no separate course `code` column. One course has many course sessions. Multiple courses can reference the same questionnaire template.
 
@@ -39,6 +39,7 @@ There is no separate course `code` column. One course has many course sessions. 
 |---|---|
 | `course_id` | Required course reference |
 | `instructor_id` | Required reference to a user |
+| `questionnaire_template_id` | Nullable saved questionnaire reference, copied from the course on creation |
 | `course_session_number` | Unique session identifier |
 | `start_date` | Session start date |
 | `end_date` | Session end date |
@@ -80,7 +81,7 @@ The primary key is `(questionnaire_template_id, question_id)`. A unique constrai
 
 `feedback_forms` stores a unique `course_session_id` and a nullable unique six-character `code`. The unique session reference enforces at most one form/code per session. Public questionnaire access looks up a form using a six-digit code. A feedback form can exist before any answers are submitted; there is no submitted-state or submitted-at column.
 
-The form does not store a participant identity or a questionnaire-template reference. The questionnaire is resolved using `feedback_form -> course_session -> course -> questionnaire_template` at request time.
+The form does not store a participant identity or its own questionnaire-template reference. The questionnaire is resolved using `feedback_form -> course_session -> questionnaire_template` at request time. There is no fallback to the course's current template. The session foreign key restricts deletion of assigned templates; it does not freeze questions or options.
 
 `CourseSession::feedbackForm()` (has-one) exposes the session-to-form relationship, while `Answer::feedbackForm()` exposes the answer-to-form relationship. The `FeedbackForm` model currently defines only `courseSession()`; it has no inverse `answers()` relation. Demo seeding creates coded forms in advance; the session creation controller does not create them.
 
@@ -105,6 +106,7 @@ erDiagram
     ROLES ||--o{ USERS : assigned
     USERS ||--o{ COURSE_SESSIONS : instructs
     QUESTIONNAIRE_TEMPLATES o|--o{ COURSES : assigned
+    QUESTIONNAIRE_TEMPLATES o|--o{ COURSE_SESSIONS : used_by
     COURSES ||--o{ COURSE_SESSIONS : contains
     QUESTIONNAIRE_TEMPLATES ||--o{ QUESTIONNAIRE_TEMPLATE_QUESTION : contains
     QUESTIONS ||--o{ QUESTIONNAIRE_TEMPLATE_QUESTION : included
@@ -119,7 +121,7 @@ erDiagram
 
 | Deleted record | Behavior for dependent records |
 |---|---|
-| Questionnaire template | Restricted by assigned courses; pivot rows cascade |
+| Questionnaire template | Restricted by assigned courses and sessions; pivot rows cascade |
 | Course | Restricted by course sessions |
 | Instructor/user | Restricted by course sessions; user controller asks for reassignment first |
 | Course session | Restricted by feedback forms |
@@ -129,7 +131,7 @@ erDiagram
 
 ## Historical interpretation
 
-There is no questionnaire snapshot or version reference on a feedback form. Changing a course's assigned template or editing question/option text can affect how historical feedback is interpreted. This is a property of the current implementation, not a versioning feature.
+Sessions save a questionnaire-template reference at creation. Changing a course's default template affects new sessions only. The reference is defined in the original session-table migration for fresh installations; no incremental migration or backfill is provided. Editing question/option content can still affect historical interpretation: this is a saved assignment, not a content snapshot or versioning feature.
 
 ## Naming and infrastructure
 

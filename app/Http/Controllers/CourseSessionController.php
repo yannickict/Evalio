@@ -17,7 +17,8 @@ class CourseSessionController extends Controller
     public function index(Request $request): View
     {
         $query = CourseSession::with([
-            'course.questionnaireTemplate',
+            'course',
+            'questionnaireTemplate',
             'instructor',
             'feedbackForm',
         ]);

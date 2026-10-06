@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $start_date
  * @property Carbon $end_date
  */
-#[Fillable(['course_id', 'instructor_id', 'course_session_number', 'start_date', 'end_date', 'evaluation_status'])]
+#[Fillable(['course_id', 'instructor_id', 'questionnaire_template_id', 'course_session_number', 'start_date', 'end_date', 'evaluation_status'])]
 class CourseSession extends Model
 {
     /** @use HasFactory<CourseSessionFactory> */
@@ -23,6 +23,11 @@ class CourseSession extends Model
     protected static function booted(): void
     {
         static::creating(function (CourseSession $session): void {
+            if (! array_key_exists('questionnaire_template_id', $session->getAttributes())) {
+                $session->questionnaire_template_id = Course::query()->whereKey($session->course_id)
+                    ->value('questionnaire_template_id');
+            }
+
             $number = $session->getAttributes()['course_session_number'] ?? null;
 
             if ($number !== null && $number !== '') {
@@ -57,6 +62,12 @@ class CourseSession extends Model
     public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');
+    }
+
+    /** @return BelongsTo<QuestionnaireTemplate, $this> */
+    public function questionnaireTemplate(): BelongsTo
+    {
+        return $this->belongsTo(QuestionnaireTemplate::class);
     }
 
     /** @return HasOne<FeedbackForm, $this> */

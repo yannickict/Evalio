@@ -31,7 +31,7 @@ $isInstructor = auth()->user()?->role?->name === 'instructor';
         </div>
     </article>
 </div>
-<x-ui.modal id="course-{{ $course->id }}" labelledby="course-title-{{ $course->id }}">
+<x-ui.modal id="course-{{ $course->id }}" labelledby="course-title-{{ $course->id }}" edit-permission="edit-courses" :edit-url="route('courses.edit', $course)">
     <x-slot:header>
         <div>
             <p class="small text-success fw-semibold mb-1">Course details</p>

@@ -1,4 +1,4 @@
-@props(['id', 'label' => null, 'labelledby' => null])
+@props(['id', 'label' => null, 'labelledby' => null, 'editPermission' => null, 'editUrl' => null])
 
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1"
@@ -12,6 +12,15 @@
             </div>
             <div class="modal-body p-4">{{ $slot }}</div>
             <div class="modal-footer px-4 py-3">
+                @if ($editPermission)
+                @can($editPermission)
+                @if ($editUrl)
+                <a class="btn btn-success rounded-3" href="{{ $editUrl }}">Edit</a>
+                @else
+                <button class="btn btn-success rounded-3" type="button">Edit</button>
+                @endif
+                @endcan
+                @endif
                 <button class="btn btn-outline-secondary rounded-3" type="button" data-bs-dismiss="modal">Close</button>
             </div>
         </div>

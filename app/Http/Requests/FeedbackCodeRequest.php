@@ -24,7 +24,10 @@ class FeedbackCodeRequest extends FormRequest
 
     public function form(): FeedbackForm
     {
-        $form = $this->feedbackForm ??= FeedbackForm::with('courseSession.course.questionnaireTemplate.questions.options')
+        $form = $this->feedbackForm ??= FeedbackForm::with([
+            'courseSession.course',
+            'courseSession.questionnaireTemplate.questions.options',
+        ])
             ->where('code', $this->query('code'))
             ->firstOrFail();
 
@@ -35,7 +38,7 @@ class FeedbackCodeRequest extends FormRequest
 
     public function template(): QuestionnaireTemplate
     {
-        $template = $this->form()->courseSession->course->questionnaireTemplate;
+        $template = $this->form()->courseSession->questionnaireTemplate;
 
         abort_if($template === null, 404, 'No questionnaire assigned.');
 

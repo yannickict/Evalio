@@ -32,7 +32,7 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
         </div>
         <div class="card-footer bg-transparent border-top px-4 py-3">
             <p class="small text-body-secondary mb-1">Questionnaire</p>
-            <p class="small fw-medium text-break mb-0">{{ $courseSession->course->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</p>
+            <p class="small fw-medium text-break mb-0">{{ $courseSession->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</p>
             <button class="btn btn-link link-success text-decoration-none fw-semibold small p-0 mt-3 stretched-link"
                 type="button" data-bs-toggle="modal" data-bs-target="#session-{{ $courseSession->id }}"
                 aria-label="View details for {{ $courseSession->course->name }}, {{ $courseSession->course_session_number }}">
@@ -41,7 +41,7 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
         </div>
     </article>
 </div>
-<x-ui.modal id="session-{{ $courseSession->id }}" labelledby="session-title-{{ $courseSession->id }}">
+<x-ui.modal id="session-{{ $courseSession->id }}" labelledby="session-title-{{ $courseSession->id }}" edit-permission="edit-sessions">
     <x-slot:header>
         <div>
             <p class="small text-success fw-semibold mb-1">Session details</p>
@@ -68,11 +68,11 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
         </div>
         <div class="col-12">
             <dt class="small text-body-secondary fw-normal">Questionnaire</dt>
-            <dd class="text-break mb-0">{{ $courseSession->course->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</dd>
+            <dd class="text-break mb-0">{{ $courseSession->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</dd>
         </div>
     </dl>
     <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 border-top pt-3 mt-4">
-        @if ($courseSession->evaluation_status === 'open' && $courseSession->course->questionnaireTemplate && $courseSession->feedbackForm?->code !== null)
+        @if ($courseSession->evaluation_status === 'open' && $courseSession->questionnaireTemplate && $courseSession->feedbackForm?->code !== null)
         <a class="btn btn-success rounded-3 text-break" href="{{ route('feedback.show', ['code' => $courseSession->feedbackForm->code]) }}">View questionnaire</a>
         @endif
         @can('manage-evaluations')

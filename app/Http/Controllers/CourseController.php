@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCourseRequest;
+use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Course;
 use App\Models\QuestionnaireTemplate;
 use Illuminate\Http\RedirectResponse;
@@ -47,5 +48,21 @@ class CourseController extends Controller
 
         return redirect()->route('courses.index')
             ->with('status', 'Course created.');
+    }
+
+    public function edit(Course $course): View
+    {
+        return view('pages.courses.edit', [
+            'course' => $course,
+            'templates' => QuestionnaireTemplate::orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(UpdateCourseRequest $request, Course $course): RedirectResponse
+    {
+        $course->update($request->validated());
+
+        return redirect()->route('courses.index')
+            ->with('status', 'Course updated.');
     }
 }

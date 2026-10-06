@@ -71,7 +71,7 @@ Administrators can approve a pending account while assigning its role, change ap
 ## Participant feedback
 
 1. The home page sends the entered code to `GET /questionnaire`.
-2. The controller finds an existing feedback form and resolves its course's assigned template. Invalid code format produces validation errors; unknown codes or missing templates return 404.
+2. The controller finds an existing feedback form and resolves its session's saved template. Invalid code format produces validation errors; unknown codes or missing session templates return 404. The course's current template is not used as a fallback.
 3. Questions render in template position order, with radio options or free-text inputs and optional comments.
 4. Submission sends `answers[question_id]` and `answers_comment[question_id]` to the same path using POST.
 5. The controller creates answer records on the existing form and redirects home with a one-time confirmation.
@@ -84,7 +84,13 @@ Repeated submissions append answers to the same form. The code is not consumed, 
 
 Session creation selects an existing course and approved instructor, validates dates and creates the session. The model generates `COURSE.0001`-style identifiers by scanning existing numbers. The unique database constraint prevents duplicate stored identifiers, but concurrent number generation has no locking/retry mechanism. Creation does not immediately generate feedback forms or codes; opening an evaluation does.
 
-The overview loads all sessions, their instructors, course templates and each session's optional feedback form. The model exposes feedbackForm() as a has-one relation and the schema makes course_session_id unique in feedback_forms. Cards show dates and status; modals expose details and existing feedback codes. Course and instructor selectors combine filters in JavaScript using exact IDs. Filtering hides cards already sent to the browser and does not provide server-side access control. No aggregate answer results are displayed.
+The overview loads visible sessions, their courses, instructors, saved session templates and each session's optional feedback form. Instructors receive only their own sessions; admins and editors receive all sessions and can use course/instructor filters. Cards show dates and status; modals expose details and existing feedback codes. No aggregate answer results are displayed.
+
+### Session questionnaire assignment
+
+`course_sessions.questionnaire_template_id` stores the questionnaire used by the session. The `CourseSession` creation hook copies the course's current template when no explicit template attribute is supplied, including factory/demo creation. HTTP session creation does not accept a template ID from the client. Changing the course default affects new sessions only. Feedback display, submission validation and session cards use `CourseSession::questionnaireTemplate()`.
+
+The original domain-table migration defines a nullable template foreign key on sessions with restricted deletion. This schema change assumes a fresh database migration; there is no incremental migration or backfill. This preserves template assignment, not question contents: editing/deleting used questions and options or changing a session's template still needs separate protection/versioning.
 
 
 ## Automatic evaluation status
