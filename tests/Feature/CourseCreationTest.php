@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Course;
 use App\Models\QuestionnaireTemplate;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,7 +31,7 @@ class CourseCreationTest extends TestCase
         $zulu = QuestionnaireTemplate::factory()->create(['name' => 'Zulu']);
         $alpha = QuestionnaireTemplate::factory()->create(['name' => 'Alpha <script>alert(1)</script>']);
 
-        $response = $this->actingAs(User::factory()->approved()->create())->get(route('courses.create'))
+        $response = $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]))->get(route('courses.create'))
             ->assertOk()->assertViewHas('templates', fn ($templates) => $templates->modelKeys() === [$alpha->id, $zulu->id])
             ->assertSee($alpha->name)->assertDontSee('<script>alert(1)</script>', false);
         $xpath = $this->xpath($response->getContent());
@@ -42,7 +43,7 @@ class CourseCreationTest extends TestCase
 
     public function test_empty_questionnaire_library_disables_creation_and_links_to_the_editor(): void
     {
-        $response = $this->actingAs(User::factory()->approved()->create())->get(route('courses.create'))
+        $response = $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]))->get(route('courses.create'))
             ->assertOk()->assertSee('No questionnaires available.')
             ->assertSee(route('questionnaires.create'), false);
         $xpath = $this->xpath($response->getContent());
@@ -54,7 +55,7 @@ class CourseCreationTest extends TestCase
     public function test_creation_assigns_the_questionnaire_and_ignores_unvalidated_fields(): void
     {
         $template = QuestionnaireTemplate::factory()->create();
-        $this->actingAs(User::factory()->approved()->create())->post(route('courses.store'), [
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]))->post(route('courses.store'), [
             'name' => 'Web development',
             'questionnaire_template_id' => $template->id,
             'id' => 999999,
@@ -94,7 +95,7 @@ class CourseCreationTest extends TestCase
         $data = ['name' => 'Course', 'questionnaire_template_id' => QuestionnaireTemplate::factory()->create()->id];
         $data[$field] = $value;
 
-        $this->actingAs(User::factory()->approved()->create())->from(route('courses.create'))
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]))->from(route('courses.create'))
             ->post(route('courses.store'), $data)->assertRedirect(route('courses.create'))
             ->assertSessionHasErrors($field);
 
@@ -106,7 +107,7 @@ class CourseCreationTest extends TestCase
         $template = QuestionnaireTemplate::factory()->create();
         $existing = Course::factory()->create(['name' => 'Web development', 'questionnaire_template_id' => $template->id]);
 
-        $this->actingAs(User::factory()->approved()->create())->from(route('courses.create'))
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]))->from(route('courses.create'))
             ->post(route('courses.store'), ['name' => $existing->name, 'questionnaire_template_id' => $template->id])
             ->assertRedirect(route('courses.create'))->assertSessionHasErrors('name');
 
@@ -118,7 +119,7 @@ class CourseCreationTest extends TestCase
         $template = QuestionnaireTemplate::factory()->create();
         QuestionnaireTemplate::factory()->create();
         $name = '<script>alert(1)</script>'.str_repeat('a', 256);
-        $this->actingAs(User::factory()->approved()->create())->from(route('courses.create'))
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]))->from(route('courses.create'))
             ->post(route('courses.store'), ['name' => $name, 'questionnaire_template_id' => $template->id])
             ->assertRedirect(route('courses.create'));
 

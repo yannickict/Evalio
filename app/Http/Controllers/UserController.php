@@ -35,6 +35,15 @@ class UserController extends Controller
 
         $data = $request->validated();
 
+        if (
+            $user->is($request->user())
+            && (int) $data['role_id'] !== (int) $user->role_id
+        ) {
+            return back()->withErrors([
+                'role_id' => 'You cannot change your own role.',
+            ]);
+        }
+
         $user->role_id = $data['role_id'];
         $user->is_approved = true;
         $user->save();

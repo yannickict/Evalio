@@ -15,14 +15,14 @@
                     </label>
                     <select class="form-select form-select-sm bg-body-tertiary rounded-3"
                         id="role-{{ $user->id }}"
-                        name="role_id" required onchange="this.form.requestSubmit()">
+                        name="role_id" required onchange="this.form.requestSubmit()" @disabled($user->is(auth()->user()))>
                         <x-users.role-options :roles="$roles" :selected="$user->role_id" />
                     </select>
-                    <noscript><button class="btn btn-success btn-sm mt-2" type="submit">Save role</button></noscript>
+                    <noscript><button class="btn btn-success btn-sm mt-2" type="submit" @disabled($user->is(auth()->user()))>Save role</button></noscript>
                 </form>
                 <x-users.delete-button :user="$user" />
             </div>
-            <p class="small text-body-secondary mt-2 mb-0">Role changes save automatically.</p>
+            <p class="small text-body-secondary mt-2 mb-0">{{ $user->is(auth()->user()) ? 'You cannot change your own role.' : 'Role changes save automatically.' }}</p>
         </div>
     </div>
 </article>

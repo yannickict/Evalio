@@ -1,8 +1,10 @@
 @props(['user', 'pending' => false])
 
 
-<form method="POST" action="{{ route('users.destroy', $user) }}"
-    onsubmit="return confirm('{{ $pending ? 'Permanently delete this pending registration?' : 'Permanently delete this user?' }}')">
+<form method="POST"
+    action="{{ route('users.destroy', $user) }}"
+    data-confirm="{{ $pending ? 'Permanently delete this pending registration?' : 'Permanently delete this user?' }}"
+    onsubmit="return confirm(this.dataset.confirm)">
     @csrf
     @method('DELETE')
     <button class="btn btn-outline-danger btn-sm rounded-3 px-3" type="submit"

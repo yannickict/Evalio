@@ -1,6 +1,6 @@
 @props(['current' => null, 'home' => false])
 
-@can('view-course-lists')
+@can('view-workflow-guide')
 <div @class(['workflow-guide text-start', 'border rounded-3 mb-4' => ! $home, 'border-top mt-4 pt-3' => $home])>
     <button class="workflow-guide-toggle btn w-100 d-flex align-items-center gap-3 text-start border-0 px-3 py-2"
             type="button" data-bs-toggle="collapse" data-bs-target="#workflow-guide-{{ $current ?? 'home' }}"

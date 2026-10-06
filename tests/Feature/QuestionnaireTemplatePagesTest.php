@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,7 +21,7 @@ class QuestionnaireTemplatePagesTest extends TestCase
     public function test_signed_in_user_can_navigate_library_and_editor_preview(): void
     {
         $this->withoutVite();
-        $this->actingAs(User::factory()->approved()->create());
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]));
         $this->get(route('questionnaires.index'))->assertOk()
             ->assertSee(route('questionnaires.create'), false)->assertSee('Questionnaire library');
         $this->get(route('questionnaires.create'))->assertOk()
@@ -38,7 +39,7 @@ class QuestionnaireTemplatePagesTest extends TestCase
         $expected = $questions;
         $expected[1]['options'][] = '';
 
-        $this->actingAs(User::factory()->approved()->create())
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]))
             ->post(route('questionnaires.preview'), [
                 'name' => 'Course feedback', 'questions' => $questions, 'action' => 'add_option:1',
             ])->assertOk()->assertViewHas('draft', [
@@ -49,7 +50,7 @@ class QuestionnaireTemplatePagesTest extends TestCase
     public function test_adding_questions_and_refreshing_types_preserve_the_draft_without_saving(): void
     {
         $this->withoutVite();
-        $this->actingAs(User::factory()->approved()->create());
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]));
         $question = ['text' => '<script>alert(1)</script>', 'type' => 'free_text', 'options' => ['Yes', 'No'], 'allows_comment' => true];
         $draft = ['name' => 'Draft', 'questions' => [$question]];
 
@@ -74,7 +75,7 @@ class QuestionnaireTemplatePagesTest extends TestCase
 
     public function test_adding_options_rejects_invalid_questions_types_and_option_limits(): void
     {
-        $this->actingAs(User::factory()->approved()->create());
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]));
 
         foreach ([
             ['type' => 'single_choice', 'options' => ['', ''], 'action' => 'add_option:99'],
@@ -92,7 +93,7 @@ class QuestionnaireTemplatePagesTest extends TestCase
     public function test_removing_questions_and_options_preserves_and_reindexes_the_remaining_draft(): void
     {
         $this->withoutVite();
-        $this->actingAs(User::factory()->approved()->create());
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]));
         $questions = [
             ['text' => 'First', 'type' => 'single_choice', 'options' => ['Yes', 'Maybe', 'No'], 'allows_comment' => true],
             ['text' => 'Second', 'type' => 'free_text', 'options' => ['', ''], 'allows_comment' => false],
@@ -114,7 +115,7 @@ class QuestionnaireTemplatePagesTest extends TestCase
 
     public function test_removal_rejects_invalid_targets_and_preserves_minimum_questions_and_options(): void
     {
-        $this->actingAs(User::factory()->approved()->create());
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]));
         foreach ([
             ['single_choice', ['Yes', 'No'], 'remove_question:0'],
             ['single_choice', ['Yes', 'Maybe', 'No'], 'remove_question:99'],

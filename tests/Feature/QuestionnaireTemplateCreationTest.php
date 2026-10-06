@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\QuestionnaireTemplate;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,7 +21,7 @@ class QuestionnaireTemplateCreationTest extends TestCase
     public function test_saving_persists_ordered_questions_and_only_single_choice_options(): void
     {
         $this->withoutVite();
-        $this->actingAs(User::factory()->approved()->create());
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]));
         $this->post(route('questionnaires.store'), [
             'name' => 'Course feedback',
             'questions' => [
@@ -42,7 +43,7 @@ class QuestionnaireTemplateCreationTest extends TestCase
 
     public function test_invalid_templates_do_not_write_partial_records_and_preserve_input(): void
     {
-        $this->actingAs(User::factory()->approved()->create());
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]));
         foreach ([
             ['name' => '', 'questions' => [['text' => 'Question', 'type' => 'free_text']]],
             ['name' => 'Draft', 'questions' => []],

@@ -5,6 +5,15 @@
     height: 3rem;
 }
 
+.course-session-link:is(:hover, :focus-visible) {
+    background-color: var(--bs-success-bg-subtle);
+}
+
+.course-session-link:focus-visible {
+    outline: 2px solid var(--bs-success);
+    outline-offset: -2px;
+}
+
 .workflow-guide-icon {
     width: 2rem;
     height: 2rem;

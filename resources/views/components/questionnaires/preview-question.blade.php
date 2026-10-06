@@ -3,9 +3,14 @@
 <li class="border rounded-4 p-3 p-sm-4" aria-labelledby="preview-question-{{ $templateId }}-{{ $question->id }}">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
         <span class="small text-success fw-semibold">Question {{ $number }}</span>
-        <span class="badge rounded-pill text-body-secondary bg-body-tertiary border fw-normal">
-            {{ $question->type === 'single_choice' ? 'Single choice' : 'Free text' }}
-        </span>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge rounded-pill text-body-secondary bg-body-tertiary border fw-normal">
+                {{ $question->type === 'single_choice' ? 'Single choice' : 'Free text' }}
+            </span>
+            <span @class(['badge rounded-pill fw-normal', 'bg-success-subtle text-success-emphasis' => $question->allows_comment, 'bg-body-tertiary text-body-secondary border' => ! $question->allows_comment])>
+                {{ $question->allows_comment ? 'Optional comment enabled' : 'No comment field' }}
+            </span>
+        </div>
     </div>
     <h3 class="h6 fw-semibold text-break mb-3" id="preview-question-{{ $templateId }}-{{ $question->id }}">{{ $question->question_text }}</h3>
 

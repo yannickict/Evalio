@@ -1,6 +1,18 @@
-import "bootstrap/js/dist/modal";
+import Modal from "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
+
+if (document.getElementById('session-overview')) {
+    const sessionId = new URLSearchParams(window.location.search).get('session');
+
+    if (sessionId && /^\d+$/.test(sessionId)) {
+        const modal = document.getElementById(`session-${sessionId}`);
+
+        if (modal?.classList.contains('modal')) {
+            Modal.getOrCreateInstance(modal).show();
+        }
+    }
+}
 
 const refreshAnswerTypes = document.getElementById("refresh-answer-types");
 

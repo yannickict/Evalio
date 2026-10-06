@@ -3,7 +3,7 @@
 @section('title', 'Sessions - Evalio')
 
 @section('content')
-<main class="container py-5">
+<main class="container py-5" id="session-overview">
     <header class="mb-4">
         <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
         <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
@@ -20,6 +20,7 @@
 
     <x-ui.setup-guide current="sessions" />
 
+    @can('view-session-filters')
     <div class="row g-4 mb-4">
         @foreach (['course' => 'Courses', 'instructor' => 'Instructors'] as $field => $label)
         <div class="col-12 col-md-6 col-xl-4">
@@ -34,6 +35,8 @@
         @endforeach
     </div>
 
+    @endcan
+
     <div class="row g-4">
         @forelse ($courseSessions as $course_session)
         <x-sessions.card :course-session="$course_session" />
@@ -42,7 +45,7 @@
             <div class="card border-0 rounded-4 shadow-sm p-5 text-center">
                 <h2 class="h5">No course sessions yet</h2>
                 <p class="text-body-secondary mb-0">Course sessions will appear here once they are created.</p>
-                @can('manage-evaluations')
+                @can('view-workflow-guide')
                 <p class="text-body-secondary mt-3 mb-2">Each session needs a course with an assigned questionnaire.</p>
                 <a class="link-success fw-semibold" href="{{ route('courses.index') }}">Choose or create a course &rarr;</a>
                 @endcan

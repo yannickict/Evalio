@@ -11,7 +11,9 @@
             <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">
                 {{ $courses->count() }} {{ $courses->count() === 1 ? 'course' : 'courses' }}
             </span>
+            @can('create-courses')
             <a class="btn btn-success rounded-3 ms-auto" href="{{ route('courses.create') }}">New course</a>
+            @endcan
         </div>
         <p class="text-body-secondary mb-0">Your courses, session counts, and assigned questionnaires.</p>
     </header>

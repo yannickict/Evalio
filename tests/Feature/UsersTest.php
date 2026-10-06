@@ -347,16 +347,16 @@ class UsersTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $approved->id, 'is_approved' => true, 'role_id' => $role->id]);
     }
 
-    public function test_admin_changing_their_own_role_is_redirected_home(): void
+    public function test_admin_cannot_change_their_own_role(): void
     {
         $admin = $this->admin();
         $role = Role::where('name', 'editor')->firstOrFail();
 
-        $this->actingAs($admin)->patch(route('users.update', $admin), [
+        $this->actingAs($admin)->from(route('users.index'))->patch(route('users.update', $admin), [
             'role_id' => $role->id,
-        ])->assertRedirect(route('home'));
+        ])->assertRedirect(route('users.index'))->assertSessionHasErrors('role_id');
 
-        $this->assertDatabaseHas('users', ['id' => $admin->id, 'role_id' => $role->id]);
+        $this->assertDatabaseHas('users', ['id' => $admin->id, 'role_id' => $admin->role_id]);
     }
 
     public function test_admin_cannot_delete_their_own_account(): void
@@ -398,7 +398,7 @@ class UsersTest extends TestCase
         $this->delete(route('users.destroy', 999999))->assertNotFound();
     }
 
-    public function test_approved_role_forms_submit_on_change_and_only_self_delete_is_disabled(): void
+    public function test_approved_role_forms_submit_on_change_and_self_role_and_delete_controls_are_disabled(): void
     {
         $admin = $this->admin();
         $user = User::factory()->approved()->create();
@@ -411,9 +411,12 @@ class UsersTest extends TestCase
             $form = '//section[@id="all-users"]//form[@action="'.route('users.update', $account).'" and input[@name="_method" and @value="PATCH"]]';
             $this->assertCount(1, $xpath->query($form.'/input[@name="_token"]'));
             $this->assertCount(1, $xpath->query($form.'/select[@name="role_id" and @onchange="this.form.requestSubmit()"]/option[@selected and @value="'.$account->role_id.'"]'));
+            $this->assertCount($account->is($admin) ? 1 : 0, $xpath->query($form.'/select[@disabled]'));
+            $this->assertCount($account->is($admin) ? 1 : 0, $xpath->query($form.'/noscript/button[@disabled]'));
             $delete = '//form[@action="'.route('users.destroy', $account).'" and input[@value="DELETE"]]/button[@disabled]';
             $this->assertCount($account->is($admin) ? 1 : 0, $xpath->query($delete));
         }
+        $response->assertSee('You cannot change your own role.');
     }
 
     public function test_non_admin_cannot_change_or_delete_an_approved_user(): void
