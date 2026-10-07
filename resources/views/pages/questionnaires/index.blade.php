@@ -16,6 +16,7 @@
     </header>
 
     <x-ui.status-alert />
+    <x-ui.validation-errors :errors="$errors" />
 
     <x-ui.setup-guide current="questionnaires" />
 

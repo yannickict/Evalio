@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', 'store')->middleware('can:create-courses')->name('store');
         Route::get('/{course}/edit', 'edit')->middleware('can:edit-courses')->name('edit');
         Route::patch('/{course}', 'update')->middleware('can:edit-courses')->name('update');
+        Route::delete('/{course}', 'delete')->middleware('can:delete-courses')->name('delete');
     });
 
     Route::prefix('questionnaires')->name('questionnaires.')->controller(QuestionnaireTemplateController::class)->group(function () {
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', 'create')->middleware('can:create-questionnaires')->name('create');
         Route::post('/', 'store')->middleware('can:create-questionnaires')->name('store');
         Route::post('/preview', 'preview')->middleware('can:create-questionnaires')->name('preview');
+        Route::delete('/{template}', 'delete')->middleware('can:delete-questionnaires')->name('delete');
     });
 
     Route::name('sessions.')->controller(CourseSessionController::class)->group(function () {
@@ -45,6 +47,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/session/{courseSession}/evaluation', 'updateEvaluationStatus')
             ->middleware('can:manage-evaluations')
             ->name('evaluation.update');
+        Route::delete('/delete/{courseSession}', 'delete')->middleware('can:delete-sessions')->name('delete');
     });
 
     Route::prefix('users')->name('users.')->middleware('can:manage-users')->controller(UserController::class)->group(function () {

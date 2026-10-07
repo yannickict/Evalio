@@ -41,7 +41,7 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
         </div>
     </article>
 </div>
-<x-ui.modal id="session-{{ $courseSession->id }}" labelledby="session-title-{{ $courseSession->id }}" edit-permission="edit-sessions" :edit-url="route('sessions.edit', $courseSession)">
+<x-ui.modal id="session-{{ $courseSession->id }}" labelledby="session-title-{{ $courseSession->id }}" edit-permission="edit-sessions" :edit-url="route('sessions.edit', $courseSession)" delete-permission="delete-sessions" :delete-url="route('sessions.delete', $courseSession)" delete-confirmation="Permanently delete this session, its feedback form and all submitted answers? This cannot be undone.">
     <x-slot:header>
         <div>
             <p class="small text-success fw-semibold mb-1">Session details</p>

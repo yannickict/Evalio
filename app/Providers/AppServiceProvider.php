@@ -22,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('edit-courses', fn (User $user): bool => $user->hasRole('admin', 'editor'));
         Gate::define('edit-sessions', fn (User $user): bool => $user->hasRole('admin', 'editor'));
         Gate::define('edit-questionnaires', fn (User $user): bool => $user->hasRole('admin', 'editor'));
+        Gate::define('delete-courses', fn (User $user): bool => $user->hasRole('admin'));
+        Gate::define('delete-sessions', fn (User $user): bool => $user->hasRole('admin'));
+        Gate::define('delete-questionnaires', fn (User $user): bool => $user->hasRole('admin'));
         Gate::define(
             'view-session-filters',
             fn (User $user): bool => $user->hasRole('admin', 'editor')

@@ -1,6 +1,6 @@
 @props(['template'])
 
-<x-ui.modal id="questionnaire-{{ $template->id }}" labelledby="questionnaire-title-{{ $template->id }}" edit-permission="edit-questionnaires">
+<x-ui.modal id="questionnaire-{{ $template->id }}" labelledby="questionnaire-title-{{ $template->id }}" edit-permission="edit-questionnaires" delete-permission="delete-questionnaires" :delete-url="route('questionnaires.delete', $template)" delete-confirmation="Permanently delete this questionnaire and its unused questions and answer options? Assigned questionnaires cannot be deleted. This cannot be undone.">
     <x-slot:header>
         <div class="pe-3">
             <p class="small text-success fw-semibold mb-1">Questionnaire preview</p>

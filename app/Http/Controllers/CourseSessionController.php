@@ -11,6 +11,8 @@ use App\Models\CourseSession;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class CourseSessionController extends Controller
@@ -98,5 +100,17 @@ class CourseSessionController extends Controller
         $courseSession->update($request->validated());
 
         return redirect()->route('sessions.index')->with('status', 'Session updated.');
+    }
+
+    public function delete(CourseSession $courseSession): RedirectResponse
+    {
+        Gate::authorize('delete-sessions');
+
+        DB::transaction(function () use ($courseSession): void {
+            $courseSession->feedbackForm()->delete();
+            $courseSession->delete();
+        });
+
+        return redirect()->route('sessions.index')->with('status', 'Session deleted.');
     }
 }

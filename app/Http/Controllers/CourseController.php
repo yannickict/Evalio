@@ -8,6 +8,8 @@ use App\Models\Course;
 use App\Models\QuestionnaireTemplate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class CourseController extends Controller
@@ -64,5 +66,21 @@ class CourseController extends Controller
 
         return redirect()->route('courses.index')
             ->with('status', 'Course updated.');
+    }
+
+    public function delete(Course $course): RedirectResponse
+    {
+        Gate::authorize('delete-courses');
+
+        DB::transaction(function () use ($course): void {
+            foreach ($course->sessions()->get() as $session) {
+                $session->feedbackForm()->delete();
+                $session->delete();
+            }
+
+            $course->delete();
+        });
+
+        return redirect()->route('courses.index')->with('status', 'Course deleted.');
     }
 }

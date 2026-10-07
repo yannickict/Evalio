@@ -1,4 +1,4 @@
-@props(['id', 'label' => null, 'labelledby' => null, 'editPermission' => null, 'editUrl' => null])
+@props(['id', 'label' => null, 'labelledby' => null, 'editPermission' => null, 'editUrl' => null, 'deletePermission' => null, 'deleteUrl' => null, 'deleteConfirmation' => 'Permanently delete this item? This cannot be undone.'])
 
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1"
@@ -18,6 +18,20 @@
                 <a class="btn btn-success rounded-3" href="{{ $editUrl }}">Edit</a>
                 @else
                 <button class="btn btn-success rounded-3" type="button">Edit</button>
+                @endif
+                @endcan
+                @endif
+                @if ($deletePermission)
+                @can($deletePermission)
+                @if ($deleteUrl)
+                <form method="POST" action="{{ $deleteUrl }}" data-confirm="{{ $deleteConfirmation }}"
+                    onsubmit="return confirm(this.dataset.confirm)">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-outline-danger rounded-3" type="submit">Delete</button>
+                </form>
+                @else
+                <button class="btn btn-outline-danger rounded-3" type="button">Delete</button>
                 @endif
                 @endcan
                 @endif
