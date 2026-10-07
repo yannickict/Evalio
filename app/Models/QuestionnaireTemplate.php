@@ -26,4 +26,10 @@ class QuestionnaireTemplate extends Model
     {
         return $this->hasMany(Course::class);
     }
+
+    /** @return HasMany<CourseSession, $this> */
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(CourseSession::class);
+    }
 }

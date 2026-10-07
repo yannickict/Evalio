@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Course;
 use App\Models\CourseSession;
 use App\Models\FeedbackForm;
 use Illuminate\Database\QueryException;
@@ -25,22 +26,33 @@ class CourseSessionTest extends TestCase
 
     public function test_session_numbers_increment_by_default(): void
     {
-        $first = CourseSession::factory()->create();
-        $second = CourseSession::factory()->create();
+        $course = Course::factory()->create(['name' => 'AID']);
+        $first = CourseSession::factory()->for($course)->create();
+        $second = CourseSession::factory()->for($course)->create();
+        $other = CourseSession::factory()->for(Course::factory()->create(['name' => 'EPR']))->create();
 
-        $this->assertSame('COURSE.0001', $first->course_session_number);
-        $this->assertSame('COURSE.0002', $second->course_session_number);
+        $this->assertSame('AID.001', $first->session_identifier);
+        $this->assertSame('AID.002', $second->session_identifier);
+        $this->assertSame('EPR.001', $other->session_identifier);
+        $course->update(['name' => 'NEW']);
+        $this->assertSame('NEW.002', $second->fresh()->session_identifier);
     }
 
     public function test_default_uses_highest_existing_number_and_preserves_explicit_numbers(): void
     {
-        CourseSession::factory()->create(['course_session_number' => 'COURSE.9999']);
-        $explicit = CourseSession::factory()->create(['course_session_number' => 'CUSTOM-1']);
-        CourseSession::factory()->create(['course_session_number' => 'COURSE.0003']);
+        $course = Course::factory()->create(['name' => 'AID']);
+        $explicit = CourseSession::factory()->for($course)->create(['session_number' => 999]);
+        CourseSession::factory()->for($course)->create(['session_number' => 3]);
+        $session = CourseSession::factory()->for($course)->create();
 
-        $session = CourseSession::factory()->create(['course_session_number' => '']);
+        $this->assertSame(999, $explicit->session_number);
+        $this->assertSame('AID.1000', $session->session_identifier);
+    }
 
-        $this->assertSame('CUSTOM-1', $explicit->course_session_number);
-        $this->assertSame('COURSE.10000', $session->course_session_number);
+    public function test_session_number_must_be_unique_within_a_course(): void
+    {
+        $session = CourseSession::factory()->create(['session_number' => 1]);
+        $this->expectException(QueryException::class);
+        CourseSession::factory()->for($session->course)->create(['session_number' => 1]);
     }
 }

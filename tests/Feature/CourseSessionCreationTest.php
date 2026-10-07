@@ -87,12 +87,14 @@ class CourseSessionCreationTest extends TestCase
             'start_date' => '2026-10-05',
             'end_date' => '2026-10-05',
             'course_session_number' => 'INJECTED',
+            'session_number' => 999,
             'evaluation_status' => 'closed',
         ])->assertRedirect(route('sessions.index'))->assertSessionHasNoErrors()
             ->assertSessionHas('status', 'Session created.');
 
         $session = CourseSession::sole();
-        $this->assertSame('COURSE.0001', $session->course_session_number);
+        $this->assertSame($course->name.'.001', $session->session_identifier);
+        $this->assertSame(1, $session->session_number);
         $this->assertNull($session->evaluation_status);
         $this->assertSame('2026-10-05', $session->start_date->toDateString());
         $this->assertSame('2026-10-05', $session->end_date->toDateString());

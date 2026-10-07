@@ -56,8 +56,8 @@ class SeederTest extends TestCase
             }
         }
         $this->assertSame(
-            array_map(fn (int $number) => sprintf('COURSE.%04d', $number), range(1, 15)),
-            CourseSession::orderBy('id')->pluck('course_session_number')->all(),
+            array_merge(...array_fill(0, 5, [1, 2, 3])),
+            CourseSession::orderBy('id')->pluck('session_number')->all(),
         );
         $this->assertSame(3, User::where('is_approved', false)->count());
     }

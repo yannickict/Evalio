@@ -18,7 +18,12 @@ class QuestionnaireTemplateController extends Controller
 {
     public function index(): View
     {
-        $templates = QuestionnaireTemplate::with('questions.options')
+        $templates = QuestionnaireTemplate::with(
+            'questions.options',
+            'courses',
+            'sessions.course',
+            'sessions.feedbackForm.answers',
+        )
             ->withCount('questions')
             ->latest()
             ->get();
@@ -69,8 +74,10 @@ class QuestionnaireTemplateController extends Controller
         Gate::authorize('delete-questionnaires');
 
         return DB::transaction(function () use ($template): RedirectResponse {
-            if ($template->courses()->exists()
-                || CourseSession::where('questionnaire_template_id', $template->id)->exists()) {
+            if (
+                $template->courses()->exists()
+                || CourseSession::where('questionnaire_template_id', $template->id)->exists()
+            ) {
                 return redirect()->route('questionnaires.index')->withErrors([
                     'questionnaire' => 'This questionnaire is assigned to a course or session and cannot be deleted.',
                 ]);
@@ -80,9 +87,11 @@ class QuestionnaireTemplateController extends Controller
             $template->delete();
 
             foreach ($questions as $question) {
-                if (! $question->questionnaireTemplates()->exists()
+                if (
+                    ! $question->questionnaireTemplates()->exists()
                     && ! Answer::where('question_id', $question->id)->exists()
-                    && ! Answer::whereIn('question_option_id', $question->options()->select('id'))->exists()) {
+                    && ! Answer::whereIn('question_option_id', $question->options()->select('id'))->exists()
+                ) {
                     $question->delete();
                 }
             }

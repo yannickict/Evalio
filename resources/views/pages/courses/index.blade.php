@@ -3,7 +3,7 @@
 @section('title', 'Courses - Evalio')
 
 @section('content')
-<main class="container py-5">
+<main class="container py-5" id="course-overview">
     <header class="mb-4">
         <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
         <div class="d-flex align-items-center flex-wrap gap-3 mb-2">

@@ -31,9 +31,10 @@ class DemoSeeder extends Seeder
 
             User::factory()->count(3)->unverified()->create();
 
-            $courses = Course::factory()->count(5)->for($template, 'questionnaireTemplate')->create();
-
-            foreach ($courses as $index => $course) {
+            foreach (['AID', 'EPR', 'EXT', 'WEB', 'SQL'] as $index => $name) {
+                $course = Course::firstOrCreate(['name' => $name], [
+                    'questionnaire_template_id' => $template->id,
+                ]);
                 foreach ([-14, 0, 14] as $days) {
                     $session = CourseSession::factory()
                         ->for($course)

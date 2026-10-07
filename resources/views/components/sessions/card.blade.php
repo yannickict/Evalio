@@ -15,7 +15,7 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
     <article class="session-card card h-100 border-0 rounded-4 shadow-sm">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-                <span class="small text-body-secondary font-monospace text-break">{{ $courseSession->course_session_number }}</span>
+                <span class="small text-body-secondary font-monospace text-break">{{ $courseSession->session_identifier }}</span>
                 <span class="badge rounded-pill bg-{{ $statusColor }}-subtle text-{{ $statusColor }}-emphasis">{{ $statusLabel }}</span>
             </div>
             <h2 class="h5 fw-semibold text-break mb-4">{{ $courseSession->course->name }}</h2>
@@ -35,7 +35,7 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
             <p class="small fw-medium text-break mb-0">{{ $courseSession->questionnaireTemplate?->name ?? 'No questionnaire assigned' }}</p>
             <button class="btn btn-link link-success text-decoration-none fw-semibold small p-0 mt-3 stretched-link"
                 type="button" data-bs-toggle="modal" data-bs-target="#session-{{ $courseSession->id }}"
-                aria-label="View details for {{ $courseSession->course->name }}, {{ $courseSession->course_session_number }}">
+                aria-label="View details for {{ $courseSession->course->name }}, {{ $courseSession->session_identifier }}">
                 View details <span aria-hidden="true">&rarr;</span>
             </button>
         </div>
@@ -52,7 +52,7 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
     <dl class="row g-3 mb-0">
         <div class="col-sm-6">
             <dt class="small text-body-secondary fw-normal">Session number</dt>
-            <dd class="font-monospace text-break mb-0">{{ $courseSession->course_session_number }}</dd>
+            <dd class="font-monospace text-break mb-0">{{ $courseSession->session_identifier }}</dd>
         </div>
         <div class="col-sm-6">
             <dt class="small text-body-secondary fw-normal">Instructor</dt>

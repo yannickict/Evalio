@@ -56,11 +56,11 @@ $isInstructor = auth()->user()?->role?->name === 'instructor';
             @if ($canOpenSession)
             <a class="course-session-link d-block rounded-3 p-3 text-body text-decoration-none"
                href="{{ route('sessions.index', ['session' => $courseSession->id]) }}"
-               aria-label="View session {{ $courseSession->course_session_number }}">
+               aria-label="View session {{ $courseSession->session_identifier }}">
             @else
             <div class="p-3">
             @endif
-            <p class="small font-monospace text-break mb-1">{{ $courseSession->course_session_number }}</p>
+            <p class="small font-monospace text-break mb-1">{{ $courseSession->session_identifier }}</p>
             <p class="fw-medium text-break mb-1">{{ $courseSession->instructor?->name ?? 'No instructor assigned' }}</p>
             <p class="small text-body-secondary mb-0">
                 <time datetime="{{ $courseSession->start_date->toDateString() }}">{{ $courseSession->start_date->format('d M Y') }}</time>

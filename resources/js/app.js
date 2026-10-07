@@ -2,11 +2,12 @@ import Modal from "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
 
-if (document.getElementById('session-overview')) {
-    const sessionId = new URLSearchParams(window.location.search).get('session');
+for (const [overviewId, parameter] of [['session-overview', 'session'], ['course-overview', 'course']]) {
+    if (!document.getElementById(overviewId)) continue;
+    const selectedId = new URLSearchParams(window.location.search).get(parameter);
 
-    if (sessionId && /^\d+$/.test(sessionId)) {
-        const modal = document.getElementById(`session-${sessionId}`);
+    if (selectedId && /^\d+$/.test(selectedId)) {
+        const modal = document.getElementById(`${parameter}-${selectedId}`);
 
         if (modal?.classList.contains('modal')) {
             Modal.getOrCreateInstance(modal).show();

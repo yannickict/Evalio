@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\CourseSessionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,8 +14,9 @@ use Illuminate\Support\Carbon;
 /**
  * @property Carbon $start_date
  * @property Carbon $end_date
+ * @property-read string $session_identifier
  */
-#[Fillable(['course_id', 'instructor_id', 'questionnaire_template_id', 'course_session_number', 'start_date', 'end_date', 'evaluation_status'])]
+#[Fillable(['course_id', 'instructor_id', 'questionnaire_template_id', 'session_number', 'start_date', 'end_date', 'evaluation_status'])]
 class CourseSession extends Model
 {
     /** @use HasFactory<CourseSessionFactory> */
@@ -28,28 +30,27 @@ class CourseSession extends Model
                     ->value('questionnaire_template_id');
             }
 
-            $number = $session->getAttributes()['course_session_number'] ?? null;
+            $number = $session->getAttributes()['session_number'] ?? null;
 
             if ($number !== null && $number !== '') {
                 return;
             }
 
-            $highestNumber = 0;
-
-            foreach (static::query()->pluck('course_session_number') as $number) {
-                if (preg_match('/^COURSE\.(\d+)$/', $number, $matches)) {
-                    $highestNumber = max($highestNumber, (int) $matches[1]);
-                }
-            }
-
-            $session->course_session_number = sprintf('COURSE.%04d', $highestNumber + 1);
+            $session->session_number = max(0, (int) static::where('course_id', $session->course_id)
+                ->max('session_number')) + 1;
         });
     }
 
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['start_date' => 'date', 'end_date' => 'date'];
+        return ['start_date' => 'date', 'end_date' => 'date', 'session_number' => 'integer'];
+    }
+
+    /** @return Attribute<non-falsy-string, never> */
+    protected function sessionIdentifier(): Attribute
+    {
+        return Attribute::get(fn (): string => sprintf('%s.%03d', $this->course->name, $this->session_number));
     }
 
     /** @return BelongsTo<Course, $this> */

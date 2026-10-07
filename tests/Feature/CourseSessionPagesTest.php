@@ -78,8 +78,8 @@ class CourseSessionPagesTest extends TestCase
         $this->actingAs($this->admin())->get(route('sessions.index'))->assertOk()
             ->assertSee('Laravel basics')->assertSee('Alex Example')
             ->assertSee('Training questionnaire')->assertSee('10 Jan 2026')->assertSee('12 Jan 2026')
-            ->assertSee($closed->course_session_number)->assertSee('3 sessions')
-            ->assertSee($open->course_session_number)->assertSee($automatic->course_session_number)
+            ->assertSee($closed->session_identifier)->assertSee('3 sessions')
+            ->assertSee($open->session_identifier)->assertSee($automatic->session_identifier)
             ->assertSee('Evaluation closed')->assertSee('Evaluation open')->assertSee('Evaluation status not set')
             ->assertViewHas('courses', fn ($courses) => $courses->contains('id', $open->course_id)
                 && $courses->contains('id', $automatic->course_id))
@@ -93,7 +93,7 @@ class CourseSessionPagesTest extends TestCase
         $session = CourseSession::factory()->create(['evaluation_status' => 'closed']);
 
         $this->actingAs($this->admin())->get(route('sessions.index'))
-            ->assertOk()->assertSee($session->course_session_number)->assertSee('No questionnaire assigned');
+            ->assertOk()->assertSee($session->session_identifier)->assertSee('No questionnaire assigned');
     }
 
     public function test_multiple_sessions_display_count_and_remain_in_registration_order(): void
@@ -103,7 +103,7 @@ class CourseSessionPagesTest extends TestCase
 
         $this->actingAs($this->admin())->get(route('sessions.index'))->assertOk()
             ->assertSee('2 sessions')
-            ->assertSeeInOrder([$older->course_session_number, $newer->course_session_number]);
+            ->assertSeeInOrder([$older->session_identifier, $newer->session_identifier]);
     }
 
     public function test_course_names_are_escaped(): void
@@ -194,8 +194,8 @@ class CourseSessionPagesTest extends TestCase
         $other = CourseSession::factory()->create();
 
         $this->actingAs($instructor)->get(route('sessions.index'))->assertOk()
-            ->assertSee($own->course_session_number)
-            ->assertDontSee($other->course_session_number)
+            ->assertSee($own->session_identifier)
+            ->assertDontSee($other->session_identifier)
             ->assertDontSee($other->course->name)
             ->assertDontSee($other->instructor->name)
             ->assertViewHas('courseSessions', fn ($sessions) => $sessions->modelKeys() === [$own->id])

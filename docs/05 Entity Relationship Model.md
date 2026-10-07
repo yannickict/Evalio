@@ -40,7 +40,7 @@ There is no separate course `code` column. One course has many course sessions. 
 | `course_id` | Required course reference |
 | `instructor_id` | Required reference to a user |
 | `questionnaire_template_id` | Nullable saved questionnaire reference, copied from the course on creation |
-| `course_session_number` | Unique session identifier |
+| `session_number` | Numeric sequence within a course; unique together with `course_id` |
 | `start_date` | Session start date |
 | `end_date` | Session end date |
 | `evaluation_status` | Nullable enum: `open` or `closed` |

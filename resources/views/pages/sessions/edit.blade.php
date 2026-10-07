@@ -12,7 +12,7 @@
                 </a>
                 <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
                 <h1 class="h2 fw-bold mb-2">Edit session</h1>
-                <p class="text-body-secondary mb-0">Review the instructor and dates for {{ $courseSession->course_session_number }}.</p>
+                <p class="text-body-secondary mb-0">Review the instructor and dates for {{ $courseSession->session_identifier }}.</p>
             </header>
 
             <x-ui.validation-errors :errors="$errors" />

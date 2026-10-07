@@ -35,6 +35,7 @@ class CourseSessionEditingTest extends TestCase
             'start_date' => '2026-10-08', 'end_date' => '2026-10-10',
             'course_id' => 999999, 'questionnaire_template_id' => 999999,
             'course_session_number' => 'CHANGED', 'evaluation_status' => 'open',
+            'session_number' => 999,
         ])->assertRedirect(route('sessions.index'))->assertSessionHasNoErrors()->assertSessionHas('status', 'Session updated.');
 
         $updated = $session->fresh();
@@ -43,7 +44,7 @@ class CourseSessionEditingTest extends TestCase
         $this->assertSame('2026-10-10', $updated->end_date->toDateString());
         $this->assertSame($session->course_id, $updated->course_id);
         $this->assertSame($session->questionnaire_template_id, $updated->questionnaire_template_id);
-        $this->assertSame($session->course_session_number, $updated->course_session_number);
+        $this->assertSame($session->session_identifier, $updated->session_identifier);
         $this->assertSame('closed', $updated->evaluation_status);
     }
 

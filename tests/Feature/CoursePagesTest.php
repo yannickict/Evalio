@@ -29,7 +29,7 @@ class CoursePagesTest extends TestCase
         $response = $this->actingAs($owner)->get(route('courses.index'))->assertOk();
         $response->assertSee(route('sessions.index', ['session' => $own->id]), false)
             ->assertDontSee(route('sessions.index', ['session' => $other->id]), false)
-            ->assertDontSee($other->course_session_number)
+            ->assertDontSee($other->session_identifier)
             ->assertSee('1 session assigned to you')
             ->assertSee('No sessions are assigned to you for this course.')
             ->assertViewHas('courses', fn ($courses) => $courses->firstWhere('id', $own->course_id)->sessions_count === 1
@@ -74,7 +74,7 @@ class CoursePagesTest extends TestCase
             ->assertViewHas('courses', fn ($courses) => $courses->firstWhere('id', $course->id)->sessions_count === 1
                 && $courses->firstWhere('id', $emptyCourse->id)->sessions_count === 0)
             ->assertSee($course->name)->assertSee($template->name)
-            ->assertSee($session->course_session_number)->assertSee($session->instructor->name)
+            ->assertSee($session->session_identifier)->assertSee($session->instructor->name)
             ->assertSee('data-bs-target="#course-'.$course->id.'"', false)
             ->assertSee('No sessions for this course yet.')
             ->assertSee('No questionnaire assigned')
