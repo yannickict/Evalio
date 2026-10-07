@@ -38,6 +38,23 @@ class QuestionnaireTemplateController extends Controller
         return view('pages.questionnaires.create', ['draft' => QuestionnaireDraft::empty()]);
     }
 
+    public function duplicate(QuestionnaireTemplate $template): View
+    {
+        $template->load('questions.options');
+
+        return view('pages.questionnaires.create', ['draft' => [
+            'name' => $template->name.' (copy)',
+            'questions' => $template->questions->map(fn (Question $question): array => [
+                'text' => $question->question_text,
+                'type' => $question->type,
+                'allows_comment' => $question->allows_comment,
+                'options' => $question->type === 'single_choice'
+                    ? $question->options->pluck('option_text')->all()
+                    : ['', ''],
+            ])->values()->all() ?: [QuestionnaireDraft::emptyQuestion()],
+        ]]);
+    }
+
     public function store(StoreQuestionnaireRequest $request): RedirectResponse
     {
         $data = $request->validated();

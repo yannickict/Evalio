@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('questionnaires')->name('questionnaires.')->controller(QuestionnaireTemplateController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->middleware('can:create-questionnaires')->name('create');
+        Route::get('/{template}/duplicate', 'duplicate')->middleware('can:create-questionnaires')->name('duplicate');
         Route::post('/', 'store')->middleware('can:create-questionnaires')->name('store');
         Route::post('/preview', 'preview')->middleware('can:create-questionnaires')->name('preview');
         Route::delete('/{template}', 'delete')->middleware('can:delete-questionnaires')->name('delete');

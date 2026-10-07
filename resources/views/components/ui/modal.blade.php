@@ -1,4 +1,4 @@
-@props(['id', 'label' => null, 'labelledby' => null, 'editPermission' => null, 'editUrl' => null, 'deletePermission' => null, 'deleteUrl' => null, 'deleteConfirmation' => 'Permanently delete this item? This cannot be undone.'])
+@props(['id', 'label' => null, 'labelledby' => null, 'editPermission' => null, 'editUrl' => null, 'editLabel' => 'Edit', 'deletePermission' => null, 'deleteUrl' => null, 'deleteConfirmation' => 'Permanently delete this item? This cannot be undone.'])
 
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1"
@@ -15,9 +15,9 @@
                 @if ($editPermission)
                 @can($editPermission)
                 @if ($editUrl)
-                <a class="btn btn-success rounded-3" href="{{ $editUrl }}">Edit</a>
+                <a class="btn btn-success rounded-3" href="{{ $editUrl }}">{{ $editLabel }}</a>
                 @else
-                <button class="btn btn-success rounded-3" type="button">Edit</button>
+                <button class="btn btn-success rounded-3" type="button">{{ $editLabel }}</button>
                 @endif
                 @endcan
                 @endif
