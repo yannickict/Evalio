@@ -1,16 +1,16 @@
 # Implementation Status
 
-Reviewed against source code on 5 October 2026. [[02 Project Requirements|Project Requirements]] remains the specification; this note records implementation progress without changing its scope or priorities.
+Reviewed against source code on 7 October 2026. [[02 Project Requirements|Project Requirements]] remains the specification; this note records implementation progress without changing its scope or priorities.
 
 ## Requirements and current behavior
 
 | Requirement area | Current implementation | Remaining work |
 |---|---|---|
 | Web application and SQL storage | Laravel, Blade, Eloquent and migrations | Production database/deployment configuration and complete SQL dump procedure |
-| Roles and least privilege | Separate role gates; instructor ownership and self-assignment; admin user management; admin/editor course/questionnaire creation and course/session editing | Result access rules as reporting is added |
+| Roles and least privilege | Separate Gates, instructor ownership for results, admin-only deletion and admin/editor creation/editing | Restrict instructor visibility in questionnaire usage queries |
 | Registration and approval | New instructor accounts are unapproved; admin approves and assigns roles; login requires approval | Forgot-password routes, forms and reset workflow |
-| Course management | Validated create/edit pages, unique names, questionnaire defaults and shared fields | Course deletion/archive workflow |
-| Course sessions | Validated create/edit pages, instructor/date updates, saved session templates, unique numbers and one feedback form per session | Delete/archive operations and reporting |
+| Course management | Validated create/edit pages, questionnaire defaults and admin-only transactional deletion with dependent feedback | Optional archiving |
+| Course sessions | Create/edit, saved templates, numeric per-course numbers, computed identifiers and transactional admin deletion | Concurrent number allocation; optional archiving |
 | Evaluation phase | Hourly start-date opening and closing on end date plus 14 days, authorized manual controls, code lifecycle and status checks on GET/POST feedback | Production scheduler setup and operational monitoring |
 | Anonymous evaluation (T-01) | Public code-based questionnaire; no participant foreign key on forms | Full anonymity assessment beyond domain storage; code lifecycle and access controls |
 | Cancel/back (T-02/T-03) | All questions appear on one page; no answer writes before POST | Explicit cancel interaction and any required navigation behavior |
@@ -20,11 +20,11 @@ Reviewed against source code on 5 October 2026. [[02 Project Requirements|Projec
 | Final storage (T-08) | Answers are created on POST; forms exist beforehand | Define submitted-form lifecycle, atomic save and duplicate/replay handling |
 | Standard questionnaire | Seeder defines ten questions, options and template positions | Verify end-to-end behavior after changes |
 | Question configuration | Database content initialized from PHP seeder | Required separate configuration-file approach remains absent |
-| Optional template management (O-01–O-03) | Admin/editor creation, draft refresh, transactional saving, optional comments and template previews | Editing/versioning and deleting saved templates |
-| Evaluation and filtering | Session details, ownership restrictions and admin/editor course/instructor filters | Aggregate answers and individual-session results |
-| One-page A4 output | No evaluation print feature found | Printable compact A4 results |
+| Optional template management (O-01–O-03) | Creation, independent duplication, usage previews, comments, course assignment and unused-template deletion | Direct editing/versioning; instructor usage visibility |
+| Evaluation and filtering | Authorized per-session counts, percentages, pie charts, written responses/comments and overview filters | Combined result filters; abstention/submission counting policy |
+| One-page A4 output | Browser print/PDF button and compact portrait A4 chart summary; written answers/comments remain on screen | Verify standard ten-question summary fits one page; long questionnaire handling |
 | Backups and CSV import | No application endpoints or workflows found | Administrator backup/restore procedure and specified CSV import |
-| Deletion | Admin user deletion with assignment guard; database FK rules | Admin course/session/feedback-form deletion workflows |
+| Deletion | Admin course/session deletion with feedback cleanup; template assignment guard and unused-question cleanup; user assignment guard | Individual submitted feedback-form deletion |
 | Validation/security | Auth/session handling, login throttling, escaped Blade output, CSRF, shared authorization gates and validated atomic feedback submission | Comprehensive role authorization and production scheduler setup |
 
 ## Data interpretation and integrity
@@ -44,3 +44,9 @@ The PHP feature suite includes authentication, users, navigation, overview, sess
 The PHP suite and static analysis were run during this cleanup. Course update tests cover role access, duplicate/unchanged names, invalid templates, restored input and preservation of session templates. Current tests also encode repeated submissions appending answers to the same form; one form per session does not group answers into separate participant submissions. Passing those tests alone would not establish that all project requirements are met.
 
 Backend cleanup verification on 6 October 2026: PHP feature tests, PHPStan, Pint, the frontend build and JavaScript tests passed using a temporary PHP 8.4 runtime. Regression tests cover unrelated questions/options, disabled comments, malformed payloads, and transaction rollback.
+
+## Verification on 7 October 2026
+
+The full PHP suite passed after session numbering changes (209 tests). Later targeted checks passed for duplication (35 questionnaire tests), results and pie charts (3 tests, 29 assertions), seeding (8 tests), navigation (10 JavaScript tests), formatting, PHPStan and frontend builds. These were different-stage runs; a final combined CI run is pending. The compatible local PHP is `C:/Users/yanni/.config/herd-lite/bin/php.exe`; PHPStan required a 512 MB CLI memory limit after the local 128 MB limit caused a worker crash.
+
+The session-number migration was applied after a local database backup. Existing session fields, courses, forms and answers were compared before/after; foreign-key checks passed. Visual browser review and A4 page-count verification remain open. Answer totals are not participant/submission totals: one feedback form is shared by a session's submissions.

@@ -48,6 +48,36 @@
     }
 }
 
+.results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.results-card { min-width: 0; }
+.results-chart { display: flex; align-items: center; gap: 1rem; }
+.results-pie { width: 120px; height: 120px; flex: 0 0 120px; }
+.results-pie-empty { border: 1px dashed var(--bs-border-color); border-radius: 50%; display: grid; place-items: center; text-align: center; }
+.results-legend { font-size: .8rem; }
+.results-legend li { display: flex; align-items: baseline; gap: .4rem; margin-bottom: .25rem; }
+.results-swatch { display: inline-block; width: .65rem; height: .65rem; border-radius: 2px; flex: 0 0 .65rem; }
+@media (max-width: 767.98px) {
+    .results-grid { grid-template-columns: 1fr; }
+}
+@media print {
+    @page { size: A4 portrait; margin: 10mm; }
+    body:has(.evaluation-results) { background: white !important; }
+    body:has(.evaluation-results) > header { display: none !important; }
+    .evaluation-results { width: 100%; max-width: none; padding: 0 !important; color: #111; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .evaluation-results > header { margin-bottom: 4mm !important; }
+    .evaluation-results h1 { font-size: 18pt; margin-bottom: 1mm !important; }
+    .evaluation-results > header p { font-size: 9pt; margin-bottom: 0 !important; }
+    .evaluation-results .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3mm; }
+    .evaluation-results .results-card { padding: 3mm !important; border: 1px solid #ddd !important; border-radius: 2mm !important; box-shadow: none !important; break-inside: avoid; }
+    .evaluation-results .results-card h2 { font-size: 9pt; line-height: 1.2; margin-bottom: 2mm !important; }
+    .evaluation-results .results-card > p { font-size: 7pt; margin-bottom: 1mm !important; }
+    .evaluation-results .results-pie { width: 23mm; height: 23mm; flex-basis: 23mm; }
+    .evaluation-results .results-chart { gap: 2mm; }
+    .evaluation-results .results-legend { font-size: 7pt; line-height: 1.15; }
+    .evaluation-results .results-legend li { margin-bottom: .8mm; }
+    .evaluation-results .results-swatch { width: 2mm; height: 2mm; flex-basis: 2mm; }
+}
+
 .editor-remove:disabled {
     color: var(--bs-secondary-color);
     background-color: var(--bs-secondary-bg);

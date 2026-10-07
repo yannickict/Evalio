@@ -45,7 +45,7 @@ There is no separate course `code` column. One course has many course sessions. 
 | `end_date` | Session end date |
 | `evaluation_status` | Nullable enum: `open` or `closed` |
 
-Each session belongs to one course and one instructor and has at most one feedback form. If no session number is supplied, the model generates a number such as `COURSE.0001` by scanning existing numbers. Session creation validates that the instructor is approved and has the instructor role, and that the end date is not before the start date.
+Each session belongs to one course and one instructor and has at most one feedback form. If no session number is supplied, the model assigns the next numeric sequence within the course. The computed identifier uses the course name and a padded number, for example `AID.001`. Session creation validates that the instructor is approved and has the instructor role, and that the end date is not before the start date.
 
 The overview displays null as “Evaluation status not set”. The hourly command opens on the start date, catches up unset sessions during the evaluation window, and closes on end date plus 14 days. Manually closed sessions stay closed on later dates. Feedback access and submission require an open status.
 
@@ -121,10 +121,10 @@ erDiagram
 
 | Deleted record | Behavior for dependent records |
 |---|---|
-| Questionnaire template | Restricted by assigned courses and sessions; pivot rows cascade |
-| Course | Restricted by course sessions |
+| Questionnaire template | Assigned courses/sessions block deletion; pivots cascade; controller removes only unshared, unanswered questions/options |
+| Course | FK restricts direct deletion; controller transaction removes session feedback and sessions first |
 | Instructor/user | Restricted by course sessions; user controller asks for reassignment first |
-| Course session | Restricted by feedback forms |
+| Course session | FK restricts direct deletion; controller removes the form first, cascading answers |
 | Feedback form | Answers cascade |
 | Question | Template pivot and answer references restrict deletion; options cascade where deletion is otherwise possible |
 | Question option | Referencing answers restrict deletion |
@@ -136,3 +136,8 @@ Sessions save a questionnaire-template reference at creation. Changing a course'
 ## Naming and infrastructure
 
 Domain tables use plural English snake_case names; model classes use singular PascalCase names. The questionnaire-question pivot name is explicitly supplied in the Eloquent relationship. Laravel also maintains infrastructure tables for authentication, sessions, cache and jobs; these are separate from the feedback domain.
+
+
+## Session identifiers
+
+Numeric `session_number` is stored with a unique `(course_id, session_number)` constraint. The `session_identifier` accessor formats the current course name and number as `AID.002`. The October 7 forward migration renumbers existing sessions in ID order per course without changing IDs or feedback relationships. Course renaming changes displayed identifiers. Concurrent maximum-based number allocation still needs locking/retry.

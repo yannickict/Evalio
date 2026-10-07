@@ -34,7 +34,7 @@ On a dedicated local demo database:
 php artisan db:seed
 ```
 
-`DatabaseSeeder` runs `RoleSeeder` and `QuestionnaireSeeder`, then `DemoSeeder` only in `local` or `testing` environments. The demo seeder creates an approved `admin@example.com` account with password `password`, five approved instructors, three additional unapproved users, five courses, fifteen sessions and one feedback form per session. Only open sessions receive random six-digit codes; closed/future sessions have null codes. Unused role permission columns were removed from the original role-table migration, so fresh migration uses role names and gates only.
+`DatabaseSeeder` runs `RoleSeeder` and `QuestionnaireSeeder`, then `DemoSeeder` only in `local` or `testing` environments. The demo seeder creates an approved `admin@example.com` account with password `password`, five approved instructors, three additional unapproved users, five short-name courses (`AID`, `EPR`, `EXT`, `WEB`, `SQL`), fifteen sessions and one feedback form per session. Only open sessions receive random six-digit codes; closed/future sessions have null codes. Unused role permission columns were removed from the original role-table migration, so fresh migration uses role names and gates only.
 
 The demo credentials are for local demonstration. Re-running the demo seeder resets the demo administrator's password and adds more factory-generated records; it is not an idempotent reset. The standard questionnaire seeder updates shared question content and rebuilds its template pivot. Seeding is therefore a data mutation, not a routine application startup step.
 
@@ -91,3 +91,12 @@ No test or build was run as part of this source-based documentation update. This
 ## Existing database compatibility
 
 The unique feedback_forms.course_session_id constraint was added to the original domain creation migration; there is no follow-up migration in the current tree. An existing database that already ran that migration will not gain the constraint just by running php artisan migrate. Plan a forward migration/data reconciliation for existing data. Rebuilding a disposable local database is an alternative, but destroys that database's contents.
+
+
+## Session-number upgrade and results output
+
+Run `php artisan migrate` for the forward session-number migration; a fresh reset is unnecessary for this change. Back up first because displayed identifiers are renumbered per course. The demo seeder reuses its named courses but still adds instructors and sessions on repeated runs.
+
+Open View evaluation results from session details. Print / Save as PDF uses browser printing and an A4 chart summary. Disable browser-added headers/footers when checking one-page output. Actual standard-questionnaire page-count verification remains required.
+
+The compatible local Windows runtime is `C:/Users/yanni/.config/herd-lite/bin/php.exe`. Put its directory before XAMPP PHP on PATH for Composer. If local PHPStan exceeds 128 MB, run `php vendor/bin/phpstan analyse --memory-limit=512M`. JavaScript tests use `npm run test:js`; these are not currently a separate CI workflow step.

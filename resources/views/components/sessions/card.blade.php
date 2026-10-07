@@ -72,6 +72,9 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
         </div>
     </dl>
     <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 border-top pt-3 mt-4">
+        @can('view-evaluation-results', $courseSession)
+        <a class="btn btn-outline-success rounded-3" href="{{ route('sessions.results', $courseSession) }}">View evaluation results</a>
+        @endcan
         @if ($courseSession->evaluation_status === 'open' && $courseSession->questionnaireTemplate && $courseSession->feedbackForm?->code !== null)
         <a class="btn btn-success rounded-3 text-break" href="{{ route('feedback.show', ['code' => $courseSession->feedbackForm->code]) }}">View questionnaire</a>
         @endif

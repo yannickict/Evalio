@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseSessionController;
+use App\Http\Controllers\EvaluationResultsController;
 use App\Http\Controllers\FeedbackResponseController;
 use App\Http\Controllers\QuestionnaireTemplateController;
 use App\Http\Controllers\UserController;
@@ -50,6 +51,8 @@ Route::middleware('auth')->group(function () {
             ->name('evaluation.update');
         Route::delete('/delete/{courseSession}', 'delete')->middleware('can:delete-sessions')->name('delete');
     });
+    Route::get('/session/{courseSession}/results', [EvaluationResultsController::class, 'show'])
+        ->middleware('can:view-evaluation-results,courseSession')->name('sessions.results');
 
     Route::prefix('users')->name('users.')->middleware('can:manage-users')->controller(UserController::class)->group(function () {
         Route::get('/', 'index')->name('index');

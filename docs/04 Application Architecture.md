@@ -1,6 +1,6 @@
 # Application Architecture
 
-Source review: 6 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack]], [[05 Entity Relationship Model|Entity Relationship Model]], [[07 Implementation Status|Implementation Status]].
+Source review: 7 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack]], [[05 Entity Relationship Model|Entity Relationship Model]], [[07 Implementation Status|Implementation Status]].
 
 ## Structure
 
@@ -61,6 +61,11 @@ Paths and handler names below match the repository.
 | GET    | `/questionnaires/create`  | `QuestionnaireTemplateController::create`  | Admin/editor                               |
 | POST   | `/questionnaires/preview` | `QuestionnaireTemplateController::preview` | Admin/editor; draft changes only           |
 | POST   | `/questionnaires`         | `QuestionnaireTemplateController::store`   | Admin/editor; persistent template creation |
+| GET | `/session/{courseSession}/results` | `EvaluationResultsController::show` | Admin/editor or assigned instructor |
+| DELETE | `/delete/{courseSession}` | `CourseSessionController::delete` | Administrator; transactional feedback cleanup |
+| DELETE | `/courses/{course}` | `CourseController::delete` | Administrator; transactional session cleanup |
+| GET | `/questionnaires/{template}/duplicate` | `QuestionnaireTemplateController::duplicate` | Admin/editor; no database writes |
+| DELETE | `/questionnaires/{template}` | `QuestionnaireTemplateController::delete` | Administrator; assigned templates blocked |
 | GET    | `/users`                  | `UserController::index`                    | Administrator                               |
 | PATCH  | `/users/{user}`           | `UserController::update`                   | Administrator                               |
 | DELETE | `/users/{user}`           | `UserController::destroy`                  | Administrator; cannot delete self           |
@@ -87,9 +92,9 @@ Repeated submissions append answers to the same form. The code is not consumed, 
 
 ## Sessions and overview
 
-Session creation selects an existing course and approved instructor, validates dates and creates the session. The model generates `COURSE.0001`-style identifiers by scanning existing numbers. The unique database constraint prevents duplicate stored identifiers, but concurrent number generation has no locking/retry mechanism. Creation does not immediately generate feedback forms or codes; opening an evaluation does.
+Session creation selects an existing course and approved instructor, validates dates and creates the session. The model stores numeric `session_number` values and assigns the next number within each course. The computed `session_identifier` combines the current course name and a minimum three-digit number, for example `AID.002`. A unique `(course_id, session_number)` constraint prevents duplicates within a course; concurrent generation still needs locking/retry. Renaming a course changes its displayed session identifiers. The forward migration `2026_10_07_000001_replace_course_session_number_with_session_number` numbers existing sessions in ID order within each course and removes the old stored identifier. Creation does not immediately generate feedback forms or codes; opening an evaluation does.
 
-The overview loads visible sessions, their courses, instructors, saved session templates and each session's optional feedback form. Instructors receive only their own sessions; admins and editors receive all sessions and can use course/instructor filters. Cards show dates and status; modals expose details and existing feedback codes. No aggregate answer results are displayed.
+The overview loads visible sessions, their courses, instructors, saved session templates and each session's optional feedback form. Instructors receive only their own sessions; admins and editors receive all sessions and can use course/instructor filters. Cards show dates and status; modals expose details and existing feedback codes. Session detail dialogs link to the authorized evaluation results page.
 
 ### Session questionnaire assignment
 
@@ -116,10 +121,26 @@ The library lists persisted templates with question counts, newest first. The ed
 
 Saving validates the template name, question text/type, optional comment setting and single-choice options, then creates the template, ordered question pivot records and options within a database transaction. Limits are 255 characters for the name, 5,000 for question text and 1,000 per option; single-choice questions require at least two options. Optional comments default to disabled and can be enabled per question. Save redirects to the database-backed library with confirmation.
 
-The library requires authentication. Creation, draft refresh and saving additionally require `create-questionnaires` (admins/editors). Editing/deleting saved templates and template versioning remain unfinished. This editor preview concerns questionnaire design; it is not the participant answer-review step required before feedback submission.
+The library requires authentication. Creation, draft refresh and saving additionally require `create-questionnaires` (admins/editors). Duplicate and edit opens the creation editor prefilled with the saved template. Saving creates independent questions/options and a new template; opening the editor does not write records. Admin-only deletion rejects templates assigned to any course or session, removes their pivot rows, and deletes only questions/options that are neither shared nor referenced by stored answers. Direct editing of saved templates and versioning remain unfinished. This editor preview concerns questionnaire design; it is not the participant answer-review step required before feedback submission.
 
 ## Shared forms and permissions
 
 Course forms share their name/template fields. Session forms share instructor and date fields; course/template are read-only on edit. `CourseSessionRequest` validates approved instructors and date ordering; its creation subclass adds course validation and instructor self-assignment enforcement, while its update subclass accepts only instructor/dates. Session updates require `edit-sessions` and preserve template, course, number and evaluation status. Date edits do not immediately recalculate evaluation status; the scheduled process uses the saved dates.
 
 Role names are the authorization source of truth. `User::hasRole()` supplies shared role checks, while gates retain separate names for creating/editing courses/questionnaires/sessions, session filters, workflow guidance, user administration and evaluation controls. Unused boolean role permission columns were removed from the original schema for fresh migration.
+
+## Questionnaire usage and detail navigation
+
+Questionnaire preview dialogs show assigned courses and sessions, with feedback-received badges based on whether answers exist. Questions and session lists are collapsed initially. Course and session links use `courses.index?course=ID` and `sessions.index?session=ID`; JavaScript opens only an existing matching detail modal. Session links are restricted to admins/editors or the assigned instructor. The questionnaire library's usage query currently loads all assigned sessions; restricting that data for instructors remains necessary.
+
+## Evaluation results and printing
+
+`GET /session/{courseSession}/results` uses `EvaluationResultsController::show`, retains route name `sessions.results`, and requires authentication plus `view-evaluation-results`. Admins/editors can view all sessions; instructors can view only their own. The controller loads the session's saved questionnaire, ordered questions/options and feedback answers, then prepares per-option totals, nonblank written responses and comments.
+
+Single-choice results use server-rendered SVG pie charts with counts and percentages. Each percentage uses the total selected options for that question; it is not a participant or submission count. Empty charts show a no-answers state, and a single populated option renders a full circle. Written answers and comments remain escaped text in the full screen view.
+
+Print / Save as PDF invokes browser printing. Print CSS requests portrait A4 with 10 mm margins and a compact two-column summary. Navigation, controls, individual written responses and comments are excluded; free-text questions show response counts. The layout targets the standard ten-question questionnaire. One-page fit has not been verified in print preview; long custom questionnaires or labels may span pages. Browser PDF saving is not a server-generated PDF export.
+
+## Administrative deletion
+
+Course and session deletion use separate admin-only Gates in routes and controllers and require frontend confirmation. Within a transaction, session deletion removes its feedback form first (answers cascade at the database level), then the session. Course deletion removes each session's form and session, then the course. Shared templates, questions, options and instructors remain intact. The underlying course/session foreign keys still restrict direct parent deletion; these cascades are implemented by controller transactions rather than changed schema rules. Individual submitted feedback deletion remains unfinished.
