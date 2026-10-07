@@ -95,11 +95,12 @@ class NavigationTest extends TestCase
         $this->assertCount(1, $xpath->query('//nav//button[@data-bs-target="#main-navigation" and @aria-controls="main-navigation" and @aria-expanded="false"]'));
         $this->assertCount(1, $xpath->query('//nav//*[@id="main-navigation"]'));
         $logoutForm = 'form[@method="POST" and @action="'.route('logout').'"]';
-        $mobileLogout = '//*[@id="main-navigation"]/'.$logoutForm.'[contains(concat(" ", normalize-space(@class), " "), " d-md-none ")]';
+        $mobileLogout = '//*[@id="main-navigation"]//'.$logoutForm.'[contains(concat(" ", normalize-space(@class), " "), " d-md-none ")]';
         $desktopProfile = '//*[@id="main-navigation"]/div[contains(concat(" ", normalize-space(@class), " "), " d-none ") and contains(concat(" ", normalize-space(@class), " "), " d-md-block ")]';
         $desktopMenu = $desktopProfile.'/div[@aria-labelledby="profile-menu-toggle" and contains(concat(" ", normalize-space(@class), " "), " dropdown-menu ") and not(contains(concat(" ", normalize-space(@class), " "), " show "))]';
 
         $this->assertCount(2, $xpath->query('//nav//form[@action="'.route('logout').'"]'));
+        $this->assertCount(2, $xpath->query('//nav//a[@href="'.route('profile.show').'" and normalize-space(.)="Account profile"]'));
         foreach ([$mobileLogout, $desktopMenu.'/'.$logoutForm] as $form) {
             $this->assertCount(1, $xpath->query($form));
             $this->assertCount(1, $xpath->query($form.'/input[@name="_token" and @type="hidden"]'));

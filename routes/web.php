@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseSessionController;
 use App\Http\Controllers\EvaluationResultsController;
 use App\Http\Controllers\FeedbackResponseController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionnaireTemplateController;
+use App\Http\Controllers\SqlDumpController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +25,12 @@ Route::prefix('questionnaire')->name('feedback.')->controller(FeedbackResponseCo
 });
 
 Route::middleware('auth')->group(function () {
+    Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
+        Route::get('/', 'show')->name('show');
+        Route::patch('/', 'update')->name('update');
+        Route::patch('/password', 'updatePassword')->middleware('throttle:6,1')->name('password.update');
+    });
+
     Route::prefix('courses')->name('courses.')->controller(CourseController::class)->group(function () {
         Route::get('/', 'index')->middleware('can:view-course-lists')->name('index');
         Route::get('/create', 'create')->middleware('can:create-courses')->name('create');
@@ -58,5 +67,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::patch('/{user}', 'update')->name('update');
         Route::delete('/{user}', 'destroy')->name('destroy');
+    });
+
+    Route::prefix('settings')->name('settings.')->middleware('can:manage-settings')->group(function () {
+        Route::view('/', 'pages.settings.index')->name('index');
+        Route::post('/sql-dump', [SqlDumpController::class, 'store'])
+            ->name('sql-dump');
+
+        Route::post('/backup', [BackupController::class, 'store'])
+            ->name('backup');
     });
 });

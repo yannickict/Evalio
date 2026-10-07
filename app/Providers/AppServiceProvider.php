@@ -16,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Gate::define('manage-settings', fn (User $user): bool => $user->hasRole('admin'));
         Gate::define('view-evaluation-results', fn (User $user, CourseSession $session): bool => $user->hasRole('admin', 'editor')
             || ($user->hasRole('instructor') && (int) $user->id === (int) $session->instructor_id)
         );

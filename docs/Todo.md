@@ -35,6 +35,7 @@ kanban-plugin: board
 - [ ] [Should] Add session and instructor result filters, including combinations; filter actual evaluation results with server authorization.
 - [ ] [Must] Verify the standard ten-question chart summary fits one A4 page in browser print/PDF; define handling for long custom questionnaires.
 - [ ] [Must] Implement administrator backups and a documented restore procedure; support a complete SQL dump of structure and data.
+  - Demo settings routes and services are connected and tested. Replace the placeholder `storage/app/private/dumps/demo.sql` in `SqlDumpService` with the server export tool before treating these files as backups.
 - [ ] [Must] Confirm specified CSV columns/data and implement validated CSV import with useful error reporting.
 - [ ] [Must] Implement individual submitted feedback deletion; course/session deletion and related-answer cleanup are implemented.
 - [ ] [Must] Review anonymity across application storage, logs and feedback-code distribution; avoid participant identity linkage.

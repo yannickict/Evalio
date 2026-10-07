@@ -1,9 +1,14 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-.user-avatar {
+.user-avatar,
+.settings-toggle {
     width: 3rem;
     height: 3rem;
+    vertical-align: middle;
 }
+
+.settings-toggle { line-height: 1; }
+.settings-toggle svg { display: block; }
 
 .course-session-link:is(:hover, :focus-visible) {
     background-color: var(--bs-success-bg-subtle);

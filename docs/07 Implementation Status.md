@@ -23,7 +23,8 @@ Reviewed against source code on 7 October 2026. [[02 Project Requirements|Projec
 | Optional template management (O-01–O-03) | Creation, independent duplication, usage previews, comments, course assignment and unused-template deletion | Direct editing/versioning; instructor usage visibility |
 | Evaluation and filtering | Authorized per-session counts, percentages, pie charts, written responses/comments and overview filters | Combined result filters; abstention/submission counting policy |
 | One-page A4 output | Browser print/PDF button and compact portrait A4 chart summary; written answers/comments remain on screen | Verify standard ten-question summary fits one page; long questionnaire handling |
-| Backups and CSV import | No application endpoints or workflows found | Administrator backup/restore procedure and specified CSV import |
+| Account profile | Personal detail updates and password changes with current-password validation; regression tests | Browser review |
+| Backups and CSV import | Admin settings page; POST routes store/download an existing demo SQL file through services, with error reporting and regression tests; CSV button disabled | Real database export tool, administrator backup/restore procedure and specified CSV import |
 | Deletion | Admin course/session deletion with feedback cleanup; template assignment guard and unused-question cleanup; user assignment guard | Individual submitted feedback-form deletion |
 | Validation/security | Auth/session handling, login throttling, escaped Blade output, CSRF, shared authorization gates and validated atomic feedback submission | Comprehensive role authorization and production scheduler setup |
 

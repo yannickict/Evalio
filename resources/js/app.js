@@ -2,6 +2,33 @@ import Modal from "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
 
+const profileForm = document.getElementById('profile-form');
+
+if (profileForm) {
+    const fields = [...profileForm.querySelectorAll('input[name="name"], input[name="email"]')];
+    const initialValues = fields.map((field) => field.dataset.originalValue ?? field.value);
+    const details = document.getElementById('profile-details');
+    const editButton = document.getElementById('profile-edit');
+    const cancelButton = document.getElementById('profile-cancel');
+
+    editButton.addEventListener('click', () => {
+        details.hidden = true;
+        profileForm.hidden = false;
+        editButton.hidden = true;
+        editButton.setAttribute('aria-expanded', 'true');
+        fields[0]?.focus();
+    });
+
+    cancelButton.addEventListener('click', () => {
+        fields.forEach((field, index) => { field.value = initialValues[index]; });
+        profileForm.hidden = true;
+        details.hidden = false;
+        editButton.hidden = false;
+        editButton.setAttribute('aria-expanded', 'false');
+        editButton.focus();
+    });
+}
+
 for (const [overviewId, parameter] of [['session-overview', 'session'], ['course-overview', 'course']]) {
     if (!document.getElementById(overviewId)) continue;
     const selectedId = new URLSearchParams(window.location.search).get(parameter);
