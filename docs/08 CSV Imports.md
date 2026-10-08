@@ -15,8 +15,8 @@ Administrators can open **Settings → Import CSV**, then choose **Sessions** or
 
 ```csv
 course_name,questionnaire_name
-Python basics,Standard Course Evaluation
-Data analysis,Standard Course Evaluation
+Python basics,Standard-Feedbackbogen
+Data analysis,Standard-Feedbackbogen
 ```
 
 Each row creates a course linked to an existing questionnaire by name. Both names are required and limited to 255 characters. Course and questionnaire names have database uniqueness constraints. Missing or ambiguous questionnaires and existing course names fail the row, including duplicate course names earlier in the same file. The import never updates existing courses.

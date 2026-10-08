@@ -14,6 +14,8 @@ German interface terminology uses **Kurse**, **Lehrgänge**, **Feedbackbögen** 
 
 ## Questionnaire content
 
+`QuestionnaireSeeder` creates the **Standard-Feedbackbogen** with ten German questions and German answer options, independent of the interface language. `DemoSeeder` uses this template. Existing questionnaires are not automatically renamed or rewritten by this source change; the seeded German template also stays German when the interface is switched to English.
+
 Only hardcoded interface text is translated. Questionnaire names, questions, answer options, course names, participant answers and comments appear exactly as stored, in the language they were written in. This applies equally to the standard questionnaire and custom questionnaires, participant forms, library previews, result charts, printed reports and duplication. Duplicating a template preserves its content and adds only the localized hardcoded copy suffix. No stored content was rewritten and no data migration is needed.
 
 With JavaScript enabled, switching language preserves the participant's current answers and comments across the reload using temporary browser session storage; they are removed from that storage after restoration. No answers are submitted by the switch. The questionnaire editor updates the language cookie and refreshes its complete draft through the existing preview action, preserving added questions and options. If browser storage is unavailable, participant draft restoration is unavailable; without JavaScript, switching reloads the page normally.

@@ -124,6 +124,10 @@ class SeederTest extends TestCase
         $this->assertDatabaseCount('questions', 10);
         $template = QuestionnaireTemplate::sole();
         $questions = $template->questions;
+        $this->assertSame('Standard-Feedbackbogen', $template->name);
+        $this->assertSame('Meine Vorkenntnisse für diesen Lehrgang waren ...', $questions->first()->question_text);
+        $this->assertSame(['Sehr gut', 'Gut', 'Befriedigend', 'Gering'], $questions->first()->options->pluck('option_text')->all());
+        $this->assertSame('Wenn Sie eine Gesamtnote vergeben müssten - welche Note würden Sie dem Schulungszentrum geben?', $questions->last()->question_text);
         $this->assertSame(range(1, 10), $questions->pluck('pivot.position')->all());
 
         foreach ($questions as $question) {

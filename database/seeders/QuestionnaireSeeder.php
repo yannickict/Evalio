@@ -11,22 +11,22 @@ class QuestionnaireSeeder extends Seeder
 {
     public function run(): void
     {
-        // Wording and order supplied in the clarified project specification.
+        // German standard content, independent of the selected interface language.
         $questions = [
-            ['My prerequisites for this course were ...', ['Very good', 'Good', 'Satisfactory', 'Low']],
-            ['The quality of the exercises in the course was ...', ['Very good', 'Good', 'Satisfactory', 'Low']],
-            ['I perceived the course atmosphere as ...', ['Motivating', 'Pleasant', 'Good', 'Exhausting', 'Boring']],
-            ['The instructor conducted the course ...', ['Very pleasantly', 'Pleasantly', 'Only partially pleasantly', 'Unpleasantly']],
-            ['The instructor was prepared in terms of content and organization ...', ['Very well prepared', 'Well prepared', 'Only partially prepared', 'Unprepared']],
-            ['Would you recommend the instructor?', ['Yes', 'No']],
-            ["The instructor's professional competence was ...", ['Very competent', 'Competent', 'Only partially competent', 'Incompetent']],
-            ['Would you recommend this course?', ['Yes', 'No']],
-            ['Enter two or three short points that come to mind about this course.', []],
-            ['If you had to give an overall grade, what grade would you give the training center?', ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5']],
+            ['Meine Vorkenntnisse für diesen Lehrgang waren ...', ['Sehr gut', 'Gut', 'Befriedigend', 'Gering']],
+            ['Die Qualität der Übungen im Lehrgang war ...', ['Sehr gut', 'Gut', 'Befriedigend', 'Gering']],
+            ['Die Lehrgangsatmosphäre empfand ich als ...', ['Motivierend', 'Angenehm', 'Gut', 'Anstrengend', 'Langweilig']],
+            ['Der Dozent gestaltete den Lehrgang ...', ['Sehr angenehm', 'Angenehm', 'Nur teilweise angenehm', 'Unangenehm']],
+            ['Der Dozent war inhaltlich und organisatorisch ...', ['Sehr gut vorbereitet', 'Gut vorbereitet', 'Nur teilweise vorbereitet', 'Unvorbereitet']],
+            ['Würden Sie den Dozenten weiterempfehlen?', ['Ja', 'Nein']],
+            ['Der Dozent war fachlich ...', ['Sehr kompetent', 'Kompetent', 'Nur teilweise kompetent', 'Inkompetent']],
+            ['Würden Sie diesen Lehrgang weiterempfehlen?', ['Ja', 'Nein']],
+            ['Geben Sie zwei, drei kurze Stichpunkte, die Ihnen zu diesem Lehrgang einfallen!', []],
+            ['Wenn Sie eine Gesamtnote vergeben müssten - welche Note würden Sie dem Schulungszentrum geben?', ['Note 1', 'Note 2', 'Note 3', 'Note 4', 'Note 5']],
         ];
 
         DB::transaction(function () use ($questions) {
-            $template = QuestionnaireTemplate::firstOrCreate(['name' => 'Standard Course Evaluation']);
+            $template = QuestionnaireTemplate::firstOrCreate(['name' => 'Standard-Feedbackbogen']);
             $template->questions()->detach();
 
             foreach ($questions as $index => [$text, $options]) {

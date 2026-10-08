@@ -26,7 +26,7 @@ class DemoSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]);
 
-            $template = QuestionnaireTemplate::where('name', 'Standard Course Evaluation')->firstOrFail();
+            $template = QuestionnaireTemplate::where('name', 'Standard-Feedbackbogen')->firstOrFail();
             $instructors = User::factory()->count(5)->approved()->create();
 
             User::factory()->count(3)->unverified()->create();

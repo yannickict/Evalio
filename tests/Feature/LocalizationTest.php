@@ -51,26 +51,27 @@ class LocalizationTest extends TestCase
         $this->assertSame('Dieser Link zum Zurücksetzen des Passworts ist ungültig.', __('passwords.token'));
     }
 
-    public function test_standard_questionnaire_keeps_its_original_language_with_german_interface(): void
+    public function test_standard_questionnaire_stays_german_in_both_interface_languages(): void
     {
         $this->seed(QuestionnaireSeeder::class);
-        $template = QuestionnaireTemplate::where('name', 'Standard Course Evaluation')->sole();
+        $template = QuestionnaireTemplate::where('name', 'Standard-Feedbackbogen')->sole();
         $session = CourseSession::factory()->create(['questionnaire_template_id' => $template->id, 'evaluation_status' => 'open']);
         $form = FeedbackForm::factory()->for($session)->create(['code' => '123456']);
 
         $this->get(route('feedback.show', ['code' => $form->code]))->assertOk()
-            ->assertSee('My prerequisites for this course were ...')
-            ->assertSee('Very good')->assertSee('Would you recommend this course?')
-            ->assertSee('Grade 5')->assertSee('Feedback absenden')
-            ->assertDontSee('Meine Vorkenntnisse für diesen Kurs waren ...');
-        $this->assertDatabaseHas('questions', ['question_text' => 'My prerequisites for this course were ...']);
-        $this->assertDatabaseHas('question_options', ['option_text' => 'Very good']);
+            ->assertSee('Meine Vorkenntnisse für diesen Lehrgang waren ...')
+            ->assertSee('Sehr gut')->assertSee('Würden Sie diesen Lehrgang weiterempfehlen?')
+            ->assertSee('Note 5')->assertSee('Feedback absenden')
+            ->assertDontSee('My prerequisites for this course were ...');
+        $this->assertDatabaseHas('questions', ['question_text' => 'Meine Vorkenntnisse für diesen Lehrgang waren ...']);
+        $this->assertDatabaseHas('question_options', ['option_text' => 'Sehr gut']);
 
         $this->actingAs($session->instructor)->get(route('questionnaires.index'))->assertOk()
-            ->assertSee('Standard Course Evaluation')->assertSee('My prerequisites for this course were ...');
+            ->assertSee('Standard-Feedbackbogen')->assertSee('Meine Vorkenntnisse für diesen Lehrgang waren ...');
         $this->app->setLocale('en');
         $this->get(route('feedback.show', ['code' => $form->code]))->assertOk()
-            ->assertSee('My prerequisites for this course were ...')->assertSee('Very good');
+            ->assertSee('Meine Vorkenntnisse für diesen Lehrgang waren ...')->assertSee('Sehr gut')
+            ->assertSee('Submit feedback')->assertDontSee('My prerequisites for this course were ...');
     }
 
     public function test_custom_content_and_participant_comments_are_preserved_in_german_results(): void
@@ -103,12 +104,12 @@ class LocalizationTest extends TestCase
         $this->get(route('settings.imports'))->assertOk()->assertSee('Kurse importieren')->assertSee('Lehrgänge importieren');
         $this->get(route('settings.courses-import.create'))->assertOk()->assertSee('CSV-Datei vorbereiten');
         $this->get(route('settings.sessions-import.create'))->assertOk()->assertSee('Datei hochladen');
-        $this->get(route('users.index'))->assertOk()->assertSee('Registrierungen freigeben')->assertSee('Redakteur');
+        $this->get(route('users.index'))->assertOk()->assertSee('Registrierungen freigeben')->assertSee('Bearbeiter')->assertSee('Dozent')->assertSee('Admin');
         Course::factory()->count(5)->create();
         $this->get(route('courses.index'))->assertOk()->assertSee('5 Kurse')
             ->assertDontSee('5 courses')->assertSee('Feedbackbogen erstellen')->assertSee('Lehrgang planen');
-        $this->get(route('sessions.index'))->assertOk()->assertSee('Alle Kursleitungen');
-        $this->get(route('profile.show'))->assertOk()->assertSee('Benutzerprofil')->assertSee('Administrator');
+        $this->get(route('sessions.index'))->assertOk()->assertSee('Alle Dozenten');
+        $this->get(route('profile.show'))->assertOk()->assertSee('Benutzerprofil')->assertSee('Admin');
         $this->get(route('questionnaires.create'))->assertOk()->assertSee('Feedbackbogen speichern')->assertSee('Antworttyp');
     }
 
@@ -142,7 +143,7 @@ class LocalizationTest extends TestCase
     public function test_german_feedback_submission_keeps_question_ids_and_translates_confirmation(): void
     {
         $this->seed(QuestionnaireSeeder::class);
-        $template = QuestionnaireTemplate::where('name', 'Standard Course Evaluation')->sole();
+        $template = QuestionnaireTemplate::where('name', 'Standard-Feedbackbogen')->sole();
         $session = CourseSession::factory()->create(['questionnaire_template_id' => $template->id, 'evaluation_status' => 'open']);
         $form = FeedbackForm::factory()->for($session)->create(['code' => '654321']);
         $question = $template->questions->first();
@@ -164,14 +165,14 @@ class LocalizationTest extends TestCase
     public function test_duplicating_a_questionnaire_preserves_its_content_language(): void
     {
         $this->seed(QuestionnaireSeeder::class);
-        $template = QuestionnaireTemplate::where('name', 'Standard Course Evaluation')->sole();
+        $template = QuestionnaireTemplate::where('name', 'Standard-Feedbackbogen')->sole();
         $editor = User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]);
 
         $response = $this->actingAs($editor)->get(route('questionnaires.duplicate', $template))->assertOk();
         $draft = $response->viewData('draft');
-        $this->assertSame('Standard Course Evaluation (Kopie)', $draft['name']);
-        $this->assertSame('My prerequisites for this course were ...', $draft['questions'][0]['text']);
-        $this->assertSame(['Very good', 'Good', 'Satisfactory', 'Low'], $draft['questions'][0]['options']);
+        $this->assertSame('Standard-Feedbackbogen (Kopie)', $draft['name']);
+        $this->assertSame('Meine Vorkenntnisse für diesen Lehrgang waren ...', $draft['questions'][0]['text']);
+        $this->assertSame(['Sehr gut', 'Gut', 'Befriedigend', 'Gering'], $draft['questions'][0]['options']);
         $this->assertDatabaseCount('questionnaire_templates', 1);
     }
 }
