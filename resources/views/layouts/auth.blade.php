@@ -15,6 +15,7 @@
                 <section class="card border-0 rounded-4 shadow-sm p-4 p-sm-5" aria-labelledby="auth-title">
                     <h1 class="h3" id="auth-title">@yield('title')</h1>
                     <p class="text-body-secondary small mb-4">@yield('intro')</p>
+                    <x-ui.status-alert />
                     <x-ui.validation-errors :errors="$errors" class="small" heading="Please check the following:" heading-class="fw-semibold" />
                     @yield('content')
                 </section>

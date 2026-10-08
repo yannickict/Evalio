@@ -19,6 +19,7 @@
             <input class="form-check-input mt-0" type="checkbox" name="remember" value="1" @checked(old('remember'))>
             Remember me
         </label>
+        <a class="link-success small" href="{{ route('password.request') }}">Forgot password?</a>
         <button class="btn btn-success rounded-pill py-2" type="submit">Log in</button>
     </form>
 @endsection

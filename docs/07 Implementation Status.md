@@ -8,7 +8,7 @@ Reviewed against source code on 8 October 2026. [[02 Project Requirements|Projec
 |---|---|---|
 | Web application and SQL storage | Laravel, Blade, Eloquent and migrations | Production database/deployment configuration and complete SQL dump procedure |
 | Roles and least privilege | Separate Gates, instructor ownership for results, admin-only deletion and admin/editor creation/editing | Restrict instructor visibility in questionnaire usage queries |
-| Registration and approval | New instructor accounts are unapproved; admin approves and assigns roles; login requires approval | Forgot-password routes, forms and reset workflow |
+| Registration and approval | New instructor accounts are unapproved; admin approves and assigns roles; login requires approval; guest password reset through the Laravel broker | Production reset-email delivery and automated reset verification |
 | Course management | Validated create/edit pages, questionnaire defaults and admin-only transactional deletion with dependent feedback | Optional archiving |
 | Course sessions | Create/edit, saved templates, numeric per-course numbers, computed identifiers and transactional admin deletion | Concurrent number allocation; optional archiving |
 | Evaluation phase | Hourly start-date opening and closing on end date plus 14 days, authorized manual controls, code lifecycle and status checks on GET/POST feedback | Production scheduler setup and operational monitoring |
@@ -57,3 +57,9 @@ The session-number migration was applied after a local database backup. Existing
 Course imports resolve existing questionnaires by unique name. Session imports resolve courses by name and approved instructors by email, validate dates, assign session numbers and inherit course questionnaires. Invalid rows are skipped and reported; file/header errors reject the upload. Shared CSV parsing handles BOMs, quoted values, blank records and reordered headers. See [[08 CSV Imports|CSV Imports]].
 
 Regression coverage was added for import navigation, permissions, mixed valid/invalid rows, dates, instructor eligibility, numbering, template inheritance, duplicate names, upload validation and escaped errors. The earlier herd-lite runtime documented above is not available in this workspace. Current PHP 8.2 cannot run dependencies requiring PHP 8.4; feature tests, Pint and PHPStan remain pending. Syntax checks passed for 13 PHP files, and diff checks passed. Isolated CSV reader checks passed for BOMs, quoted commas/multiline values, trimming, blank records, record numbering, malformed rows and invalid headers, using lightweight framework stubs; these do not replace the Laravel feature suite.
+
+## Password reset update on 8 October 2026
+
+Forgot-password and reset forms use the auth layout, generic request confirmations, guest-only routes, rate limits and Form Requests. The Laravel broker handles tokens; successful resets rotate remember tokens and preserve approval/roles. Operational logs record broker statuses without account identifiers or reset secrets. The user confirmed local log-mail delivery works. See [[09 Password Reset|Password Reset]].
+
+Password reset regression tests were added; the available PHP 8.2 runtime cannot run installed dependencies requiring PHP 8.4. Automated Laravel, formatting and static-analysis verification remain pending.

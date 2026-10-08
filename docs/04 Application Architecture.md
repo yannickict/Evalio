@@ -148,3 +148,7 @@ Course and session deletion use separate admin-only Gates in routes and controll
 ## CSV imports
 
 Admin-only settings routes expose an import selection page and course/session uploads. Upload authorization and file validation live in `ImportCoursesRequest` and `ImportSessionsRequest`. `CsvImportReader` streams normalized CSV records and closes the handle reliably. Import controllers validate each record separately, resolve existing relationships and report failed records while creating valid ones. Session writes lock the course row in a transaction. See [[08 CSV Imports|CSV Imports]] for formats and retry semantics.
+
+## Password reset
+
+Guest-only routes delegate link requests and password changes to `PasswordResetController`, using `ForgotPasswordRequest` and `ResetPasswordRequest`. Laravel's password broker manages token storage, expiry and consumption. Both POST routes are rate-limited; account approval remains unchanged. Operational logs record broker statuses, and the auth layout displays feedback. See [[09 Password Reset|Password Reset]] for setup and tests.

@@ -10,6 +10,7 @@ Documentation updated: 8 October 2026
 - [[06 Development Setup|Development Setup]] — local installation, demo data and verification commands.
 - [[07 Implementation Status|Implementation Status]] — current capabilities and gaps against the requirements.
 - [[08 CSV Imports|CSV Imports]] ? formats, reference matching, validation and retry behavior.
+- [[09 Password Reset|Password Reset]] ? guest reset flow, mail configuration, logs and tests.
 - [[Todo]] — Kanban board for remaining work and completed tasks.
 
 These notes and the board are stored in the repository's `docs` folder. Open that folder as an Obsidian vault; the root `README.md` provides standard Markdown links for repository browsing.

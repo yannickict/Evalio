@@ -16,7 +16,8 @@ kanban-plugin: board
 
 - [x] [Must] Enforce role-based course/session writes, admin deletion and ownership checks on results routes.
 - [x] [Must] Restrict instructor overview and evaluation results to their own sessions; test other-instructor access.
-- [ ] [Must] Implement forgot-password request/reset pages, routes, token validation and mail delivery.
+- [x] [Must] Implement forgot-password/reset forms, broker token handling, validation and local log-mail delivery.
+- [ ] Configure and verify production password reset email delivery.
 - [ ] [Should] Detect potential duplicate courses and show a useful warning before saving.
 - [ ] Make generated session numbers safe under concurrent creation through locking/retry or another collision-safe strategy.
 - [ ] Implement feedback-form/code creation and distribution for newly created sessions; define code reuse and expiry behavior.

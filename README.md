@@ -12,6 +12,7 @@ A Laravel web application for course-session feedback, with anonymous code-based
 - [Development setup](docs/06%20Development%20Setup.md)
 - [Implementation status](docs/07%20Implementation%20Status.md)
 - [CSV imports](docs/08%20CSV%20Imports.md)
+- [Password reset](docs/09%20Password%20Reset.md)
 - [Todo board](docs/Todo.md)
 
 The implementation-status note distinguishes working features from unfinished requirements. Follow the development setup guide for installation, demo data and verification commands.

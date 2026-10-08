@@ -7,6 +7,7 @@ use App\Http\Controllers\CourseImportController;
 use App\Http\Controllers\CourseSessionController;
 use App\Http\Controllers\EvaluationResultsController;
 use App\Http\Controllers\FeedbackResponseController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionnaireTemplateController;
 use App\Http\Controllers\SessionImportController;
@@ -89,3 +90,21 @@ Route::middleware('auth')->group(function () {
             ->name('sessions-import.store');
     });
 });
+
+Route::middleware('guest')
+    ->controller(PasswordResetController::class)
+    ->group(function () {
+        Route::get('/forgot-password', 'create')
+            ->name('password.request');
+
+        Route::post('/forgot-password', 'store')
+            ->middleware('throttle:5,1')
+            ->name('password.email');
+
+        Route::get('/reset-password/{token}', 'edit')
+            ->name('password.reset');
+
+        Route::post('/reset-password', 'update')
+            ->middleware('throttle:5,1')
+            ->name('password.update');
+    });
