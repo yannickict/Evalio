@@ -11,6 +11,7 @@ A Laravel web application for course-session feedback, with anonymous code-based
 - [Entity relationship model](docs/05%20Entity%20Relationship%20Model.md)
 - [Development setup](docs/06%20Development%20Setup.md)
 - [Implementation status](docs/07%20Implementation%20Status.md)
+- [CSV imports](docs/08%20CSV%20Imports.md)
 - [Todo board](docs/Todo.md)
 
 The implementation-status note distinguishes working features from unfinished requirements. Follow the development setup guide for installation, demo data and verification commands.

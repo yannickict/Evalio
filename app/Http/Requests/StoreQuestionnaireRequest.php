@@ -8,7 +8,7 @@ class StoreQuestionnaireRequest extends QuestionnaireRequest
     public function rules(): array
     {
         $rules = parent::rules();
-        $rules['name'] = ['required', 'string', 'max:255'];
+        $rules['name'] = ['required', 'string', 'max:255', 'unique:questionnaire_templates,name'];
         $rules['questions.*.text'] = ['required', 'string', 'max:5000'];
 
         $questions = $this->input('questions', []);

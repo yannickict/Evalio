@@ -1,6 +1,6 @@
 # Implementation Status
 
-Reviewed against source code on 7 October 2026. [[02 Project Requirements|Project Requirements]] remains the specification; this note records implementation progress without changing its scope or priorities.
+Reviewed against source code on 8 October 2026. [[02 Project Requirements|Project Requirements]] remains the specification; this note records implementation progress without changing its scope or priorities.
 
 ## Requirements and current behavior
 
@@ -24,7 +24,7 @@ Reviewed against source code on 7 October 2026. [[02 Project Requirements|Projec
 | Evaluation and filtering | Authorized per-session counts, percentages, pie charts, written responses/comments and overview filters | Combined result filters; abstention/submission counting policy |
 | One-page A4 output | Browser print/PDF button and compact portrait A4 chart summary; written answers/comments remain on screen | Verify standard ten-question summary fits one page; long questionnaire handling |
 | Account profile | Personal detail updates and password changes with current-password validation; regression tests | Browser review |
-| Backups and CSV import | Admin settings page; POST routes store/download an existing demo SQL file through services, with error reporting and regression tests; CSV button disabled | Real database export tool, administrator backup/restore procedure and specified CSV import |
+| Backups and CSV import | Admin settings page; POST routes store/download an existing demo SQL file through services, with error reporting and regression tests; admin-only course/session CSV imports with row errors and an import selection page | Real database export tool, administrator backup/restore procedure and instructor/questionnaire imports |
 | Deletion | Admin course/session deletion with feedback cleanup; template assignment guard and unused-question cleanup; user assignment guard | Individual submitted feedback-form deletion |
 | Validation/security | Auth/session handling, login throttling, escaped Blade output, CSRF, shared authorization gates and validated atomic feedback submission | Comprehensive role authorization and production scheduler setup |
 
@@ -51,3 +51,9 @@ Backend cleanup verification on 6 October 2026: PHP feature tests, PHPStan, Pint
 The full PHP suite passed after session numbering changes (209 tests). Later targeted checks passed for duplication (35 questionnaire tests), results and pie charts (3 tests, 29 assertions), seeding (8 tests), navigation (10 JavaScript tests), formatting, PHPStan and frontend builds. These were different-stage runs; a final combined CI run is pending. The compatible local PHP is `C:/Users/yanni/.config/herd-lite/bin/php.exe`; PHPStan required a 512 MB CLI memory limit after the local 128 MB limit caused a worker crash.
 
 The session-number migration was applied after a local database backup. Existing session fields, courses, forms and answers were compared before/after; foreign-key checks passed. Visual browser review and A4 page-count verification remain open. Answer totals are not participant/submission totals: one feedback form is shared by a session's submissions.
+
+## CSV import update on 8 October 2026
+
+Course imports resolve existing questionnaires by unique name. Session imports resolve courses by name and approved instructors by email, validate dates, assign session numbers and inherit course questionnaires. Invalid rows are skipped and reported; file/header errors reject the upload. Shared CSV parsing handles BOMs, quoted values, blank records and reordered headers. See [[08 CSV Imports|CSV Imports]].
+
+Regression coverage was added for import navigation, permissions, mixed valid/invalid rows, dates, instructor eligibility, numbering, template inheritance, duplicate names, upload validation and escaped errors. The earlier herd-lite runtime documented above is not available in this workspace. Current PHP 8.2 cannot run dependencies requiring PHP 8.4; feature tests, Pint and PHPStan remain pending. Syntax checks passed for 13 PHP files, and diff checks passed. Isolated CSV reader checks passed for BOMs, quoted commas/multiline values, trimming, blank records, record numbering, malformed rows and invalid headers, using lightweight framework stubs; these do not replace the Laravel feature suite.

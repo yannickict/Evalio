@@ -144,3 +144,7 @@ Print / Save as PDF invokes browser printing. Print CSS requests portrait A4 wit
 ## Administrative deletion
 
 Course and session deletion use separate admin-only Gates in routes and controllers and require frontend confirmation. Within a transaction, session deletion removes its feedback form first (answers cascade at the database level), then the session. Course deletion removes each session's form and session, then the course. Shared templates, questions, options and instructors remain intact. The underlying course/session foreign keys still restrict direct parent deletion; these cascades are implemented by controller transactions rather than changed schema rules. Individual submitted feedback deletion remains unfinished.
+
+## CSV imports
+
+Admin-only settings routes expose an import selection page and course/session uploads. Upload authorization and file validation live in `ImportCoursesRequest` and `ImportSessionsRequest`. `CsvImportReader` streams normalized CSV records and closes the handle reliably. Import controllers validate each record separately, resolve existing relationships and report failed records while creating valid ones. Session writes lock the course row in a transaction. See [[08 CSV Imports|CSV Imports]] for formats and retry semantics.

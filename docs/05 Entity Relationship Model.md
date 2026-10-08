@@ -51,7 +51,7 @@ The overview displays null as “Evaluation status not set”. The hourly comman
 
 ### Questionnaire Template
 
-`questionnaire_templates` stores the template `name`. It has no description column. A template has many questions through the `questionnaire_template_question` pivot and can be assigned to many courses.
+`questionnaire_templates` stores the unique template `name`. It has no description column. A template has many questions through the `questionnaire_template_question` pivot and can be assigned to many courses.
 
 ### Question
 

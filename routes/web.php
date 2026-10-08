@@ -3,11 +3,13 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseImportController;
 use App\Http\Controllers\CourseSessionController;
 use App\Http\Controllers\EvaluationResultsController;
 use App\Http\Controllers\FeedbackResponseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionnaireTemplateController;
+use App\Http\Controllers\SessionImportController;
 use App\Http\Controllers\SqlDumpController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -71,10 +73,19 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('settings')->name('settings.')->middleware('can:manage-settings')->group(function () {
         Route::view('/', 'pages.settings.index')->name('index');
+        Route::view('/imports', 'pages.settings.imports')->name('imports');
+        Route::get('/courses-import', [CourseImportController::class, 'create'])->name('courses-import.create');
+        Route::post('/courses-import', [CourseImportController::class, 'store'])->name('courses-import.store');
         Route::post('/sql-dump', [SqlDumpController::class, 'store'])
             ->name('sql-dump');
 
         Route::post('/backup', [BackupController::class, 'store'])
             ->name('backup');
+
+        Route::get('/sessions-import', [SessionImportController::class, 'create'])
+            ->name('sessions-import.create');
+
+        Route::post('/sessions-import', [SessionImportController::class, 'store'])
+            ->name('sessions-import.store');
     });
 });

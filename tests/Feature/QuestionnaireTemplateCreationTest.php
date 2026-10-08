@@ -64,4 +64,29 @@ class QuestionnaireTemplateCreationTest extends TestCase
             $this->assertDatabaseCount('question_options', 0);
         }
     }
+
+    public function test_duplicate_names_are_rejected_including_surrounding_whitespace(): void
+    {
+        QuestionnaireTemplate::factory()->create(['name' => 'Course feedback']);
+        $this->actingAs(User::factory()->approved()->create(['role_id' => Role::where('name', 'editor')->sole()->id]));
+
+        foreach (['Course feedback', '  Course feedback  '] as $name) {
+            $this->from(route('questionnaires.create'))->post(route('questionnaires.store'), [
+                'name' => $name,
+                'questions' => [['text' => 'Any suggestions?', 'type' => 'free_text']],
+            ])->assertRedirect(route('questionnaires.create'))->assertSessionHasErrors('name');
+        }
+
+        $this->assertDatabaseCount('questionnaire_templates', 1);
+        $this->assertDatabaseCount('questions', 0);
+    }
+
+    public function test_database_rejects_duplicate_names(): void
+    {
+        QuestionnaireTemplate::factory()->create(['name' => 'Course feedback']);
+
+        $this->expectException(\Illuminate\Database\UniqueConstraintViolationException::class);
+
+        QuestionnaireTemplate::factory()->create(['name' => 'Course feedback']);
+    }
 }

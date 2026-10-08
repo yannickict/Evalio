@@ -23,6 +23,7 @@
                 'title' => 'CSV import',
                 'description' => 'Import records from a CSV file.',
                 'button' => 'Import CSV',
+                'link' => 'settings.imports',
             ],
             [
                 'title' => 'SQL dump',
@@ -36,7 +37,9 @@
                 <h2 class="h5 fw-semibold">{{ $setting['title'] }}</h2>
                 <p class="small text-body-secondary">{{ $setting['description'] }}</p>
                 <div class="mt-auto">
-                    @if (isset($setting['route']))
+                    @if (isset($setting['link']))
+                    <a href="{{ route($setting['link']) }}" class="btn btn-outline-success rounded-3">{{ $setting['button'] }}</a>
+                    @elseif (isset($setting['route']))
                     <form method="POST" action="{{ route($setting['route']) }}">
                         @csrf
                         <button class="btn btn-outline-success rounded-3" type="submit">{{ $setting['button'] }}</button>

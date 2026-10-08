@@ -100,3 +100,9 @@ Run `php artisan migrate` for the forward session-number migration; a fresh rese
 Open View evaluation results from session details. Print / Save as PDF uses browser printing and an A4 chart summary. Disable browser-added headers/footers when checking one-page output. Actual standard-questionnaire page-count verification remains required.
 
 The compatible local Windows runtime is `C:/Users/yanni/.config/herd-lite/bin/php.exe`. Put its directory before XAMPP PHP on PATH for Composer. If local PHPStan exceeds 128 MB, run `php vendor/bin/phpstan analyse --memory-limit=512M`. JavaScript tests use `npm run test:js`; these are not currently a separate CI workflow step.
+
+## CSV imports and local runtime status (8 October 2026)
+
+See [[08 CSV Imports|CSV Imports]] for administrator upload formats and import order. Questionnaire-name uniqueness is defined in the original domain migration; use a fresh disposable local database when applying this schema change. `migrate:fresh --seed` deletes existing data.
+
+The previously documented herd-lite PHP executable is currently absent. XAMPP provides PHP 8.2.4, but installed Composer dependencies require PHP 8.4 or newer. Use a compatible runtime before running Artisan, PHPUnit, Pint or PHPStan. Do not bypass Composer platform checks.
