@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\QuestionnaireTemplate;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -85,7 +86,7 @@ class QuestionnaireTemplateCreationTest extends TestCase
     {
         QuestionnaireTemplate::factory()->create(['name' => 'Course feedback']);
 
-        $this->expectException(\Illuminate\Database\UniqueConstraintViolationException::class);
+        $this->expectException(UniqueConstraintViolationException::class);
 
         QuestionnaireTemplate::factory()->create(['name' => 'Course feedback']);
     }

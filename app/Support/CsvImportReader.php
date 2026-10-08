@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationException;
 class CsvImportReader
 {
     /**
-     * @param list<string> $requiredHeaders
+     * @param  list<string>  $requiredHeaders
      * @return Generator<int, array{row: int, data: array<string, string>, error: string|null}>
      */
     public function rows(UploadedFile $file, array $requiredHeaders): Generator
