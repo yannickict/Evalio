@@ -1,5 +1,22 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
+.language-switch-controls { display: flex; align-items: center; gap: .3rem; }
+.language-switch-option {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--bs-secondary-color);
+    font-size: .75rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: .65rem .25rem;
+    border-radius: .25rem;
+}
+.language-switch-option:disabled { color: var(--bs-body-color); font-weight: 700; opacity: 1; }
+.language-switch-option:not(:disabled):hover { color: var(--bs-success); }
+.language-switch-option:focus-visible { outline: 2px solid var(--bs-success); outline-offset: 2px; }
+.language-switch-divider { color: var(--bs-border-color); font-size: .75rem; }
+
 .user-avatar,
 .settings-toggle {
     width: 3rem;

@@ -183,6 +183,7 @@
     "Invalid email or password.": "Invalid email or password.",
     "Joined": "Joined",
     "Keep at least one question and choose an existing question to remove.": "Keep at least one question and choose an existing question to remove.",
+    "Language": "Language",
     "Last name": "Last name",
     "Log in": "Log in",
     "Log in to your account to continue.": "Log in to your account to continue.",
@@ -335,6 +336,7 @@
     "The SQL dump could not be downloaded.": "The SQL dump could not be downloaded.",
     "The backup could not be created.": "The backup could not be created.",
     "The course name has already been taken.": "The course name has already been taken.",
+    "The language could not be changed. Please try again.": "The language could not be changed. Please try again.",
     "The number of values does not match the headers.": "The number of values does not match the headers.",
     "The print summary includes charts and response counts. Written responses and comments are shown below.": "The print summary includes charts and response counts. Written responses and comments are shown below.",
     "This evaluation is closed.": "This evaluation is closed.",
@@ -391,6 +393,8 @@
     "answer": "answer",
     "answers": "answers",
     "before adding a course.": "before adding a course.",
+    "course": "course",
+    "courses": "courses",
     "e.g. End-of-course feedback": "e.g. End-of-course feedback",
     "e.g. Introduction to web development": "e.g. Introduction to web development",
     "for :name": "for :name",
@@ -408,7 +412,5 @@
     "user": "user",
     "users": "users",
     "without needing an account.": "without needing an account.",
-    "written": "written",
-    "Language": "Language",
-    "The language could not be changed. Please try again.": "The language could not be changed. Please try again."
+    "written": "written"
 }

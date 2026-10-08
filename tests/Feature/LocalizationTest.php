@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Answer;
+use App\Models\Course;
 use App\Models\CourseSession;
 use App\Models\FeedbackForm;
 use App\Models\Question;
@@ -30,7 +31,7 @@ class LocalizationTest extends TestCase
     public function test_guest_pages_render_in_german_and_english_remains_available(): void
     {
         $this->get(route('home'))->assertOk()->assertSee('lang="de"', false)
-            ->assertSee('Geben Sie uns Feedback.')->assertSee('Fragebogen öffnen');
+            ->assertSee('Geben Sie uns Feedback.')->assertSee('Feedbackbogen öffnen');
         $this->get(route('login'))->assertOk()->assertSee('Willkommen zurück')->assertSee('Passwort vergessen?');
         $this->get(route('register'))->assertOk()->assertSee('Vorname')->assertSee('Benutzerkonto erstellen');
         $this->get(route('password.request'))->assertOk()->assertSee('Link zum Zurücksetzen senden');
@@ -99,14 +100,16 @@ class LocalizationTest extends TestCase
         $this->actingAs($admin);
 
         $this->get(route('settings.index'))->assertOk()->assertSee('Sicherung erstellen')->assertSee('SQL-Export erstellen');
-        $this->get(route('settings.imports'))->assertOk()->assertSee('Kurse importieren')->assertSee('Kursdurchführungen importieren');
+        $this->get(route('settings.imports'))->assertOk()->assertSee('Kurse importieren')->assertSee('Lehrgänge importieren');
         $this->get(route('settings.courses-import.create'))->assertOk()->assertSee('CSV-Datei vorbereiten');
         $this->get(route('settings.sessions-import.create'))->assertOk()->assertSee('Datei hochladen');
         $this->get(route('users.index'))->assertOk()->assertSee('Registrierungen freigeben')->assertSee('Redakteur');
-        $this->get(route('courses.index'))->assertOk()->assertSee('Fragebogen erstellen')->assertSee('Kursdurchführung planen');
+        Course::factory()->count(5)->create();
+        $this->get(route('courses.index'))->assertOk()->assertSee('5 Kurse')
+            ->assertDontSee('5 courses')->assertSee('Feedbackbogen erstellen')->assertSee('Lehrgang planen');
         $this->get(route('sessions.index'))->assertOk()->assertSee('Alle Kursleitungen');
         $this->get(route('profile.show'))->assertOk()->assertSee('Benutzerprofil')->assertSee('Administrator');
-        $this->get(route('questionnaires.create'))->assertOk()->assertSee('Fragebogen speichern')->assertSee('Antworttyp');
+        $this->get(route('questionnaires.create'))->assertOk()->assertSee('Feedbackbogen speichern')->assertSee('Antworttyp');
     }
 
     public function test_password_reset_email_is_translated(): void
@@ -132,7 +135,7 @@ class LocalizationTest extends TestCase
 
         $this->post(route('settings.courses-import.store'), ['file' => $file])->assertOk()
             ->assertSee('Importierte Kurse: 0. Übersprungene Zeilen: 1.')
-            ->assertSee('Zeile 2: Fragebogen nicht gefunden: &lt;script&gt;Missing&lt;/script&gt;.', false)
+            ->assertSee('Zeile 2: Feedbackbogen nicht gefunden: &lt;script&gt;Missing&lt;/script&gt;.', false)
             ->assertDontSee('<script>Missing</script>', false);
     }
 

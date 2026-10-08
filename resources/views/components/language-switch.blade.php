@@ -2,12 +2,14 @@
     data-error="{{ __('The language could not be changed. Please try again.') }}">
     @csrf
     <input type="hidden" name="return_to" value="{{ request()->routeIs('questionnaires.preview') ? route('questionnaires.create', [], false) : request()->getRequestUri() }}">
-    <div class="btn-group btn-group-sm" role="group" aria-label="{{ __('Language') }}">
+    <div class="language-switch-controls" role="group" aria-label="{{ __('Language') }}">
         @foreach (['de' => 'Deutsch', 'en' => 'English'] as $locale => $label)
         <button type="submit" name="locale" value="{{ $locale }}" lang="{{ $locale }}"
-            @class(['btn', 'btn-success' => app()->getLocale() === $locale, 'btn-outline-success' => app()->getLocale() !== $locale])
+            class="language-switch-option"
+            aria-label="{{ $label }}" title="{{ $label }}"
             aria-pressed="{{ app()->getLocale() === $locale ? 'true' : 'false' }}"
-            @disabled(app()->getLocale() === $locale)>{{ $label }}</button>
+            @disabled(app()->getLocale() === $locale)>{{ strtoupper($locale) }}</button>
+        @if (! $loop->last)<span class="language-switch-divider" aria-hidden="true">/</span>@endif
         @endforeach
     </div>
 </form>

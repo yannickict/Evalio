@@ -5,11 +5,7 @@
             Evalio<span class="d-none d-lg-inline small fw-normal text-body-secondary fs-6 ms-3">{{ __('Course evaluations') }}</span>
         </a>
             @auth
-            <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse"
-                data-bs-target="#main-navigation" aria-controls="main-navigation" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="main-navigation">
+            <div class="collapse navbar-collapse order-3 order-md-1" id="main-navigation">
                 <div class="navbar-nav gap-1 mt-3 mt-md-0">
                 <a href="{{ route('home') }}"
                    @class(['nav-link rounded-3 px-3 py-2 small fw-semibold', 'active bg-success-subtle text-success-emphasis' => request()->routeIs('home')])
@@ -68,12 +64,18 @@
                     </div>
                 </div>
             </div>
-            @else
-                <a class="btn btn-success btn-sm rounded-3 px-4 py-2" href="{{ route('login') }}">{{ __('Log in') }}</a>
             @endauth
+            <div class="d-flex align-items-center gap-3 ms-auto ps-md-3 order-2">
+                <x-language-switch />
+                @auth
+                <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#main-navigation" aria-controls="main-navigation" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                @else
+                <a class="btn btn-success btn-sm rounded-3 px-4 py-2" href="{{ route('login') }}">{{ __('Log in') }}</a>
+                @endauth
+            </div>
     </div>
     </nav>
-    <div class="container d-flex justify-content-end pb-2">
-        <x-language-switch />
-    </div>
 </header>

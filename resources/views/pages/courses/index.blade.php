@@ -9,7 +9,7 @@
         <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
             <h1 class="h2 fw-bold mb-0">{{ __('Courses') }}</h1>
             <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">
-                {{ $courses->count() }} {{ $courses->count() === 1 ? 'course' : 'courses' }}
+                {{ $courses->count() }} {{ $courses->count() === 1 ? __('course') : __('courses') }}
             </span>
             @can('create-courses')
             <a class="btn btn-success rounded-3 ms-auto" href="{{ route('courses.create') }}">{{ __('New course') }}</a>
