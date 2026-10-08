@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\CourseSession;
+use App\Models\FeedbackForm;
+use App\Models\QuestionnaireTemplate;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,6 +13,46 @@ use Tests\TestCase;
 class QuestionnaireTemplatePagesTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_questionnaire_usage_only_loads_an_instructors_own_sessions(): void
+    {
+        $this->withoutVite();
+        $owner = User::factory()->approved()->create();
+        $template = QuestionnaireTemplate::factory()->create();
+        $otherTemplate = QuestionnaireTemplate::factory()->create();
+        $own = CourseSession::factory()->for($owner, 'instructor')->create(['questionnaire_template_id' => $template->id]);
+        $other = CourseSession::factory()->create(['questionnaire_template_id' => $template->id]);
+        $otherOnly = CourseSession::factory()->create(['questionnaire_template_id' => $otherTemplate->id]);
+        FeedbackForm::factory()->create(['course_session_id' => $other->id]);
+
+        $response = $this->actingAs($owner)->get(route('questionnaires.index'))->assertOk();
+        $response->assertSee($own->session_identifier)
+            ->assertSee(route('sessions.index', ['session' => $own->id]), false)
+            ->assertDontSee($other->session_identifier)
+            ->assertDontSee($otherOnly->session_identifier)
+            ->assertDontSee(route('sessions.index', ['session' => $other->id]), false)
+            ->assertSee('No sessions are assigned to you for this questionnaire.')
+            ->assertViewHas('templates', fn ($templates) => $templates->firstWhere('id', $template->id)->sessions->modelKeys() === [$own->id]
+                && $templates->firstWhere('id', $otherTemplate->id)->sessions->isEmpty());
+
+        foreach (['admin', 'editor'] as $role) {
+            $viewer = User::factory()->approved()->create(['role_id' => Role::where('name', $role)->sole()->id]);
+            $this->actingAs($viewer)->get(route('questionnaires.index'))->assertOk()
+                ->assertSee($own->session_identifier)
+                ->assertSee($other->session_identifier)
+                ->assertSee($otherOnly->session_identifier)
+                ->assertViewHas('templates', fn ($templates) => $templates->firstWhere('id', $template->id)->sessions->count() === 2
+                    && $templates->firstWhere('id', $template->id)->sessions->firstWhere('id', $other->id)->feedbackForm !== null);
+        }
+    }
+
+    public function test_user_without_a_role_cannot_list_questionnaires(): void
+    {
+        $user = User::factory()->approved()->create();
+        $user->setRelation('role', null);
+
+        $this->actingAs($user)->get(route('questionnaires.index'))->assertForbidden();
+    }
 
     public function test_questionnaire_pages_require_authentication(): void
     {

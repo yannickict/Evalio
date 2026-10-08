@@ -7,7 +7,6 @@ kanban-plugin: board
 ## Backlog
 
 - [ ] [Can] Add direct editing/versioning of saved questionnaire content; creation, duplication and unused-template deletion are implemented.
-- [ ] [Can] Restrict questionnaire usage queries for instructors; current previews load all assigned sessions.
 - [ ] Preserve historical feedback through questionnaire snapshots/versioning or an explicit immutable-content policy.
 - [ ] Document production configuration and deployment, including database choice and runtime requirements.
 
@@ -64,6 +63,7 @@ kanban-plugin: board
 
 ## Done
 
+- [x] Restrict questionnaire usage queries to instructors' own sessions and feedback; admins/editors retain all-session visibility. Regression tests added; compatible-PHP execution pending.
 
 - [x] Implement course editing and template assignment; preserve existing session templates.
 - [x] Implement session editing with instructor/date validation and read-only course/template/number.

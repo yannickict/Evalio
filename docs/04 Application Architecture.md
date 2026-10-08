@@ -57,7 +57,7 @@ Paths and handler names below match the repository.
 | GET | `/session/{courseSession}/edit` | `CourseSessionController::edit` | Admin/editor |
 | PATCH | `/session/{courseSession}` | `CourseSessionController::update` | Admin/editor; instructor/date update |
 | PATCH | `/session/{courseSession}/evaluation` | `CourseSessionController::updateEvaluationStatus` | Admin/editor |
-| GET    | `/questionnaires`         | `QuestionnaireTemplateController::index`   | Authenticated                               |
+| GET    | `/questionnaires`         | `QuestionnaireTemplateController::index`   | Authenticated with a role; instructor session usage scoped to ownership |
 | GET    | `/questionnaires/create`  | `QuestionnaireTemplateController::create`  | Admin/editor                               |
 | POST   | `/questionnaires/preview` | `QuestionnaireTemplateController::preview` | Admin/editor; draft changes only           |
 | POST   | `/questionnaires`         | `QuestionnaireTemplateController::store`   | Admin/editor; persistent template creation |
@@ -131,7 +131,7 @@ Role names are the authorization source of truth. `User::hasRole()` supplies sha
 
 ## Questionnaire usage and detail navigation
 
-Questionnaire preview dialogs show assigned courses and sessions, with feedback-received badges based on whether answers exist. Questions and session lists are collapsed initially. Course and session links use `courses.index?course=ID` and `sessions.index?session=ID`; JavaScript opens only an existing matching detail modal. Session links are restricted to admins/editors or the assigned instructor. The questionnaire library's usage query currently loads all assigned sessions; restricting that data for instructors remains necessary.
+Questionnaire preview dialogs show assigned courses and sessions, with feedback-received badges based on whether answers exist. Questions and session lists are collapsed initially. Course and session links use `courses.index?course=ID` and `sessions.index?session=ID`; JavaScript opens only an existing matching detail modal. Session links are restricted to admins/editors or the assigned instructor. The questionnaire library requires a role and scopes the session eager-load query to the signed-in instructor's own sessions before loading their courses, feedback forms and answers. Session counts and feedback badges therefore contain only visible sessions; admins/editors retain all-session visibility. Questionnaire definitions and course assignments remain shared library information. Instructors receive an ownership-specific empty-state message.
 
 ## Evaluation results and printing
 

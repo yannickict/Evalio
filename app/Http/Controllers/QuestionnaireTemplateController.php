@@ -10,20 +10,26 @@ use App\Models\Question;
 use App\Models\QuestionnaireTemplate;
 use App\Support\QuestionnaireDraft;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class QuestionnaireTemplateController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $templates = QuestionnaireTemplate::with(
+        $templates = QuestionnaireTemplate::with([
             'questions.options',
             'courses',
-            'sessions.course',
-            'sessions.feedbackForm.answers',
-        )
+            'sessions' => function ($query) use ($request): void {
+                if ($request->user()->hasRole('instructor')) {
+                    $query->where('instructor_id', $request->user()->id);
+                }
+
+                $query->with('course', 'feedbackForm.answers');
+            },
+        ])
             ->withCount('questions')
             ->latest()
             ->get();

@@ -7,7 +7,7 @@ Reviewed against source code on 8 October 2026. [[02 Project Requirements|Projec
 | Requirement area | Current implementation | Remaining work |
 |---|---|---|
 | Web application and SQL storage | Laravel, Blade, Eloquent and migrations | Production database/deployment configuration and complete SQL dump procedure |
-| Roles and least privilege | Separate Gates, instructor ownership for results, admin-only deletion and admin/editor creation/editing | Restrict instructor visibility in questionnaire usage queries |
+| Roles and least privilege | Separate Gates, instructor ownership for results and questionnaire session usage, admin-only deletion and admin/editor creation/editing | Run new questionnaire visibility regression tests with compatible PHP |
 | Registration and approval | New instructor accounts are unapproved; admin approves and assigns roles; login requires approval; guest password reset through the Laravel broker | Production reset-email delivery and automated reset verification |
 | Course management | Validated create/edit pages, questionnaire defaults and admin-only transactional deletion with dependent feedback | Optional archiving |
 | Course sessions | Create/edit, saved templates, numeric per-course numbers, computed identifiers and transactional admin deletion | Concurrent number allocation; optional archiving |
@@ -20,7 +20,7 @@ Reviewed against source code on 8 October 2026. [[02 Project Requirements|Projec
 | Final storage (T-08) | Answers are created on POST; forms exist beforehand | Define submitted-form lifecycle, atomic save and duplicate/replay handling |
 | Standard questionnaire | Seeder defines ten questions, options and template positions | Verify end-to-end behavior after changes |
 | Question configuration | Database content initialized from PHP seeder | Required separate configuration-file approach remains absent |
-| Optional template management (O-01–O-03) | Creation, independent duplication, usage previews, comments, course assignment and unused-template deletion | Direct editing/versioning; instructor usage visibility |
+| Optional template management (O-01–O-03) | Creation, independent duplication, usage previews scoped to instructor-owned sessions, comments, course assignment and unused-template deletion | Direct editing/versioning |
 | Evaluation and filtering | Authorized per-session counts, percentages, pie charts, written responses/comments and overview filters | Combined result filters; abstention/submission counting policy |
 | One-page A4 output | Browser print/PDF button and compact portrait A4 chart summary; written answers/comments remain on screen | Verify standard ten-question summary fits one page; long questionnaire handling |
 | Account profile | Personal detail updates and password changes with current-password validation; regression tests | Browser review |
@@ -63,3 +63,9 @@ Regression coverage was added for import navigation, permissions, mixed valid/in
 Forgot-password and reset forms use the auth layout, generic request confirmations, guest-only routes, rate limits and Form Requests. The Laravel broker handles tokens; successful resets rotate remember tokens and preserve approval/roles. Operational logs record broker statuses without account identifiers or reset secrets. The user confirmed local log-mail delivery works. See [[09 Password Reset|Password Reset]].
 
 Password reset regression tests were added; the available PHP 8.2 runtime cannot run installed dependencies requiring PHP 8.4. Automated Laravel, formatting and static-analysis verification remain pending.
+
+## Questionnaire visibility update on 8 October 2026
+
+The library now requires an authenticated user with a role. Its session usage query restricts instructors to their own sessions before eager-loading feedback forms and answers. Counts, session identifiers, dates, links and feedback badges therefore exclude other instructors' sessions. Admins/editors retain full visibility; questionnaire definitions and course assignments remain shared. Instructor empty-state text explicitly describes their assignments.
+
+Regression tests cover shared templates, templates used only by another instructor, own-session links, absence of other-session details, the loaded session collections, full admin/editor visibility and denial for users without a role. PHP syntax checks passed for the controller, routes and test file; `git diff --check` passed. The targeted Laravel test command was attempted but blocked by Composer's PHP 8.4 requirement with the available PHP 8.2.4 runtime. Feature tests, Pint and PHPStan remain pending on a compatible runtime.

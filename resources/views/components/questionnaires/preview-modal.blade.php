@@ -35,7 +35,7 @@
 
     <section class="border-top pt-4 mt-4" aria-labelledby="questionnaire-usage-{{ $template->id }}">
         <h3 class="h5 fw-semibold mb-1" id="questionnaire-usage-{{ $template->id }}">Where it's used</h3>
-        <p class="small text-body-secondary mb-4">Course assignments and feedback received for each session.</p>
+        <p class="small text-body-secondary mb-4">{{ auth()->user()->hasRole('instructor') ? 'Course assignments and feedback received for your sessions.' : 'Course assignments and feedback received for each session.' }}</p>
 
         <div class="row g-4">
             <div class="col-12 col-sm-4">
@@ -92,7 +92,7 @@
                         </p>
                     </li>
                     @empty
-                    <li class="border rounded-3 bg-body-tertiary p-3 small text-body-secondary">No sessions use this questionnaire yet.</li>
+                    <li class="border rounded-3 bg-body-tertiary p-3 small text-body-secondary">{{ auth()->user()->hasRole('instructor') ? 'No sessions are assigned to you for this questionnaire.' : 'No sessions use this questionnaire yet.' }}</li>
                     @endforelse
                 </ul>
                 </div>
