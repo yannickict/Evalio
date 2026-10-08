@@ -38,7 +38,7 @@ class CourseCreationTest extends TestCase
 
         $this->assertCount(1, $xpath->query('//form[@method="POST" and @action="'.route('courses.store').'"]/input[@name="_token"]'));
         $this->assertCount(1, $xpath->query('//select[@name="questionnaire_template_id"]/option[@selected and @value=""]'));
-        $this->assertCount(0, $xpath->query('//button[@type="submit" and @disabled]'));
+        $this->assertCount(0, $xpath->query('//form[@action="'.route('courses.store').'"]//button[@type="submit" and @disabled]'));
     }
 
     public function test_empty_questionnaire_library_disables_creation_and_links_to_the_editor(): void
@@ -49,7 +49,7 @@ class CourseCreationTest extends TestCase
         $xpath = $this->xpath($response->getContent());
 
         $this->assertCount(1, $xpath->query('//select[@name="questionnaire_template_id" and @disabled]'));
-        $this->assertCount(1, $xpath->query('//button[@type="submit" and @disabled]'));
+        $this->assertCount(1, $xpath->query('//form[@action="'.route('courses.store').'"]//button[@type="submit" and @disabled]'));
     }
 
     public function test_creation_assigns_the_questionnaire_and_ignores_unvalidated_fields(): void

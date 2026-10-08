@@ -28,7 +28,7 @@ class PasswordResetController extends Controller
 
         return back()->with(
             'status',
-            'If an account exists, we have sent a password reset link.'
+            __('If an account exists, we have sent a password reset link.')
         );
     }
 
@@ -64,7 +64,7 @@ class PasswordResetController extends Controller
 
         return redirect()->route('login')->with(
             'status',
-            'Your password has been reset. You can now log in.'
+            __('Your password has been reset. You can now log in.')
         );
     }
 }

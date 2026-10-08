@@ -9,12 +9,12 @@
         <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
             <h3 class="h6 fw-semibold mb-0">{{ $user->name }}</h3>
             @if ($pending)
-                <span class="badge rounded-pill text-bg-light border fw-normal">Pending</span>
+                <span class="badge rounded-pill text-bg-light border fw-normal">{{ __('Pending') }}</span>
             @elseif ($user->id === auth()->id())
-                <span class="badge rounded-pill text-bg-light border fw-normal">You</span>
+                <span class="badge rounded-pill text-bg-light border fw-normal">{{ __('You') }}</span>
             @endif
         </div>
         <p class="small text-body-secondary mb-1">{{ $user->email }}</p>
-        <p class="small text-body-secondary mb-0">Joined {{ $user->created_at->format('M j, Y') }}</p>
+        <p class="small text-body-secondary mb-0">{{ __('Joined') }} {{ $user->created_at->locale(app()->getLocale())->translatedFormat(app()->getLocale() === 'de' ? 'd.m.Y' : 'M j, Y') }}</p>
     </div>
 </div>

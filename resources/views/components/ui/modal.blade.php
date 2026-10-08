@@ -1,4 +1,4 @@
-@props(['id', 'label' => null, 'labelledby' => null, 'editPermission' => null, 'editUrl' => null, 'editLabel' => 'Edit', 'deletePermission' => null, 'deleteUrl' => null, 'deleteConfirmation' => 'Permanently delete this item? This cannot be undone.'])
+@props(['id', 'label' => null, 'labelledby' => null, 'editPermission' => null, 'editUrl' => null, 'editLabel' => __('Edit'), 'deletePermission' => null, 'deleteUrl' => null, 'deleteConfirmation' => __('Permanently delete this item? This cannot be undone.')])
 
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1"
@@ -8,7 +8,7 @@
         <div class="modal-content border-0 rounded-4 shadow">
             <div class="modal-header px-4 py-3">
                 {{ $header ?? '' }}
-                <button class="btn-close ms-auto" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close ms-auto" type="button" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
             <div class="modal-body p-4">{{ $slot }}</div>
             <div class="modal-footer px-4 py-3">
@@ -28,14 +28,14 @@
                     onsubmit="return confirm(this.dataset.confirm)">
                     @csrf
                     @method('DELETE')
-                    <button class="btn btn-outline-danger rounded-3" type="submit">Delete</button>
+                    <button class="btn btn-outline-danger rounded-3" type="submit">{{ __('Delete') }}</button>
                 </form>
                 @else
-                <button class="btn btn-outline-danger rounded-3" type="button">Delete</button>
+                <button class="btn btn-outline-danger rounded-3" type="button">{{ __('Delete') }}</button>
                 @endif
                 @endcan
                 @endif
-                <button class="btn btn-outline-secondary rounded-3" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-outline-secondary rounded-3" type="button" data-bs-dismiss="modal">{{ __('Close') }}</button>
             </div>
         </div>
     </div>

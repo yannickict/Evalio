@@ -1,38 +1,38 @@
 @extends('layouts.auth')
 
-@section('title', 'Create your account')
-@section('intro', 'Your account will need approval before you can log in.')
+@section('title', __('Create your account'))
+@section('intro', __('Your account will need approval before you can log in.'))
 
 @section('content')
     <form class="d-grid gap-3" method="POST" action="{{ route('register.store') }}">
         @csrf
         <div class="row g-3">
             <div class="col-sm-6">
-                <label class="form-label fw-semibold" for="first_name">First name</label>
+                <label class="form-label fw-semibold" for="first_name">{{ __('First name') }}</label>
                 <input class="form-control" id="first_name" name="first_name" autocomplete="given-name" value="{{ old('first_name') }}" maxlength="255" required>
             </div>
             <div class="col-sm-6">
-                <label class="form-label fw-semibold" for="last_name">Last name</label>
+                <label class="form-label fw-semibold" for="last_name">{{ __('Last name') }}</label>
                 <input class="form-control" id="last_name" name="last_name" autocomplete="family-name" value="{{ old('last_name') }}" maxlength="255" required>
             </div>
         </div>
         <div class="mb-1">
-            <label class="form-label fw-semibold" for="email">Email address</label>
+            <label class="form-label fw-semibold" for="email">{{ __('Email address') }}</label>
             <input class="form-control" id="email" type="email" name="email" autocomplete="email" placeholder="you@example.com" value="{{ old('email') }}" maxlength="255" required>
         </div>
         <div class="mb-1">
-            <label class="form-label fw-semibold" for="password">Password</label>
+            <label class="form-label fw-semibold" for="password">{{ __('Password') }}</label>
             <input class="form-control" id="password" type="password" name="password" autocomplete="new-password" minlength="8" aria-describedby="password-hint" required>
-            <p id="password-hint" class="form-text mb-0">Use at least 8 characters.</p>
+            <p id="password-hint" class="form-text mb-0">{{ __('Use at least 8 characters.') }}</p>
         </div>
         <div class="mb-1">
-            <label class="form-label fw-semibold" for="password_confirmation">Confirm password</label>
+            <label class="form-label fw-semibold" for="password_confirmation">{{ __('Confirm password') }}</label>
             <input class="form-control" id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" minlength="8" required>
         </div>
-        <button class="btn btn-success rounded-pill py-2" type="submit">Create account</button>
+        <button class="btn btn-success rounded-pill py-2" type="submit">{{ __('Create account') }}</button>
     </form>
 @endsection
 
 @section('footer')
-    Already have an account? <a class="link-success fw-semibold link-offset-2" href="{{ route('login') }}">Log in</a>
+    {{ __('Already have an account?') }} <a class="link-success fw-semibold link-offset-2" href="{{ route('login') }}">{{ __('Log in') }}</a>
 @endsection

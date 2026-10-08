@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Questionnaires - Evalio')
+@section('title', __('Questionnaires - Evalio'))
 
 @section('content')
 <main class="container py-5">
     <header class="mb-4">
-        <p class="text-success small fw-semibold text-uppercase mb-2">Course evaluations</p>
+        <p class="text-success small fw-semibold text-uppercase mb-2">{{ __('Course evaluations') }}</p>
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-2">
-            <h1 class="h2 fw-bold mb-0">Questionnaires</h1>
+            <h1 class="h2 fw-bold mb-0">{{ __('Questionnaires') }}</h1>
             @can('create-questionnaires')
-            <a href="{{ route('questionnaires.create') }}" class="btn btn-success rounded-3">New questionnaire</a>
+            <a href="{{ route('questionnaires.create') }}" class="btn btn-success rounded-3">{{ __('New questionnaire') }}</a>
             @endcan
         </div>
-        <p class="text-body-secondary mb-0">Create reusable feedback questionnaires for your course sessions.</p>
+        <p class="text-body-secondary mb-0">{{ __('Create reusable feedback questionnaires for your course sessions.') }}</p>
     </header>
 
     <x-ui.status-alert />
@@ -27,13 +27,13 @@
         <div class="col-12">
             <div class="card border-0 rounded-4 shadow-sm">
                 <div class="card-body p-4 p-md-5 text-center">
-                    <span class="badge rounded-pill bg-success-subtle text-success-emphasis mb-3">Questionnaire library</span>
-                    <h2 class="h5 fw-semibold">Build your next feedback form</h2>
+                    <span class="badge rounded-pill bg-success-subtle text-success-emphasis mb-3">{{ __('Questionnaire library') }}</span>
+                    <h2 class="h5 fw-semibold">{{ __('Build your next feedback form') }}</h2>
                     @can('create-questionnaires')
-                    <p class="text-body-secondary mb-4">Start with a name, then add questions and answer options.</p>
-                    <a href="{{ route('questionnaires.create') }}" class="btn btn-outline-success rounded-3">Create a questionnaire</a>
+                    <p class="text-body-secondary mb-4">{{ __('Start with a name, then add questions and answer options.') }}</p>
+                    <a href="{{ route('questionnaires.create') }}" class="btn btn-outline-success rounded-3">{{ __('Create a questionnaire') }}</a>
                     @else
-                    <p class="text-body-secondary mb-0">An admin or editor can create a questionnaire and assign it to a course.</p>
+                    <p class="text-body-secondary mb-0">{{ __('An admin or editor can create a questionnaire and assign it to a course.') }}</p>
                     @endcan
                 </div>
             </div>

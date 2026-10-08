@@ -8,7 +8,7 @@
 
 <div class="results-chart">
     @if ($total > 0)
-    <svg class="results-pie" viewBox="0 0 100 100" role="img" aria-label="Answer distribution. Counts and percentages are listed alongside the chart.">
+    <svg class="results-pie" viewBox="0 0 100 100" role="img" aria-label="{{ __('Answer distribution. Counts and percentages are listed alongside the chart.') }}">
         @foreach ($options as $option)
         @php
             $fraction = $option['count'] / $total;
@@ -27,7 +27,7 @@
         @endforeach
     </svg>
     @else
-    <div class="results-pie results-pie-empty small text-body-secondary">No answers yet</div>
+    <div class="results-pie results-pie-empty small text-body-secondary">{{ __('No answers yet') }}</div>
     @endif
 
     <ul class="list-unstyled results-legend mb-0">
@@ -39,4 +39,4 @@
         @endforeach
     </ul>
 </div>
-<p class="small text-body-secondary mb-0 mt-2">{{ $total }} {{ $total === 1 ? 'answer' : 'answers' }}</p>
+<p class="small text-body-secondary mb-0 mt-2">{{ $total }} {{ $total === 1 ? __('answer') : __('answers') }}</p>

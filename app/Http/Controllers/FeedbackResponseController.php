@@ -40,6 +40,6 @@ class FeedbackResponseController extends Controller
             }
         });
 
-        return redirect()->route('home')->with('status', 'Thank you! Your feedback has been submitted.');
+        return redirect()->route('home')->with('status', __('Thank you! Your feedback has been submitted.'));
     }
 }

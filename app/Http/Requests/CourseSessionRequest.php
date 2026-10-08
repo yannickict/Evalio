@@ -27,7 +27,7 @@ abstract class CourseSessionRequest extends FormRequest
             }
 
             if (! User::approvedInstructors()->whereKey($this->input('instructor_id'))->exists()) {
-                $validator->errors()->add('instructor_id', 'Choose an approved instructor.');
+                $validator->errors()->add('instructor_id', __('Choose an approved instructor.'));
             }
         }];
     }

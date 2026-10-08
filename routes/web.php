@@ -7,6 +7,7 @@ use App\Http\Controllers\CourseImportController;
 use App\Http\Controllers\CourseSessionController;
 use App\Http\Controllers\EvaluationResultsController;
 use App\Http\Controllers\FeedbackResponseController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionnaireTemplateController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'pages.home.index')->name('home');
+Route::post('/language', [LanguageController::class, 'update'])->name('language.update');
 Route::view('/register', 'pages.auth.register')->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 Route::view('/login', 'pages.auth.login')->name('login');

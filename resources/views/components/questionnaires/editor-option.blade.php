@@ -4,7 +4,7 @@
     <label
         for="question-{{ $index }}-option-{{ $optionIndex }}"
         class="form-label small text-body-secondary">
-        Option {{ $optionIndex + 1 }}
+        {{ __('Option') }} {{ $optionIndex + 1 }}
     </label>
 
     <div class="input-group">
@@ -17,8 +17,8 @@
         <button type="submit" name="action" value="remove_option:{{ $index }}:{{ $optionIndex }}"
             class="btn btn-outline-danger editor-remove"
             @disabled($optionCount <= 2)
-            aria-label="{{ $optionCount <= 2 ? 'Cannot remove: minimum two options required' : 'Remove option '.($optionIndex + 1).' from question '.($index + 1) }}">
-            Remove
+            aria-label="{{ $optionCount <= 2 ? __('Cannot remove: minimum two options required') : __('Remove option :option from question :question', ['option' => $optionIndex + 1, 'question' => $index + 1]) }}">
+            {{ __('Remove') }}
         </button>
     </div>
 </div>

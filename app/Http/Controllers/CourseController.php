@@ -49,7 +49,7 @@ class CourseController extends Controller
         Course::create($request->validated());
 
         return redirect()->route('courses.index')
-            ->with('status', 'Course created.');
+            ->with('status', __('Course created.'));
     }
 
     public function edit(Course $course): View
@@ -65,7 +65,7 @@ class CourseController extends Controller
         $course->update($request->validated());
 
         return redirect()->route('courses.index')
-            ->with('status', 'Course updated.');
+            ->with('status', __('Course updated.'));
     }
 
     public function delete(Course $course): RedirectResponse
@@ -81,6 +81,6 @@ class CourseController extends Controller
             $course->delete();
         });
 
-        return redirect()->route('courses.index')->with('status', 'Course deleted.');
+        return redirect()->route('courses.index')->with('status', __('Course deleted.'));
     }
 }

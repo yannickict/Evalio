@@ -65,12 +65,11 @@ class SessionImportController extends Controller
                 $messages = [];
 
                 if (! $course) {
-                    $messages[] = 'Course not found: '.$data['course_name'].'.';
+                    $messages[] = __('Course not found: :name.', ['name' => $data['course_name']]);
                 }
 
                 if (! $instructor) {
-                    $messages[] = 'Approved instructor not found: '
-                        .$data['instructor_email'].'.';
+                    $messages[] = __('Approved instructor not found: :email.', ['email' => $data['instructor_email']]);
                 }
 
                 $failures[] = [

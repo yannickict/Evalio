@@ -40,7 +40,7 @@ class UserController extends Controller
             && (int) $data['role_id'] !== (int) $user->role_id
         ) {
             return back()->withErrors([
-                'role_id' => 'You cannot change your own role.',
+                'role_id' => __('You cannot change your own role.'),
             ]);
         }
 
@@ -52,7 +52,7 @@ class UserController extends Controller
             ? 'home' : 'users.index';
 
         return redirect()->route($destination)
-            ->with('status', $wasApproved ? 'User role updated.' : 'User approved and role assigned.');
+            ->with('status', $wasApproved ? __('User role updated.') : __('User approved and role assigned.'));
     }
 
     public function destroy(User $user): RedirectResponse
@@ -61,12 +61,12 @@ class UserController extends Controller
 
         if ($user->courseSessions()->exists()) {
             return redirect()->route('users.index')->withErrors([
-                'user' => 'This user is assigned to course sessions. Reassign those sessions to another instructor before deleting this user.',
+                'user' => __('This user is assigned to course sessions. Reassign those sessions to another instructor before deleting this user.'),
             ]);
         }
 
         $user->delete();
 
-        return redirect()->route('users.index')->with('status', $user->is_approved ? 'User deleted.' : 'Pending registration deleted.');
+        return redirect()->route('users.index')->with('status', $user->is_approved ? __('User deleted.') : __('Pending registration deleted.'));
     }
 }

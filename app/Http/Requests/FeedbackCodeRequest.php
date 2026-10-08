@@ -31,7 +31,7 @@ class FeedbackCodeRequest extends FormRequest
             ->where('code', $this->query('code'))
             ->firstOrFail();
 
-        abort_unless($form->courseSession->evaluation_status === 'open', 403, 'This evaluation is closed.');
+        abort_unless($form->courseSession->evaluation_status === 'open', 403, __('This evaluation is closed.'));
 
         return $form;
     }
@@ -40,7 +40,7 @@ class FeedbackCodeRequest extends FormRequest
     {
         $template = $this->form()->courseSession->questionnaireTemplate;
 
-        abort_if($template === null, 404, 'No questionnaire assigned.');
+        abort_if($template === null, 404, __('No questionnaire assigned.'));
 
         return $template;
     }

@@ -69,7 +69,7 @@ class CourseSessionController extends Controller
     {
         CourseSession::create($request->validated());
 
-        return redirect()->route('sessions.index')->with('status', 'Session created.');
+        return redirect()->route('sessions.index')->with('status', __('Session created.'));
     }
 
     public function edit(CourseSession $courseSession): View
@@ -91,15 +91,15 @@ class CourseSessionController extends Controller
 
         return redirect()->route('sessions.index')
             ->with('status', $data['evaluation_status'] === 'open'
-                ? 'Evaluation opened.'
-                : 'Evaluation closed.');
+                ? __('Evaluation opened.')
+                : __('Evaluation closed.'));
     }
 
     public function update(UpdateCourseSessionRequest $request, CourseSession $courseSession): RedirectResponse
     {
         $courseSession->update($request->validated());
 
-        return redirect()->route('sessions.index')->with('status', 'Session updated.');
+        return redirect()->route('sessions.index')->with('status', __('Session updated.'));
     }
 
     public function delete(CourseSession $courseSession): RedirectResponse
@@ -111,6 +111,6 @@ class CourseSessionController extends Controller
             $courseSession->delete();
         });
 
-        return redirect()->route('sessions.index')->with('status', 'Session deleted.');
+        return redirect()->route('sessions.index')->with('status', __('Session deleted.'));
     }
 }

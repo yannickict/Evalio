@@ -17,13 +17,13 @@ class BackupController extends Controller
             report($exception);
 
             return redirect()->route('settings.index')->withErrors([
-                'backup' => 'The backup could not be created.',
+                'backup' => __('The backup could not be created.'),
             ]);
         }
 
         return redirect()->route('settings.index')->with(
             'status',
-            'Demo backup stored. This is not a real database backup.',
+            __('Demo backup stored. This is not a real database backup.'),
         );
     }
 }

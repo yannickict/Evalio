@@ -11,13 +11,13 @@
                     type="button"
                     data-bs-toggle="modal"
                     data-bs-target="#approve-user-{{ $user->id }}">
-                    Approve
+                    {{ __('Approve') }}
                 </button>
 
                 <x-users.approval-modal :user="$user" :roles="$roles" />
                 <x-users.delete-button :user="$user" pending />
             </div>
-            <p class="small text-body-secondary mt-2 mb-0">Choose a role when approving.</p>
+            <p class="small text-body-secondary mt-2 mb-0">{{ __('Choose a role when approving.') }}</p>
         </div>
     </div>
 </article>

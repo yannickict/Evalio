@@ -31,6 +31,8 @@ The request classes cover registration, login, user role updates, session creati
 
 `app/Support` contains supporting application logic that does not handle HTTP directly. Currently, `QuestionnaireDraft` creates the initial empty questionnaire and applies editor actions: adding or removing questions and options, refreshing answer types, and enforcing draft limits. It accepts validated data and returns an updated draft without writing to the database. Invalid draft actions raise validation errors that Laravel displays on the form.
 
+Interface strings use Laravel translation helpers and German/English language files; German is the default locale. `SetLocale` applies the validated preference cookie after cookie decryption. `LanguageController` handles CSRF-protected language changes and local-only return paths. All stored questionnaire content and participant responses retain their original wording in every locale. See [[10 Localization|Localization]].
+
 For an editor preview, the flow is: `PreviewQuestionnaireRequest` validates input, `QuestionnaireTemplateController::preview` passes it to `QuestionnaireDraft::apply`, and the controller renders the editor with the updated draft. For a save action, the request validates input and the controller uses models to persist it, then returns a redirect. This keeps controllers focused on coordinating the request and response.
 
 ## Route map

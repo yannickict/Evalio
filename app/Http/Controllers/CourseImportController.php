@@ -47,8 +47,8 @@ class CourseImportController extends Controller
             $templates = QuestionnaireTemplate::where('name', $data['questionnaire_name'])->get();
             if ($templates->count() !== 1) {
                 $failures[] = ['row' => $rowNumber, 'message' => $templates->isEmpty()
-                    ? 'Questionnaire not found: '.$data['questionnaire_name'].'.'
-                    : 'Multiple questionnaires match: '.$data['questionnaire_name'].'.'];
+                    ? __('Questionnaire not found: :name.', ['name' => $data['questionnaire_name']])
+                    : __('Multiple questionnaires match: :name.', ['name' => $data['questionnaire_name']])];
 
                 continue;
             }
@@ -59,7 +59,7 @@ class CourseImportController extends Controller
                     'questionnaire_template_id' => $templates->sole()->id,
                 ]);
             } catch (UniqueConstraintViolationException) {
-                $failures[] = ['row' => $rowNumber, 'message' => 'The course name has already been taken.'];
+                $failures[] = ['row' => $rowNumber, 'message' => __('The course name has already been taken.')];
 
                 continue;
             }

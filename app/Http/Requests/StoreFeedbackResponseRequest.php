@@ -35,7 +35,7 @@ class StoreFeedbackResponseRequest extends FeedbackCodeRequest
                 $field = "answers.$questionId";
 
                 if ($question === null) {
-                    $validator->errors()->add($field, 'Choose a question from this questionnaire.');
+                    $validator->errors()->add($field, __('Choose a question from this questionnaire.'));
 
                     continue;
                 }
@@ -54,7 +54,7 @@ class StoreFeedbackResponseRequest extends FeedbackCodeRequest
                 $question = $questions->get($questionId);
 
                 if ($question === null || ! $question->allows_comment) {
-                    $validator->errors()->add("answers_comment.$questionId", 'Comments are not allowed for this question.');
+                    $validator->errors()->add("answers_comment.$questionId", __('Comments are not allowed for this question.'));
                 }
             }
         }];

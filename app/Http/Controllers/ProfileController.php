@@ -20,7 +20,7 @@ class ProfileController extends Controller
         $request->user()->update($request->validated());
 
         return redirect()->route('profile.show')
-            ->with('status', 'Profile updated.');
+            ->with('status', __('Profile updated.'));
     }
 
     public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
@@ -28,6 +28,6 @@ class ProfileController extends Controller
         $data = $request->validated();
         $request->user()->update(['password' => $data['password']]);
 
-        return redirect()->route('profile.show')->with('status', 'Password changed.');
+        return redirect()->route('profile.show')->with('status', __('Password changed.'));
     }
 }

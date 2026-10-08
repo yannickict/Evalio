@@ -49,7 +49,7 @@ class QuestionnaireTemplateController extends Controller
         $template->load('questions.options');
 
         return view('pages.questionnaires.create', ['draft' => [
-            'name' => $template->name.' (copy)',
+            'name' => $template->name.__(' (copy)'),
             'questions' => $template->questions->map(fn (Question $question): array => [
                 'text' => $question->question_text,
                 'type' => $question->type,
@@ -84,7 +84,7 @@ class QuestionnaireTemplateController extends Controller
             }
         });
 
-        return redirect()->route('questionnaires.index')->with('status', 'Questionnaire saved.');
+        return redirect()->route('questionnaires.index')->with('status', __('Questionnaire saved.'));
     }
 
     public function preview(PreviewQuestionnaireRequest $request, QuestionnaireDraft $draft): View
@@ -102,7 +102,7 @@ class QuestionnaireTemplateController extends Controller
                 || CourseSession::where('questionnaire_template_id', $template->id)->exists()
             ) {
                 return redirect()->route('questionnaires.index')->withErrors([
-                    'questionnaire' => 'This questionnaire is assigned to a course or session and cannot be deleted.',
+                    'questionnaire' => __('This questionnaire is assigned to a course or session and cannot be deleted.'),
                 ]);
             }
 
@@ -119,7 +119,7 @@ class QuestionnaireTemplateController extends Controller
                 }
             }
 
-            return redirect()->route('questionnaires.index')->with('status', 'Questionnaire deleted.');
+            return redirect()->route('questionnaires.index')->with('status', __('Questionnaire deleted.'));
         });
     }
 }

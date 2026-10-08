@@ -105,4 +105,8 @@ The compatible local Windows runtime is `C:/Users/yanni/.config/herd-lite/bin/ph
 
 See [[08 CSV Imports|CSV Imports]] for administrator upload formats and import order. Questionnaire-name uniqueness is defined in the original domain migration; use a fresh disposable local database when applying this schema change. `migrate:fresh --seed` deletes existing data.
 
-The previously documented herd-lite PHP executable is currently absent. XAMPP provides PHP 8.2.4, but installed Composer dependencies require PHP 8.4 or newer. Use a compatible runtime before running Artisan, PHPUnit, Pint or PHPStan. Do not bypass Composer platform checks.
+The herd-lite executable at `C:/Users/yanni/.config/herd-lite/bin/php.exe` was verified available as PHP 8.4.0 during localization work on 8 October 2026. Restricted execution may deny access to that path; run it with the appropriate local filesystem access. XAMPP provides PHP 8.2.4, which cannot run installed Composer dependencies requiring PHP 8.4 or newer. Do not bypass Composer platform checks.
+
+## Language
+
+German is the installation default (`APP_LOCALE=de`). Use the **Deutsch / English** buttons in the header or authentication pages to change the interface language; a cookie remembers the choice. `APP_LOCALE=en` can change the default for visitors without a preference. After changing `.env`, run `php artisan config:clear`. Tests keep their existing English assertions using the explicit English setting in `phpunit.xml`; German-specific tests switch the application locale. Stored questionnaire content remains in its original language. See [[10 Localization|Localization]].

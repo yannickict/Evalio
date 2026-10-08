@@ -16,13 +16,13 @@ class CsvImportReader
     {
         $handle = fopen($file->getPathname(), 'r');
         if ($handle === false) {
-            throw ValidationException::withMessages(['file' => 'The CSV file could not be read.']);
+            throw ValidationException::withMessages(['file' => __('The CSV file could not be read.')]);
         }
 
         try {
             $header = fgetcsv($handle, null, ',', '"', '');
             if ($header === false) {
-                throw ValidationException::withMessages(['file' => 'The CSV file is empty.']);
+                throw ValidationException::withMessages(['file' => __('The CSV file is empty.')]);
             }
 
             $header = array_map(fn ($value): string => trim((string) $value), $header);
@@ -33,7 +33,7 @@ class CsvImportReader
                 || count($header) !== count(array_unique($header))
                 || array_diff($requiredHeaders, $header)) {
                 throw ValidationException::withMessages([
-                    'file' => 'Use unique, non-empty headers including: '.implode(', ', $requiredHeaders).'.',
+                    'file' => __('Use unique, non-empty headers including: :headers.', ['headers' => implode(', ', $requiredHeaders)]),
                 ]);
             }
 
@@ -45,7 +45,7 @@ class CsvImportReader
                 }
 
                 if (count($row) !== count($header)) {
-                    yield ['row' => $rowNumber, 'data' => [], 'error' => 'The number of values does not match the headers.'];
+                    yield ['row' => $rowNumber, 'data' => [], 'error' => __('The number of values does not match the headers.')];
 
                     continue;
                 }

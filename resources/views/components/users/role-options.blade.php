@@ -2,5 +2,5 @@
 
 
 @foreach ($roles as $role)
-<option value="{{ $role->id }}" @selected($role->id === $selected)>{{ ucfirst($role->name) }}</option>
+<option value="{{ $role->id }}" @selected($role->id === $selected)>{{ __(ucfirst($role->name)) }}</option>
 @endforeach

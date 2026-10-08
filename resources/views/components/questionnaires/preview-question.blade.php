@@ -2,13 +2,13 @@
 
 <li class="border rounded-4 p-3 p-sm-4" aria-labelledby="preview-question-{{ $templateId }}-{{ $question->id }}">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-        <span class="small text-success fw-semibold">Question {{ $number }}</span>
+        <span class="small text-success fw-semibold">{{ __('Question') }} {{ $number }}</span>
         <div class="d-flex flex-wrap gap-2">
             <span class="badge rounded-pill text-body-secondary bg-body-tertiary border fw-normal">
-                {{ $question->type === 'single_choice' ? 'Single choice' : 'Free text' }}
+                {{ $question->type === 'single_choice' ? __('Single choice') : __('Free text') }}
             </span>
             <span @class(['badge rounded-pill fw-normal', 'bg-success-subtle text-success-emphasis' => $question->allows_comment, 'bg-body-tertiary text-body-secondary border' => ! $question->allows_comment])>
-                {{ $question->allows_comment ? 'Optional comment enabled' : 'No comment field' }}
+                {{ $question->allows_comment ? __('Optional comment enabled') : __('No comment field') }}
             </span>
         </div>
     </div>
@@ -22,23 +22,23 @@
                     <span class="small text-break">{{ $option->option_text }}</span>
                 </li>
             @empty
-                <li class="small text-body-secondary">No answer options yet.</li>
+                <li class="small text-body-secondary">{{ __('No answer options yet.') }}</li>
             @endforelse
         </ul>
     @elseif ($question->type === 'free_text')
         <textarea class="form-control bg-body-tertiary rounded-3 small" rows="3"
             aria-labelledby="preview-question-{{ $templateId }}-{{ $question->id }}"
-            placeholder="Participants can write their answer here" disabled></textarea>
+            placeholder="{{ __('Participants can write their answer here') }}" disabled></textarea>
     @endif
 
     @if ($question->allows_comment)
         <div class="border-top pt-3 mt-3">
             <label class="form-label small fw-medium" for="preview-comment-{{ $templateId }}-{{ $question->id }}">
-                Comment <span class="text-body-secondary fw-normal">(optional)</span>
+                {{ __('Comment') }} <span class="text-body-secondary fw-normal">{{ __('(optional)') }}</span>
             </label>
             <textarea class="form-control bg-body-tertiary rounded-3 small" rows="2"
                 id="preview-comment-{{ $templateId }}-{{ $question->id }}"
-                placeholder="Participants can add a comment" disabled></textarea>
+                placeholder="{{ __('Participants can add a comment') }}" disabled></textarea>
         </div>
     @endif
 </li>

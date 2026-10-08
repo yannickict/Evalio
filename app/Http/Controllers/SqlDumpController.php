@@ -17,7 +17,7 @@ class SqlDumpController extends Controller
             report($exception);
 
             return redirect()->route('settings.index')->withErrors([
-                'sql_dump' => 'The SQL dump could not be downloaded.',
+                'sql_dump' => __('The SQL dump could not be downloaded.'),
             ]);
         }
 

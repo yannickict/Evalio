@@ -63,7 +63,9 @@ kanban-plugin: board
 
 ## Done
 
-- [x] Restrict questionnaire usage queries to instructors' own sessions and feedback; admins/editors retain all-session visibility. Regression tests added; compatible-PHP execution pending.
+- [x] Add German and English interface translations with German as default; localize dates, validation and reset emails while displaying all stored questionnaire content and participant responses in their original language.
+- [x] Add a Deutsch/English switch for guests and authenticated users, remember the preference, and preserve participant/editor drafts when switching with JavaScript.
+- [x] Restrict questionnaire usage queries to instructors' own sessions and feedback; admins/editors retain all-session visibility. Regression tests passed with PHP 8.4.
 
 - [x] Implement course editing and template assignment; preserve existing session templates.
 - [x] Implement session editing with instructor/date validation and read-only course/template/number.

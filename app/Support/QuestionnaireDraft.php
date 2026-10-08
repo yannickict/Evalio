@@ -42,7 +42,7 @@ class QuestionnaireDraft
         if ($data['action'] === 'add_question') {
             if (count($draft['questions']) >= 50) {
                 throw ValidationException::withMessages([
-                    'questions' => 'You can add up to 50 questions.',
+                    'questions' => __('You can add up to 50 questions.'),
                 ]);
             }
 
@@ -52,19 +52,19 @@ class QuestionnaireDraft
 
             if (! isset($draft['questions'][$index])) {
                 throw ValidationException::withMessages([
-                    'questions' => 'This question does not exist.',
+                    'questions' => __('This question does not exist.'),
                 ]);
             }
 
             if ($draft['questions'][$index]['type'] !== 'single_choice') {
                 throw ValidationException::withMessages([
-                    'questions' => 'Only single-choice questions have answer options.',
+                    'questions' => __('Only single-choice questions have answer options.'),
                 ]);
             }
 
             if (count($draft['questions'][$index]['options']) >= 20) {
                 throw ValidationException::withMessages([
-                    'questions' => 'A question can have up to 20 options.',
+                    'questions' => __('A question can have up to 20 options.'),
                 ]);
             }
 
@@ -74,7 +74,7 @@ class QuestionnaireDraft
 
             if (! isset($draft['questions'][$index]) || count($draft['questions']) <= 1) {
                 throw ValidationException::withMessages([
-                    'questions' => 'Keep at least one question and choose an existing question to remove.',
+                    'questions' => __('Keep at least one question and choose an existing question to remove.'),
                 ]);
             }
 
@@ -90,7 +90,7 @@ class QuestionnaireDraft
                 || ! array_key_exists($optionIndex, $draft['questions'][$questionIndex]['options'])
                 || count($draft['questions'][$questionIndex]['options']) <= 2) {
                 throw ValidationException::withMessages([
-                    'questions' => 'Choose an existing single-choice option to remove and keep at least two options.',
+                    'questions' => __('Choose an existing single-choice option to remove and keep at least two options.'),
                 ]);
             }
 

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Evalio · Course evaluations')
+@section('title', __('Evalio · Course evaluations'))
 
 @section('content')
 <main class="container flex-grow-1 d-flex flex-column align-items-center justify-content-center py-5">
@@ -17,18 +17,18 @@
 
         <div class="card border-0 rounded-4 shadow-sm p-4 p-sm-5">
             <header class="mb-4">
-                <p class="text-success text-uppercase small fw-semibold mb-3">Your experience matters</p>
-                <h1 class="h2 fw-bold mb-3" id="entry-title">Share your feedback.</h1>
-                <p class="text-body-secondary mb-0">Enter the six-digit code from your instructor.</p>
+                <p class="text-success text-uppercase small fw-semibold mb-3">{{ __('Your experience matters') }}</p>
+                <h1 class="h2 fw-bold mb-3" id="entry-title">{{ __('Share your feedback.') }}</h1>
+                <p class="text-body-secondary mb-0">{{ __('Enter the six-digit code from your instructor.') }}</p>
             </header>
             <form method="GET" action="{{ route('feedback.show') }}">
-            <label class="form-label fw-semibold small" for="session-code">Feedback code</label>
+            <label class="form-label fw-semibold small" for="session-code">{{ __('Feedback code') }}</label>
             <input class="form-control form-control-lg bg-body-tertiary text-center fs-2 py-3 rounded-3" id="session-code" name="code" type="text" inputmode="numeric"
                 pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="off" required
                 placeholder="123456" spellcheck="false" aria-describedby="code-hint">
-            <button class="btn btn-success btn-lg w-100 rounded-3 mt-3" type="submit">Open questionnaire</button>
+            <button class="btn btn-success btn-lg w-100 rounded-3 mt-3" type="submit">{{ __('Open questionnaire') }}</button>
             </form>
-            <p class="text-body-secondary small mt-3 mb-0" id="code-hint">No account needed.</p>
+            <p class="text-body-secondary small mt-3 mb-0" id="code-hint">{{ __('No account needed.') }}</p>
             <x-ui.setup-guide :home="true" />
         </div>
     </section>

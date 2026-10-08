@@ -19,7 +19,7 @@ class StoreCourseSessionRequest extends CourseSessionRequest
             if (! $validator->errors()->has('instructor_id')
                 && $this->user()->hasRole('instructor')
                 && (int) $this->input('instructor_id') !== $this->user()->id) {
-                $validator->errors()->add('instructor_id', 'You can only create sessions for yourself.');
+                $validator->errors()->add('instructor_id', __('You can only create sessions for yourself.'));
             }
         }, ...parent::after()];
     }

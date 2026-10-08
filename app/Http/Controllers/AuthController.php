@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
-                ->withErrors(['email' => 'Invalid email or password.'])
+                ->withErrors(['email' => __('Invalid email or password.')])
                 ->onlyInput('email');
         }
 
