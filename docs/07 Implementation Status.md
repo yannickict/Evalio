@@ -1,4 +1,4 @@
-﻿# Implementation Status
+# Implementation Status
 
 Reviewed against source code on 12 October 2026. [[02 Project Requirements|Project Requirements]] remains the specification; this note records implemented behavior and remaining gaps without changing requirement priorities.
 
