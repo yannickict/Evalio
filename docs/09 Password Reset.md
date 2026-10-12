@@ -1,5 +1,7 @@
 # Password Reset
 
+Source review: 12 October 2026.
+
 Guests can use **Forgot password?** on login to request an email link, choose a new password and return to login. Resetting a password never approves an account or changes its role. Pending users still require administrator approval before login.
 
 ## Implementation
@@ -42,11 +44,11 @@ Configure a real mail transport, valid sender address and your public HTTPS `APP
 
 ## Verification
 
-On 8 October 2026, the user confirmed that local reset email logging works. `PasswordResetTest` adds coverage for guest forms, notifications, generic confirmations, success and login, token reuse, invalid/expired/wrong-account tokens, pending accounts, validation, safe status logging and rate limits. This is separate from a passing automated test run.
+On 8 October 2026, the user confirmed that local reset email logging works. `PasswordResetTest` adds coverage for guest forms, notifications, generic confirmations, success and login, token reuse, invalid/expired/wrong-account tokens, pending accounts, validation, safe status logging and rate limits. The reset regressions subsequently passed in the full PHP suite; current verification is recorded in [[07 Implementation Status|Implementation Status]].
 
 ```powershell
 php artisan test --filter='PasswordResetTest|AuthTest|PasswordChangeTest'
 composer ci:check
 ```
 
-Installed dependencies require PHP 8.4 or newer. The currently available XAMPP PHP 8.2 cannot run the Laravel test suite or the required formatter.
+Installed dependencies require PHP 8.4 or newer. The compatible local herd-lite PHP 8.4 executable is documented in [[06 Development Setup|Development Setup]]. XAMPP PHP 8.2 cannot run the locked Laravel test suite or required formatter.

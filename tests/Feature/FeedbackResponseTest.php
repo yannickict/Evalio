@@ -130,6 +130,48 @@ class FeedbackResponseTest extends TestCase
         $this->get(route('home'))->assertOk()->assertDontSee('Thank you! Your feedback has been submitted.');
     }
 
+    public function test_comment_only_submission_is_saved_and_displayed_without_counting_a_selected_option(): void
+    {
+        $template = $this->questionnaire();
+        $form = FeedbackForm::where('code', '012345')->sole();
+        $question = Question::factory()->create(['type' => 'single_choice', 'allows_comment' => true]);
+        $template->questions()->attach($question, ['position' => 1]);
+        QuestionOption::factory()->for($question)->create();
+
+        // No radio option selected: the browser sends only the comment for this question.
+        $this->post(route('feedback.store', ['code' => '012345']), [
+            'answers_comment' => [$question->id => 'More practical exercises, please.'],
+        ])->assertRedirect(route('home'))->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('answers', 1);
+        $this->assertDatabaseHas('answers', [
+            'feedback_form_id' => $form->id,
+            'question_id' => $question->id,
+            'question_option_id' => null,
+            'answer_text' => null,
+            'comment' => 'More practical exercises, please.',
+        ]);
+        $response = $this->actingAs($form->courseSession->instructor)
+            ->get(route('sessions.results', $form->courseSession))->assertOk()
+            ->assertSee('More practical exercises, please.');
+        $this->assertSame([0], $response->viewData('results')->first()['options']->pluck('count')->all());
+    }
+
+    public function test_completely_blank_answers_and_comments_are_not_stored(): void
+    {
+        $template = $this->questionnaire();
+        $choice = Question::factory()->create(['type' => 'single_choice', 'allows_comment' => true]);
+        $text = Question::factory()->create(['type' => 'free_text']);
+        $template->questions()->attach([$choice->id => ['position' => 1], $text->id => ['position' => 2]]);
+
+        $this->post(route('feedback.store', ['code' => '012345']), [
+            'answers' => [$text->id => ''],
+            'answers_comment' => [$choice->id => '   '],
+        ])->assertRedirect(route('home'))->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('answers', 0);
+    }
+
     public function test_submissions_use_the_selected_sessions_form(): void
     {
         $template = $this->questionnaire();

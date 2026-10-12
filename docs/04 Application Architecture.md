@@ -1,6 +1,6 @@
 # Application Architecture
 
-Source review: 7 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack]], [[05 Entity Relationship Model|Entity Relationship Model]], [[07 Implementation Status|Implementation Status]].
+Source review: 12 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack]], [[05 Entity Relationship Model|Entity Relationship Model]], [[07 Implementation Status|Implementation Status]].
 
 ## Structure
 
@@ -23,13 +23,19 @@ flowchart LR
     Assets --> Browser
 ```
 
+## Interface and browser state
+
+Authenticated workspace pages use a white sidebar, a compact account/language bar, light backgrounds and blue actions. Bootstrap offcanvas supplies the mobile navigation drawer; modal, collapse and dropdown components handle dialogs and disclosure controls. Course/session/questionnaire collections use responsive rows. Participant questionnaire pages have a focused public layout, and authentication pages use their own shared layout. Both layouts include `public/favicon.svg`. Keyboard users have visible focus states, dialog focus handling and a workspace skip link; normal page scrollbars remain visible.
+
+After a manual evaluation-status change, the controller redirects to `/overview?session=ID`. Before submitting that specific form, JavaScript stores the session ID, window scroll position and course/instructor filters in session storage. On return, matching state is consumed, filters are reapplied and the scroll position is restored before reopening the modal. Direct detail links open without requiring saved state. With JavaScript or browser storage unavailable, automatic modal reopening or position restoration is limited accordingly. Modal actions use compact neutral controls, with destructive actions separated from Close/Edit; permissions and confirmation checks remain unchanged.
+
 ## Requests and supporting logic
 
 `app/Http/Requests` contains Laravel Form Request classes. Laravel validates these requests before running the controller action that receives them. Each class defines the accepted fields and their rules; `after()` callbacks handle checks that need related records. For example, `StoreCourseSessionRequest` checks that the course and instructor exist, the dates are valid, and the instructor is approved and has the instructor role. Invalid web form input redirects back with validation errors and previous input. Controllers access the validated fields through `$request->validated()`.
 
 The request classes cover registration, login, user role updates, session creation, questionnaire drafts and saving, and public feedback. `QuestionnaireRequest` shares the editor's common rules with its preview and save requests. `FeedbackCodeRequest` validates the query-string code and resolves the existing form and template; its submission subclass also validates answers, options and comments. Endpoint authorization remains in route middleware and shared gates.
 
-`app/Support` contains supporting application logic that does not handle HTTP directly. Currently, `QuestionnaireDraft` creates the initial empty questionnaire and applies editor actions: adding or removing questions and options, refreshing answer types, and enforcing draft limits. It accepts validated data and returns an updated draft without writing to the database. Invalid draft actions raise validation errors that Laravel displays on the form.
+`app/Support` contains supporting application logic that does not handle HTTP directly. `CsvImportReader` parses CSV uploads for course/session imports. `QuestionnaireDraft` creates the initial empty questionnaire and applies editor actions: adding or removing questions and options, refreshing answer types, and enforcing draft limits. It accepts validated data and returns an updated draft without writing to the database. Invalid draft actions raise validation errors that Laravel displays on the form.
 
 Interface strings use Laravel translation helpers and German/English language files; German is the default locale. `SetLocale` applies the validated preference cookie after cookie decryption. `LanguageController` handles CSRF-protected language changes and local-only return paths. All stored questionnaire content and participant responses retain their original wording in every locale. See [[10 Localization|Localization]].
 
@@ -72,7 +78,23 @@ Paths and handler names below match the repository.
 | PATCH  | `/users/{user}`           | `UserController::update`                   | Administrator                               |
 | DELETE | `/users/{user}`           | `UserController::destroy`                  | Administrator; cannot delete self           |
 
-Web forms use CSRF tokens. Shared `view-course-lists` and `manage-users` gates are applied through route middleware; the navigation uses the same user-management gate. Self-deletion remains guarded in the controller. Role permission columns do not constitute comprehensive endpoint authorization.
+| POST | `/language` | `LanguageController::update` | Public; validated locale and local return path |
+| GET | `/profile` | `ProfileController::show` | Authenticated |
+| PATCH | `/profile` | `ProfileController::update` | Authenticated; validated personal details |
+| PATCH | `/profile/password` | `ProfileController::updatePassword` | Authenticated; current password; throttle `6,1` |
+| GET | `/forgot-password` | `PasswordResetController::create` | Guests |
+| POST | `/forgot-password` | `PasswordResetController::store` | Guests; throttle `5,1` |
+| GET | `/reset-password/{token}` | `PasswordResetController::edit` | Guests |
+| POST | `/reset-password` | `PasswordResetController::update` | Guests; throttle `5,1` |
+| GET | `/settings`, `/settings/imports` | Settings/import selection views | Administrator |
+| GET | `/settings/courses-import` | `CourseImportController::create` | Administrator |
+| POST | `/settings/courses-import` | `CourseImportController::store` | Administrator; validated CSV upload |
+| GET | `/settings/sessions-import` | `SessionImportController::create` | Administrator |
+| POST | `/settings/sessions-import` | `SessionImportController::store` | Administrator; validated CSV upload |
+| POST | `/settings/backup` | `BackupController::store` | Administrator; demo-file backup |
+| POST | `/settings/sql-dump` | `SqlDumpController::store` | Administrator; demo-file download |
+
+Web forms use CSRF tokens. Shared `view-course-lists` and `manage-users` gates are applied through route middleware; the navigation uses the same user-management gate. Self-deletion remains guarded in the controller. Role names, rather than boolean role permission columns, determine authorization.
 
 ## Registration and administration
 
@@ -88,7 +110,7 @@ Administrators can approve a pending account while assigning its role, change ap
 4. Submission sends `answers[question_id]` and `answers_comment[question_id]` to the same path using POST.
 5. The controller creates answer records on the existing form and redirects home with a one-time confirmation.
 
-Participant answers are now optional in the browser. Tests cover skipped questions and blank free-text submissions. The incomplete-answer JavaScript warning has been removed. There is no separate review step or draft storage. Opening the page does not create answer records; feedback forms and their codes already exist. Comments alone are not processed because submission iterates the answer array.
+Participant answers are now optional in the browser. Tests cover skipped questions and blank free-text submissions. The incomplete-answer JavaScript warning has been removed. There is no separate participant review step or persistent server-side draft storage; the language switch temporarily preserves participant inputs in browser session storage. Opening the page does not create answer records; feedback forms and their codes already exist. Submission considers question IDs from both the answer and comment arrays. A permitted comment is saved even without an answer, with a null selected option/text. Completely blank answer/comment pairs are skipped.
 
 Repeated submissions append answers to the same form. The code is not consumed, and there is no submitted flag. Form Requests validate the query code, payload arrays, answer types and lengths, question/template membership, option/question membership and whether comments are allowed. Answer writes use one database transaction. Both questionnaire access and submission require an open evaluation. Closing clears its access code while preserving the feedback form and collected answers. See [[07 Implementation Status|Implementation Status]] for the resulting requirement gaps.
 
@@ -96,11 +118,11 @@ Repeated submissions append answers to the same form. The code is not consumed, 
 
 Session creation selects an existing course and approved instructor, validates dates and creates the session. The model stores numeric `session_number` values and assigns the next number within each course. The computed `session_identifier` combines the current course name and a minimum three-digit number, for example `AID.002`. A unique `(course_id, session_number)` constraint prevents duplicates within a course; concurrent generation still needs locking/retry. Renaming a course changes its displayed session identifiers. The forward migration `2026_10_07_000001_replace_course_session_number_with_session_number` numbers existing sessions in ID order within each course and removes the old stored identifier. Creation does not immediately generate feedback forms or codes; opening an evaluation does.
 
-The overview loads visible sessions, their courses, instructors, saved session templates and each session's optional feedback form. Instructors receive only their own sessions; admins and editors receive all sessions and can use course/instructor filters. Cards show dates and status; modals expose details and existing feedback codes. Session detail dialogs link to the authorized evaluation results page.
+The overview loads visible sessions, their courses, instructors, saved session templates and each session's optional feedback form. Instructors receive only their own sessions; admins and editors receive all sessions and can use course/instructor filters. Compact rows show dates and status; modals expose details and existing feedback codes. Session detail dialogs link to the authorized evaluation results page.
 
 ### Session questionnaire assignment
 
-`course_sessions.questionnaire_template_id` stores the questionnaire used by the session. The `CourseSession` creation hook copies the course's current template when no explicit template attribute is supplied, including factory/demo creation. HTTP session creation does not accept a template ID from the client. Changing the course default affects new sessions only. Feedback display, submission validation and session cards use `CourseSession::questionnaireTemplate()`.
+`course_sessions.questionnaire_template_id` stores the questionnaire used by the session. The `CourseSession` creation hook copies the course's current template when no explicit template attribute is supplied, including factory/demo creation. HTTP session creation does not accept a template ID from the client. Changing the course default affects new sessions only. Feedback display, submission validation and session rows use `CourseSession::questionnaireTemplate()`.
 
 The original domain-table migration defines a nullable template foreign key on sessions with restricted deletion. This schema change assumes a fresh database migration; there is no incremental migration or backfill. This preserves template assignment, not question contents: editing/deleting used questions and options or changing a session's template still needs separate protection/versioning.
 
@@ -141,7 +163,7 @@ Questionnaire preview dialogs show assigned courses and sessions, with feedback-
 
 Single-choice results use server-rendered SVG pie charts with counts and percentages. Each percentage uses the total selected options for that question; it is not a participant or submission count. Empty charts show a no-answers state, and a single populated option renders a full circle. Written answers and comments remain escaped text in the full screen view.
 
-Print / Save as PDF invokes browser printing. Print CSS requests portrait A4 with 10 mm margins and a compact two-column summary. Navigation, controls, individual written responses and comments are excluded; free-text questions show response counts. The layout targets the standard ten-question questionnaire. One-page fit has not been verified in print preview; long custom questionnaires or labels may span pages. Browser PDF saving is not a server-generated PDF export.
+Print / Save as PDF invokes browser printing. Print CSS requests portrait A4 with 10 mm margins and a compact two-column summary. Navigation, controls, individual written responses and comments are excluded; free-text questions show response counts. The layout targets ten questions. The existing ten-question demo summary was verified to produce one A4 page in a headless browser on 12 October 2026. That snapshot used existing stored content; the newly seeded German standard questionnaire and long custom questionnaires require separate print review. The screen-only no-feedback alert is omitted from print; per-question empty states remain. Browser PDF saving is not a server-generated PDF export.
 
 ## Administrative deletion
 
@@ -154,3 +176,7 @@ Admin-only settings routes expose an import selection page and course/session up
 ## Password reset
 
 Guest-only routes delegate link requests and password changes to `PasswordResetController`, using `ForgotPasswordRequest` and `ResetPasswordRequest`. Laravel's password broker manages token storage, expiry and consumption. Both POST routes are rate-limited; account approval remains unchanged. Operational logs record broker statuses, and the auth layout displays feedback. See [[09 Password Reset|Password Reset]] for setup and tests.
+
+## Backups and SQL export
+
+Admin-only settings actions call `BackupService` and `SqlDumpService`. The dump service reads the existing placeholder `storage/app/private/dumps/demo.sql`; it does not export the live database. The UI labels these as demo-file operations. Real database export and a documented restore procedure remain unfinished.

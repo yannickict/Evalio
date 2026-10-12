@@ -1,83 +1,55 @@
-# Implementation Status
+﻿# Implementation Status
 
-Reviewed against source code on 8 October 2026. [[02 Project Requirements|Project Requirements]] remains the specification; this note records implementation progress without changing its scope or priorities.
+Reviewed against source code on 12 October 2026. [[02 Project Requirements|Project Requirements]] remains the specification; this note records implemented behavior and remaining gaps without changing requirement priorities.
 
 ## Requirements and current behavior
 
 | Requirement area | Current implementation | Remaining work |
 |---|---|---|
-| Web application and SQL storage | Laravel, Blade, Eloquent and migrations | Production database/deployment configuration and complete SQL dump procedure |
-| Roles and least privilege | Separate Gates, instructor ownership for results and questionnaire session usage, admin-only deletion and admin/editor creation/editing; regression tests passed | Production security review |
-| Registration and approval | New instructor accounts are unapproved; admin approves and assigns roles; login requires approval; guest password reset through the Laravel broker with passing regression tests | Production reset-email delivery |
-| Course management | Validated create/edit pages, questionnaire defaults and admin-only transactional deletion with dependent feedback | Optional archiving |
-| Course sessions | Create/edit, saved templates, numeric per-course numbers, computed identifiers and transactional admin deletion | Concurrent number allocation; optional archiving |
-| Evaluation phase | Hourly start-date opening and closing on end date plus 14 days, authorized manual controls, code lifecycle and status checks on GET/POST feedback | Production scheduler setup and operational monitoring |
-| Anonymous evaluation (T-01) | Public code-based questionnaire; no participant foreign key on forms | Full anonymity assessment beyond domain storage; code lifecycle and access controls |
-| Cancel/back (T-02/T-03) | All questions appear on one page; no answer writes before POST | Explicit cancel interaction and any required navigation behavior |
-| Optional questions (T-04) | Browser allows skipped answers; server accepts skipped/blank responses; feature tests cover this | Define consistent abstention counting and validate payloads; comment-only handling remains open |
-| Comments (T-05) | Comment fields and answer comment storage | Server checks for allowed comments, types and lengths; behavior for comment-only responses |
-| Review/edit (T-06/T-07) | Answers can be edited on the questionnaire page | Separate pre-submission answer overview and correction flow |
-| Final storage (T-08) | Answers are created on POST; forms exist beforehand | Define submitted-form lifecycle, atomic save and duplicate/replay handling |
-| Standard questionnaire | Seeder defines ten questions, options and template positions | Verify end-to-end behavior after changes |
-| Question configuration | Database content initialized from PHP seeder | Required separate configuration-file approach remains absent |
-| Optional template management (O-01–O-03) | Creation, independent duplication, usage previews scoped to instructor-owned sessions, comments, course assignment and unused-template deletion | Direct editing/versioning |
-| Evaluation and filtering | Authorized per-session counts, percentages, pie charts, written responses/comments and overview filters | Combined result filters; abstention/submission counting policy |
-| One-page A4 output | Browser print/PDF button and compact portrait A4 chart summary; written answers/comments remain on screen | Verify standard ten-question summary fits one page; long questionnaire handling |
-| Account profile | Personal detail updates and password changes with current-password validation; regression tests | Browser review |
-| Backups and CSV import | Admin settings page; POST routes store/download an existing demo SQL file through services, with error reporting and regression tests; admin-only course/session CSV imports with row errors and an import selection page | Real database export tool, administrator backup/restore procedure and instructor/questionnaire imports |
-| Deletion | Admin course/session deletion with feedback cleanup; template assignment guard and unused-question cleanup; user assignment guard | Individual submitted feedback-form deletion |
-| Validation/security | Auth/session handling, login throttling, escaped Blade output, CSRF, shared authorization gates and validated atomic feedback submission | Comprehensive role authorization and production scheduler setup |
+| Web application and SQL storage | Laravel, Blade, Eloquent and SQL migrations | Production database/deployment configuration |
+| Roles and least privilege | Role-name gates, instructor ownership checks, admin-only deletion and admin/editor management | Production security and anonymity review |
+| Registration and approval | Unapproved instructor registration, admin approval/role assignment, approval-gated login and password reset | Production reset-email delivery |
+| Courses and sessions | Validated create/edit, saved session templates, numeric per-course numbering and transactional admin deletion | Collision-safe manual session numbering; forward migrations for schema changes made in original creation migrations |
+| Evaluation phase | Hourly automatic opening/closing, manual controls, code creation/invalidation and status checks on questionnaire GET/POST | Production scheduler and monitoring; missed closing days require manual correction |
+| Anonymous evaluation (T-01) | Public six-digit code access; no participant identity foreign key | Anonymity review of logs/infrastructure/code distribution; individual submission lifecycle |
+| Cancel/back (T-02/T-03) | All questions appear on one page; no answer records before final POST | Explicit cancellation interaction |
+| Optional questions (T-04) | Skipped questions accepted; completely blank answer/comment pairs are not stored | Explicit abstention reporting and individual submission totals |
+| Comments (T-05) | Comment types/lengths and allowed-question membership validated; comment-only responses saved and displayed | No known storage gap; comments do not count as selected options |
+| Review/edit (T-06/T-07) | Answers editable on the questionnaire page | Pre-submission answer overview and correction flow |
+| Final storage (T-08) | Validated answer/comment records saved atomically on POST | Separate participant submissions, submission state/time, empty submission policy and duplicate/replay handling |
+| Standard questionnaire | Seeder defines ten German questions/options; stored content retains its original language | One-page print review of the newly seeded German content; existing questionnaires are not rewritten |
+| Question configuration | PHP seeder initializes database questionnaire content | Separate configuration-file approach (Should) |
+| Optional template management (O-01–O-03) | Creation, independent duplication, course assignment, ownership-scoped usage previews and unused-template deletion | Direct editing/versioning and preservation of historical content |
+| Evaluation and filtering | Authorized per-session counts, percentages, SVG pie charts, written answers/comments and course/instructor overview filters | Combined filters on actual evaluation results; submission/abstention totals |
+| A4 output | Browser printing; tested ten-question demo summary fits one A4 page | Seeded German content and long custom questionnaires need separate print review |
+| Account profile | Personal detail editing and password changes with current-password validation | No known implementation gap |
+| Backups and CSV import | Admin course/session CSV imports with row errors; explicitly labeled demo-file backup/export | Real SQL export and restore procedure; instructor/questionnaire imports |
+| Deletion | Admin users/courses/sessions/template deletion with assignment guards and dependent-answer cleanup | Individual submitted feedback deletion |
+| Duplicate course detection | Unique names rejected during creation/import | Potential-duplicate warnings (Should) |
 
 ## Data interpretation and integrity
 
-- Multiple submissions currently append answers for the same form/question, including identical retries. The existing feature test explicitly expects this behavior; it does not establish compliance with one completed evaluation per form.
-- Sessions now save their questionnaire template on creation; course default changes affect only new sessions. The column is defined in the original session-table migration and assumes fresh migration. This does not freeze question/option content: template versioning and protection against editing used questions remain unfinished. Forms still have no submission timestamp.
-- Database foreign keys validate existence, but do not enforce that a selected option belongs to the submitted question or that the question belongs to the assigned template.
-- Feedback submission validates question/option membership and saves the complete answer set in a transaction; a failed write rolls back all answers from that request.
-- Role names and gates define authorization. Instructors receive only their own sessions, including course-modal session counts; admins/editors can create courses/questionnaires and edit courses/sessions. Instructor session creation enforces self-assignment. Session filters are shown only to admins/editors.
+- A session has at most one feedback form/code. This form is shared by participants; it does not represent one completed participant questionnaire. Repeated POSTs append answers, including repeated identical submissions.
+- Submission processes question IDs from both `answers` and `answers_comment`. A permitted comment without an answer creates one row with null selected-option/text fields. Fully blank pairs are skipped. Validation rejects unrelated questions/options and disabled comments; all writes share one transaction.
+- Charts count selected options per question. Comment-only records remain visible as comments and do not increase option totals. Written-response counts include only nonblank text. These totals are not participant/submission totals, and skipped questions are not individually recorded as abstentions.
+- Session template assignments are saved on creation. Changing a course default affects new sessions only. Content is not snapshotted or versioned; changing question/option content can alter historical interpretation.
+- The template-assignment, unique-template-name and one-form-per-session constraints were added in original creation migrations. Existing databases need forward migrations/data reconciliation; ordinary migration does not replay altered creation migrations. A separate forward session-number migration is present.
+- Automatic evaluation updates open on the start date, catch up unset sessions within the open window and close exactly on end date plus 14 days. Manual changes can be overridden on boundary dates; missed closing days are not caught up automatically.
 
-Schema details are in [[05 Entity Relationship Model|Entity Relationship Model]]; request behavior is in [[04 Application Architecture|Application Architecture]].
+## Interface and browser state
 
-## Existing verification coverage
+Authenticated workspace pages use a responsive Bootstrap sidebar/offcanvas drawer, a compact account/language bar, light backgrounds and blue actions. Course/session/questionnaire collections use rows. Forms, imports, user management and participant pages share restrained typography and spacing. Both layouts include `public/favicon.svg`.
 
-The PHP feature suite includes authentication, users, navigation, overview, session creation, domain models, seeding, questionnaire pages and answer persistence. JavaScript tests cover combined overview filters and questionnaire-editor type refresh/scroll behavior using mocked browser objects and Bootstrap imports. PHP tests now also cover course pages, optional participant answers and questionnaire creation/validation.
+Modal controls use compact secondary styles and separate destructive actions. After a manual evaluation-status update, the redirect selects the same session modal. JavaScript restores matching scroll position and course/instructor filters from temporary session storage before reopening it. Without JavaScript or browser storage, this enhancement is limited; server-side status updates still work.
 
-The PHP suite and static analysis were run during this cleanup. Course update tests cover role access, duplicate/unchanged names, invalid templates, restored input and preservation of session templates. Current tests also encode repeated submissions appending answers to the same form; one form per session does not group answers into separate participant submissions. Passing those tests alone would not establish that all project requirements are met.
+German is the interface default; DE/EN controls remember the preference and preserve participant/editor drafts with JavaScript. The seeded standard questionnaire is German independently of the interface language. Existing database content is not translated or rewritten. See [[10 Localization|Localization]].
 
-Backend cleanup verification on 6 October 2026: PHP feature tests, PHPStan, Pint, the frontend build and JavaScript tests passed using a temporary PHP 8.4 runtime. Regression tests cover unrelated questions/options, disabled comments, malformed payloads, and transaction rollback.
+## Latest local verification
 
-## Verification on 7 October 2026
+On 12 October 2026, the full PHP suite passed: **271 tests and 2,071 assertions**. This includes comment-only persistence/result display, blank-answer handling and evaluation-status redirect regressions. All **17 JavaScript tests**, the frontend build, Pint, PHPStan, Blade compilation and diff checks passed. PHP checks used the compatible herd-lite PHP 8.4 runtime.
 
-The full PHP suite passed after session numbering changes (209 tests). Later targeted checks passed for duplication (35 questionnaire tests), results and pie charts (3 tests, 29 assertions), seeding (8 tests), navigation (10 JavaScript tests), formatting, PHPStan and frontend builds. These were different-stage runs; a final combined CI run is pending. The compatible local PHP is `C:/Users/yanni/.config/herd-lite/bin/php.exe`; PHPStan required a 512 MB CLI memory limit after the local 128 MB limit caused a worker crash.
+The redesign was reviewed in a headless browser with overflow checks at 1440, 768, 375 and 320 pixels. Checks covered drawer focus/Escape dismissal, session dialogs, course filtering and participant answer selection. The tested ten-question demo result produced a single A4 PDF. That snapshot used existing stored questionnaire content; newly seeded German questions and custom content require separate print review.
 
-The session-number migration was applied after a local database backup. Existing session fields, courses, forms and answers were compared before/after; foreign-key checks passed. Visual browser review and A4 page-count verification remain open. Answer totals are not participant/submission totals: one feedback form is shared by a session's submissions.
+These are local checks. Remote CI and production deployment/email/scheduling/backup operations have not been verified. CI builds the frontend and runs PHP checks, but does not currently run the separate JavaScript test command.
 
-## CSV import update on 8 October 2026
-
-Course imports resolve existing questionnaires by unique name. Session imports resolve courses by name and approved instructors by email, validate dates, assign session numbers and inherit course questionnaires. Invalid rows are skipped and reported; file/header errors reject the upload. Shared CSV parsing handles BOMs, quoted values, blank records and reordered headers. See [[08 CSV Imports|CSV Imports]].
-
-Regression coverage was added for import navigation, permissions, mixed valid/invalid rows, dates, instructor eligibility, numbering, template inheritance, duplicate names, upload validation and escaped errors. The earlier herd-lite runtime documented above is not available in this workspace. Current PHP 8.2 cannot run dependencies requiring PHP 8.4; feature tests, Pint and PHPStan remain pending. Syntax checks passed for 13 PHP files, and diff checks passed. Isolated CSV reader checks passed for BOMs, quoted commas/multiline values, trimming, blank records, record numbering, malformed rows and invalid headers, using lightweight framework stubs; these do not replace the Laravel feature suite.
-
-## Password reset update on 8 October 2026
-
-Forgot-password and reset forms use the auth layout, generic request confirmations, guest-only routes, rate limits and Form Requests. The Laravel broker handles tokens; successful resets rotate remember tokens and preserve approval/roles. Operational logs record broker statuses without account identifiers or reset secrets. The user confirmed local log-mail delivery works. See [[09 Password Reset|Password Reset]].
-
-Password reset regression tests were added; the available PHP 8.2 runtime cannot run installed dependencies requiring PHP 8.4. Automated Laravel, formatting and static-analysis verification remain pending.
-
-## Questionnaire visibility update on 8 October 2026
-
-The library now requires an authenticated user with a role. Its session usage query restricts instructors to their own sessions before eager-loading feedback forms and answers. Counts, session identifiers, dates, links and feedback badges therefore exclude other instructors' sessions. Admins/editors retain full visibility; questionnaire definitions and course assignments remain shared. Instructor empty-state text explicitly describes their assignments.
-
-Regression tests cover shared templates, templates used only by another instructor, own-session links, absence of other-session details, the loaded session collections, full admin/editor visibility and denial for users without a role. PHP syntax checks passed for the controller, routes and test file; `git diff --check` passed. The targeted Laravel test command was attempted but blocked by Composer's PHP 8.4 requirement with the available PHP 8.2.4 runtime. Feature tests, Pint and PHPStan remain pending on a compatible runtime.
-
-## Localization and combined verification on 8 October 2026
-
-German is now the default in configuration, the example environment and the local environment. German/English translations cover hardcoded interface text, accessibility labels, confirmation dialogs, status/error messages, validation and password-reset emails. German dates use `dd.mm.yyyy`. All stored questionnaire names, questions, options and participant responses retain their original wording. A Deutsch/English switch on guest, authenticated and authentication pages remembers the choice in an encrypted cookie. With JavaScript enabled, participant answers/comments and editor drafts are preserved while switching. See [[10 Localization|Localization]].
-
-The herd-lite PHP 8.4.0 executable was verified available with sufficient filesystem access, superseding the earlier runtime blocker. After adding the language switch and preserving all stored content in its original language, the final full suite passed: 269 PHP tests and 2,047 assertions, including nine localization tests, six language-switch tests and the instructor-visibility regressions. Pint, PHPStan, all 16 JavaScript tests, the frontend build, Blade template compilation and diff checks passed. Language tests cover cookie preferences, guest/authenticated pages, invalid locale values and external return URLs; frontend tests cover draft restoration and editor refresh. Earlier HTTP checks of local guest pages confirmed successful responses and German HTML. Visual browser review and one-page A4 verification remain open because no browser was available in this session. Remote CI has not been run by this local verification.
-
-## Interface redesign on 12 October 2026
-
-Authenticated pages now use a persistent sidebar with a Bootstrap offcanvas drawer on smaller screens and an account/language bar. Course, session and questionnaire collections use compact rows; forms, user management, imports, settings and participant pages share a light palette with blue actions, modest headings and minimal borders. Evaluation statuses retain semantic colors. Existing routes, authorization, form submissions, detail dialogs, filters and draft behavior remain in place. Keyboard users have a skip link, visible focus indicators and Bootstrap dialog/drawer focus handling.
-
-The full PHP suite passed with 269 tests and 2,059 assertions; all 16 JavaScript tests, the frontend build, Pint and Blade compilation passed. Rendered pages were visually reviewed in a headless browser at desktop and phone sizes, with overflow checks at 1440, 768, 375 and 320 pixels. Browser checks covered drawer focus and Escape dismissal, session dialogs, course filtering and participant answer selection. The standard ten-question evaluation produced a single A4 PDF after reducing print spacing; custom questionnaire lengths still need their own print review. These are local checks; remote CI has not been run.
+See [[04 Application Architecture|Application Architecture]], [[05 Entity Relationship Model|Entity Relationship Model]] and [[06 Development Setup|Development Setup]] for implementation details and verification commands. [[Todo]] summarizes the main remaining work.

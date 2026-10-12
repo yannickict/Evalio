@@ -1,7 +1,7 @@
 # Evalio Documentation
 
 Repository reviewed: `C:\Users\yanni\Documents\Evalio`  
-Documentation updated: 8 October 2026
+Documentation updated: 12 October 2026
 
 - [[02 Project Requirements|Project Requirements]] — intended functionality and priorities. Only the selected stack has been updated.
 - [[03 Programmier-Stack|Programming Stack]] — dependencies, tooling and technical choices.
@@ -9,11 +9,11 @@ Documentation updated: 8 October 2026
 - [[04 Application Architecture|Application Architecture]] — request flow, routes and application boundaries.
 - [[06 Development Setup|Development Setup]] — local installation, demo data and verification commands.
 - [[07 Implementation Status|Implementation Status]] — current capabilities and gaps against the requirements.
-- [[08 CSV Imports|CSV Imports]] ? formats, reference matching, validation and retry behavior.
-- [[09 Password Reset|Password Reset]] ? guest reset flow, mail configuration, logs and tests.
-- [[Todo]] — Kanban board for remaining work and completed tasks.
+- [[08 CSV Imports|CSV Imports]] — formats, reference matching, validation and retry behavior.
+- [[09 Password Reset|Password Reset]] — guest reset flow, mail configuration, logs and tests.
+- [[Todo]] — Kanban board for the main remaining work; detailed gaps are recorded in Implementation Status.
 - [[10 Localization|Localization]] — German default, language switch, original-language questionnaire content and verification.
 
 These notes and the board are stored in the repository's `docs` folder. Open that folder as an Obsidian vault; the root `README.md` provides standard Markdown links for repository browsing.
 
-Implementation notes describe source code at the review date. A route, database field or interface mockup alone does not mean a requirement is complete. The initial review did not run the application or test suites; subsequent verification results are recorded in [[07 Implementation Status|Implementation Status]].
+Implementation notes describe source code at the review date. A route, database field or interface mockup alone does not mean a requirement is complete. Current local verification results and their limits are recorded in [[07 Implementation Status|Implementation Status]].

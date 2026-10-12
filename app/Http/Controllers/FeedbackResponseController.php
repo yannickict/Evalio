@@ -21,12 +21,17 @@ class FeedbackResponseController extends Controller
         $data = $request->validated();
         $form = $request->form();
         $questions = $request->template()->questions->keyBy('id');
+        $answers = $data['answers'] ?? [];
+        $comments = $data['answers_comment'] ?? [];
+        $questionIds = array_unique([...array_keys($answers), ...array_keys($comments)]);
 
-        DB::transaction(function () use ($data, $form, $questions): void {
-            foreach ($data['answers'] ?? [] as $questionId => $answer) {
+        DB::transaction(function () use ($answers, $comments, $questionIds, $form, $questions): void {
+            foreach ($questionIds as $questionId) {
                 $question = $questions->get($questionId);
+                $answer = $answers[$questionId] ?? null;
+                $comment = $comments[$questionId] ?? null;
 
-                if ($question === null) {
+                if ($question === null || (blank($answer) && blank($comment))) {
                     continue;
                 }
 
@@ -35,7 +40,7 @@ class FeedbackResponseController extends Controller
                     'question_id' => $question->id,
                     'question_option_id' => $question->type === 'single_choice' ? $answer : null,
                     'answer_text' => $question->type === 'free_text' ? $answer : null,
-                    'comment' => $data['answers_comment'][$questionId] ?? null,
+                    'comment' => $comment,
                 ]);
             }
         });

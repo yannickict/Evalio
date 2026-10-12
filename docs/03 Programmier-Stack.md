@@ -1,10 +1,10 @@
 # Programming Stack
 
-This document describes the current project as of 5 October 2026. Version entries below are dependency constraints, not a measurement of the installed runtime.
+This document describes the current project as of 12 October 2026. Version entries below are dependency constraints, not a measurement of the installed runtime.
 
 | Technology | Purpose | Declared version / configuration |
 |---|---|---|
-| PHP | Backend language | Composer requires `^8.3` |
+| PHP | Backend language | Composer declares `^8.3`; installed locked dependencies require PHP 8.4 or newer |
 | Laravel | Web framework | `^13.17` |
 | Eloquent | Relational models and database access | Included with Laravel |
 | Blade | Server-rendered HTML | Included with Laravel |
@@ -34,7 +34,7 @@ Authentication uses Laravel's authentication/session facilities. Login requires 
 
 ## Frontend
 
-Blade templates live in `resources/views`. `resources/js/app.js` imports Bootstrap modal, collapse and dropdown components, refreshes questionnaire-editor answer types with scroll/focus restoration and filters overview cards by course and instructor. Filtering occurs in the browser after sessions have been loaded; it does not limit the records returned by the server.
+Blade templates live in `resources/views`. `resources/js/app.js` imports Bootstrap modal, collapse, dropdown and offcanvas components. It handles the responsive sidebar, questionnaire-editor scroll/focus restoration, session-list filters and restoration of list position/filters after evaluation-status changes. Shared Blade layouts include the SVG favicon in `public/favicon.svg`. Filtering occurs in the browser after sessions have been loaded; it does not limit the records returned by the server.
 
 ## Database and questionnaire content
 
@@ -46,7 +46,7 @@ Database configuration is defined in `config/database.php` and environment setti
 |---|---|
 | `composer install` | Install locked PHP dependencies |
 | `npm ci` | Install locked frontend dependencies |
-| `composer dev` | Run local server, queue listener and frontend development server |
+| `composer dev` | Run local server, queue listener, scheduler worker and frontend development server |
 | `npm run build` | Compile frontend assets |
 | `php artisan test` | Run PHP application tests |
 | `npm run test:js` | Run JavaScript tests |
@@ -54,6 +54,6 @@ Database configuration is defined in `config/database.php` and environment setti
 | `composer types:check` | Run PHPStan analysis |
 | `composer test` | Clear configuration, check formatting, run static analysis and PHP tests |
 
-This document records available commands; it does not claim they were executed or passed during the documentation review.
+Verification results are recorded in [[07 Implementation Status|Implementation Status]].
 
 The GitHub Actions workflow runs setup/build and `composer ci:check`. JavaScript tests have a separate npm command and are not explicitly included in that workflow.

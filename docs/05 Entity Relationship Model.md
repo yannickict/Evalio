@@ -1,6 +1,6 @@
 # Entity Relationship Model
 
-This document describes the implemented database schema as of 6 October 2026. Project requirements describe the intended functionality separately.
+This document describes the implemented database schema as of 12 October 2026. Project requirements describe the intended functionality separately.
 
 Related: [[01 Documentation Index|Documentation Index]], [[04 Application Architecture|Application Architecture]] and [[07 Implementation Status|Implementation Status]].
 
@@ -61,7 +61,7 @@ The overview displays null as “Evaluation status not set”. The hourly comman
 | `type` | Enum: `single_choice` or `free_text` |
 | `allows_comment` | Boolean indicating comment support |
 
-A question can belong to multiple templates and have multiple possible options. Multiple simultaneous selected options are not represented by this schema. The standard ten-question questionnaire is defined in `QuestionnaireSeeder`.
+A question can belong to multiple templates and have multiple possible options. Multiple simultaneous selected options are not represented by this schema. The standard ten-question questionnaire is defined in German in `QuestionnaireSeeder`; stored content is independent of the interface language.
 
 ### Question Option
 
@@ -83,7 +83,7 @@ The primary key is `(questionnaire_template_id, question_id)`. A unique constrai
 
 The form does not store a participant identity or its own questionnaire-template reference. The questionnaire is resolved using `feedback_form -> course_session -> questionnaire_template` at request time. There is no fallback to the course's current template. The session foreign key restricts deletion of assigned templates; it does not freeze questions or options.
 
-`CourseSession::feedbackForm()` (has-one) exposes the session-to-form relationship, while `Answer::feedbackForm()` exposes the answer-to-form relationship. The `FeedbackForm` model currently defines only `courseSession()`; it has no inverse `answers()` relation. Demo seeding creates forms for every session and codes only for open evaluations. Session creation does not create forms; opening an evaluation creates its form/code as needed.
+`CourseSession::feedbackForm()` (has-one) exposes the session-to-form relationship, while `Answer::feedbackForm()` exposes the answer-to-form relationship. The `FeedbackForm` model defines `courseSession()` and the inverse has-many `answers()` relation. Demo seeding creates forms for every session and codes only for open evaluations. Session creation does not create forms; opening an evaluation creates its form/code as needed.
 
 ### Answer
 
@@ -95,7 +95,7 @@ The form does not store a participant identity or its own questionnaire-template
 | `answer_text` | Nullable free-text answer |
 | `comment` | Nullable additional comment |
 
-Single-choice writes set `question_option_id` and leave `answer_text` null. Free-text writes set `answer_text` and leave `question_option_id` null. The controller also stores supplied comments. There are no `feedback_responses` or `response_options` tables.
+Single-choice writes set `question_option_id` and leave `answer_text` null. Free-text writes set `answer_text` and leave `question_option_id` null. The controller also stores permitted comments without a selected option or free-text answer. Such rows have null answer fields and a nonblank `comment`. Fully blank answer/comment pairs are not stored. There are no `feedback_responses` or `response_options` tables.
 
 The table has a non-unique index on `(feedback_form_id, question_id)`. Repeated submissions can therefore create multiple answers for the same form/question. Foreign keys establish record existence, but do not establish that an option belongs to its answer's question or that the question belongs to the form's template. The feedback Form Request validates both memberships, and the response controller wraps all answer writes in one transaction.
 

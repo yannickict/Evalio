@@ -1,10 +1,10 @@
 # Development Setup
 
-Source review: 5 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack]], [[04 Application Architecture|Application Architecture]], [[07 Implementation Status|Implementation Status]].
+Source review: 12 October 2026. Related: [[03 Programmier-Stack|Programmier-Stack]], [[04 Application Architecture|Application Architecture]], [[07 Implementation Status|Implementation Status]].
 
 ## Prerequisites
 
-Use PHP compatible with Composer's `^8.3` constraint, Composer, Node.js/npm and an SQLite-capable PHP installation for the default local database. The GitHub Actions workflow uses PHP 8.4, Composer v2 and Node 22. Install exact dependencies from the lockfiles.
+Use PHP 8.4 or newer compatible with the committed Composer lockfile, Composer, Node.js/npm and an SQLite-capable PHP installation for the default local database. The root Composer constraint is `^8.3`, but locked dependencies require a newer runtime. The GitHub Actions workflow uses PHP 8.4, Composer v2 and Node 22. Install exact dependencies from the lockfiles.
 
 Run commands from the project root, currently `C:\Users\yanni\Documents\Evalio`.
 
@@ -86,7 +86,7 @@ The second command updates records and access codes in your configured database;
 
 The GitHub Actions workflow runs `composer setup` and `composer ci:check` on pushes to `main` and pull requests. Setup builds frontend assets, but the workflow currently does not explicitly run `npm run test:js`.
 
-No test or build was run as part of this source-based documentation update. This note is a local development guide; the repository does not yet provide application backup, CSV import or a production deployment workflow.
+Current test/build results are recorded in [[07 Implementation Status|Implementation Status]]. Administrator course/session CSV imports are implemented. Settings expose demo-file backup/export actions, while real database backup/restore and a production deployment workflow remain unfinished.
 
 ## Existing database compatibility
 
@@ -97,7 +97,7 @@ The unique feedback_forms.course_session_id constraint was added to the original
 
 Run `php artisan migrate` for the forward session-number migration; a fresh reset is unnecessary for this change. Back up first because displayed identifiers are renumbered per course. The demo seeder reuses its named courses but still adds instructors and sessions on repeated runs.
 
-Open View evaluation results from session details. Print / Save as PDF uses browser printing and an A4 chart summary. Disable browser-added headers/footers when checking one-page output. Actual standard-questionnaire page-count verification remains required.
+Open View evaluation results from session details. Print / Save as PDF uses browser printing and an A4 chart summary. Disable browser-added headers/footers when checking one-page output. The existing ten-question demo summary was verified as a single A4 PDF in a headless browser on 12 October 2026. Review the newly seeded German standard questionnaire, custom questionnaires and printer/browser settings separately.
 
 The compatible local Windows runtime is `C:/Users/yanni/.config/herd-lite/bin/php.exe`. Put its directory before XAMPP PHP on PATH for Composer. If local PHPStan exceeds 128 MB, run `php vendor/bin/phpstan analyse --memory-limit=512M`. JavaScript tests use `npm run test:js`; these are not currently a separate CI workflow step.
 

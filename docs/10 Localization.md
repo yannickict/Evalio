@@ -1,5 +1,7 @@
 # Localization
 
+Source review: 12 October 2026.
+
 German is the default interface language. `config/app.php` defaults to `de`, and `.env.example` and the local `.env` use `APP_LOCALE=de`. The **DE / EN** controls appear in the main header and above authentication forms. Both guests and signed-in users can change language. An encrypted, HttpOnly cookie remembers the choice for one year; it survives login and logout. Without a valid preference cookie, the configured default applies.
 
 `POST /language` validates the selected language and returns to a local application path, retaining query parameters such as questionnaire codes. External return URLs are rejected in favour of the home page. The form has CSRF protection and works without JavaScript. `SetLocale` runs after cookie decryption and applies the preference to web requests. `APP_LOCALE=en` can still change the installation default; clear or rebuild the configuration cache after changing environment settings.

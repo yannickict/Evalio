@@ -1,5 +1,7 @@
 # CSV Imports
 
+Source review: 12 October 2026.
+
 Administrators can open **Settings → Import CSV**, then choose **Sessions** or **Courses**. Instructor and questionnaire imports are not implemented yet.
 
 ## File format
