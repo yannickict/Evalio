@@ -86,12 +86,12 @@ class EvaluationStatusTest extends TestCase
         $url = route('sessions.evaluation.update', $session);
 
         $this->actingAs($actor)->patch($url, ['evaluation_status' => 'open'])
-            ->assertRedirect(route('sessions.index'))->assertSessionHasNoErrors();
+            ->assertRedirect(route('sessions.index', ['session' => $session->id]))->assertSessionHasNoErrors();
         $this->assertSame('open', $session->fresh()->evaluation_status);
         $form = $session->feedbackForm()->sole();
 
         $this->patch($url, ['evaluation_status' => 'closed'])
-            ->assertRedirect(route('sessions.index'))->assertSessionHasNoErrors();
+            ->assertRedirect(route('sessions.index', ['session' => $session->id]))->assertSessionHasNoErrors();
         $this->assertNull($form->fresh()->code);
     }
 

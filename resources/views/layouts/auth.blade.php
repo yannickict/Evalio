@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>@yield('title') · Evalio</title>
-    @vite('resources/css/app.css')
-    <x-page-scrollbar />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-body-tertiary">
     <main class="container min-vh-100 d-flex align-items-center py-5">
         <div class="row justify-content-center w-100 mx-0">
             <div class="col-12 col-md-8 col-lg-6 col-xl-5">
                 <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
-                    <a class="fw-bold text-success text-decoration-none" href="/">Evalio <span class="small fw-normal text-body-secondary">{{ __('/ Course evaluations') }}</span></a>
+                    <a class="fw-bold text-primary text-decoration-none" href="/">Evalio <span class="small fw-normal text-body-secondary">{{ __('/ Course evaluations') }}</span></a>
                     <x-language-switch />
                 </div>
-                <section class="card border-0 rounded-4 shadow-sm p-4 p-sm-5" aria-labelledby="auth-title">
+                <section class="card border rounded-2 p-4 p-sm-5" aria-labelledby="auth-title">
                     <h1 class="h3" id="auth-title">@yield('title')</h1>
                     <p class="text-body-secondary small mb-4">@yield('intro')</p>
                     <x-ui.status-alert />

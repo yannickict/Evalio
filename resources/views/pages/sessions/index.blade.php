@@ -3,15 +3,14 @@
 @section('title', __('Sessions - Evalio'))
 
 @section('content')
-<main class="container py-5" id="session-overview">
+<main class="container py-4 py-lg-5" id="session-overview">
     <header class="mb-4">
-        <p class="text-success small fw-semibold text-uppercase mb-2">{{ __('Course evaluations') }}</p>
         <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
-            <h1 class="h2 fw-bold mb-0">{{ __('Sessions') }}</h1>
-            <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">
+            <h1 class="h3 fw-semibold mb-0">{{ __('Sessions') }}</h1>
+            <span class="badge rounded-1 text-body-secondary bg-body-secondary">
                 {{ $courseSessions->count() }} {{ $courseSessions->count() === 1 ? __('session') : __('sessions') }}
             </span>
-            <a class="btn btn-success rounded-3 ms-auto" href="{{ route('sessions.create') }}">{{ __('New session') }}</a>
+            <a class="btn btn-primary rounded-2 ms-auto" href="{{ route('sessions.create') }}">{{ __('New session') }}</a>
         </div>
         <p class="text-body-secondary mb-0">{{ __('All your course sessions, in one place.') }}</p>
     </header>
@@ -38,17 +37,26 @@
 
     @endcan
 
-    <div class="row g-4">
+    <div class="collection-list row g-0 border rounded-2 overflow-hidden">
+        <div class="col-12 d-none d-lg-block border-bottom bg-body-tertiary px-4 py-2">
+            <div class="row small text-body-secondary">
+                <div class="col-lg-2">{{ __('Course') }}</div>
+                <div class="col-lg-2">{{ __('Instructor') }}</div>
+                <div class="col-lg-3">{{ __('Course dates') }} / {{ __('Questionnaire') }}</div>
+                <div class="col-lg-3">{{ __('Evaluation phase') }}</div>
+                <div class="col-lg-2 text-end">{{ __('Details') }}</div>
+            </div>
+        </div>
         @forelse ($courseSessions as $course_session)
         <x-sessions.card :course-session="$course_session" />
         @empty
         <div class="col-12">
-            <div class="card border-0 rounded-4 shadow-sm p-5 text-center">
+            <div class="card border rounded-2 p-5 text-center">
                 <h2 class="h5">{{ __('No course sessions yet') }}</h2>
                 <p class="text-body-secondary mb-0">{{ __('Course sessions will appear here once they are created.') }}</p>
                 @can('view-workflow-guide')
                 <p class="text-body-secondary mt-3 mb-2">{{ __('Each session needs a course with an assigned questionnaire.') }}</p>
-                <a class="link-success fw-semibold" href="{{ route('courses.index') }}">{{ __('Choose or create a course →') }}</a>
+                <a class="link-primary fw-semibold" href="{{ route('courses.index') }}">{{ __('Choose or create a course →') }}</a>
                 @endcan
             </div>
         </div>

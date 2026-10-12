@@ -13,12 +13,12 @@
                     <label class="form-label small text-body-secondary mb-1" for="role-{{ $user->id }}">
                         {{ __('Role') }} <span class="visually-hidden">{{ __('for :name', ['name' => $user->name]) }}</span>
                     </label>
-                    <select class="form-select form-select-sm bg-body-tertiary rounded-3"
+                    <select class="form-select form-select-sm bg-body-tertiary rounded-2"
                         id="role-{{ $user->id }}"
                         name="role_id" required onchange="this.form.requestSubmit()" @disabled($user->is(auth()->user()))>
                         <x-users.role-options :roles="$roles" :selected="$user->role_id" />
                     </select>
-                    <noscript><button class="btn btn-success btn-sm mt-2" type="submit" @disabled($user->is(auth()->user()))>{{ __('Save role') }}</button></noscript>
+                    <noscript><button class="btn btn-primary btn-sm mt-2" type="submit" @disabled($user->is(auth()->user()))>{{ __('Save role') }}</button></noscript>
                 </form>
                 <x-users.delete-button :user="$user" />
             </div>

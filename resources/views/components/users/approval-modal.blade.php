@@ -12,7 +12,7 @@
             @csrf
             @method('PATCH')
 
-            <div class="modal-header">
+            <div class="modal-header px-4 py-3">
                 <h2 class="modal-title fs-5"
                     id="approve-title-{{ $user->id }}">
                     {{ __('Approve') }} {{ $user->name }}
@@ -21,7 +21,7 @@
                     data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <label class="form-label" for="role-{{ $user->id }}">
                     {{ __('Assign role') }}
                 </label>
@@ -32,12 +32,12 @@
                 </select>
             </div>
 
-            <div class="modal-footer">
-                <button class="btn btn-outline-secondary" type="button"
+            <div class="modal-footer bg-body-tertiary px-4 py-3 gap-2">
+                <button class="btn btn-light border btn-sm" type="button"
                     data-bs-dismiss="modal">
                     {{ __('Cancel') }}
                 </button>
-                <button class="btn btn-success" type="submit">
+                <button class="btn btn-primary btn-sm" type="submit">
                     {{ __('Approve and assign role') }}
                 </button>
             </div>

@@ -7,7 +7,7 @@
         </div>
         <div class="col-12 col-md-5">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-success btn-sm rounded-3 px-3 flex-grow-1"
+                <button class="btn btn-primary btn-sm rounded-2 px-3 flex-grow-1"
                     type="button"
                     data-bs-toggle="modal"
                     data-bs-target="#approve-user-{{ $user->id }}">

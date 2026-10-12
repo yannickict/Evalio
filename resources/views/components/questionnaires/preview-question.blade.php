@@ -1,13 +1,13 @@
 @props(['question', 'number', 'templateId'])
 
-<li class="border rounded-4 p-3 p-sm-4" aria-labelledby="preview-question-{{ $templateId }}-{{ $question->id }}">
+<li class="border rounded-2 p-3 p-sm-4" aria-labelledby="preview-question-{{ $templateId }}-{{ $question->id }}">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-        <span class="small text-success fw-semibold">{{ __('Question') }} {{ $number }}</span>
+        <span class="small text-primary fw-semibold">{{ __('Question') }} {{ $number }}</span>
         <div class="d-flex flex-wrap gap-2">
-            <span class="badge rounded-pill text-body-secondary bg-body-tertiary border fw-normal">
+            <span class="badge rounded-1 text-body-secondary bg-body-tertiary border fw-normal">
                 {{ $question->type === 'single_choice' ? __('Single choice') : __('Free text') }}
             </span>
-            <span @class(['badge rounded-pill fw-normal', 'bg-success-subtle text-success-emphasis' => $question->allows_comment, 'bg-body-tertiary text-body-secondary border' => ! $question->allows_comment])>
+            <span @class(['badge rounded-1 fw-normal', 'bg-primary-subtle text-primary-emphasis' => $question->allows_comment, 'bg-body-tertiary text-body-secondary border' => ! $question->allows_comment])>
                 {{ $question->allows_comment ? __('Optional comment enabled') : __('No comment field') }}
             </span>
         </div>
@@ -17,8 +17,8 @@
     @if ($question->type === 'single_choice')
         <ul class="list-unstyled d-grid gap-2 mb-0">
             @forelse ($question->options as $option)
-                <li class="d-flex align-items-start gap-2 border rounded-3 bg-body-tertiary px-3 py-2">
-                    <span class="text-success flex-shrink-0" aria-hidden="true">&#9675;</span>
+                <li class="d-flex align-items-start gap-2 border rounded-2 bg-body-tertiary px-3 py-2">
+                    <span class="text-primary flex-shrink-0" aria-hidden="true">&#9675;</span>
                     <span class="small text-break">{{ $option->option_text }}</span>
                 </li>
             @empty
@@ -26,7 +26,7 @@
             @endforelse
         </ul>
     @elseif ($question->type === 'free_text')
-        <textarea class="form-control bg-body-tertiary rounded-3 small" rows="3"
+        <textarea class="form-control bg-body-tertiary rounded-2 small" rows="3"
             aria-labelledby="preview-question-{{ $templateId }}-{{ $question->id }}"
             placeholder="{{ __('Participants can write their answer here') }}" disabled></textarea>
     @endif
@@ -36,7 +36,7 @@
             <label class="form-label small fw-medium" for="preview-comment-{{ $templateId }}-{{ $question->id }}">
                 {{ __('Comment') }} <span class="text-body-secondary fw-normal">{{ __('(optional)') }}</span>
             </label>
-            <textarea class="form-control bg-body-tertiary rounded-3 small" rows="2"
+            <textarea class="form-control bg-body-tertiary rounded-2 small" rows="2"
                 id="preview-comment-{{ $templateId }}-{{ $question->id }}"
                 placeholder="{{ __('Participants can add a comment') }}" disabled></textarea>
         </div>

@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vite-plus/test';
 vi.mock('bootstrap/js/dist/modal', () => ({}));
 vi.mock('bootstrap/js/dist/collapse', () => ({}));
 vi.mock('bootstrap/js/dist/dropdown', () => ({}));
+vi.mock('bootstrap/js/dist/offcanvas', () => ({}));
 
 let form;
 let select;

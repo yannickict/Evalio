@@ -29,10 +29,10 @@
             <label class="form-label fw-semibold" for="password_confirmation">{{ __('Confirm password') }}</label>
             <input class="form-control" id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" minlength="8" required>
         </div>
-        <button class="btn btn-success rounded-pill py-2" type="submit">{{ __('Create account') }}</button>
+        <button class="btn btn-primary rounded-pill py-2" type="submit">{{ __('Create account') }}</button>
     </form>
 @endsection
 
 @section('footer')
-    {{ __('Already have an account?') }} <a class="link-success fw-semibold link-offset-2" href="{{ route('login') }}">{{ __('Log in') }}</a>
+    {{ __('Already have an account?') }} <a class="link-primary fw-semibold link-offset-2" href="{{ route('login') }}">{{ __('Log in') }}</a>
 @endsection

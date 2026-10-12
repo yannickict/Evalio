@@ -13,37 +13,27 @@
     border-radius: .25rem;
 }
 .language-switch-option:disabled { color: var(--bs-body-color); font-weight: 700; opacity: 1; }
-.language-switch-option:not(:disabled):hover { color: var(--bs-success); }
-.language-switch-option:focus-visible { outline: 2px solid var(--bs-success); outline-offset: 2px; }
+.language-switch-option:not(:disabled):hover { color: var(--bs-primary); }
+.language-switch-option:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: 2px; }
 .language-switch-divider { color: var(--bs-border-color); font-size: .75rem; }
 
-.user-avatar,
-.settings-toggle {
+.user-avatar {
     width: 3rem;
     height: 3rem;
     vertical-align: middle;
 }
 
-.settings-toggle { line-height: 1; }
-.settings-toggle svg { display: block; }
-
 .course-session-link:is(:hover, :focus-visible) {
-    background-color: var(--bs-success-bg-subtle);
+    background-color: var(--bs-primary-bg-subtle);
 }
 
 .course-session-link:focus-visible {
-    outline: 2px solid var(--bs-success);
+    outline: 2px solid var(--bs-primary);
     outline-offset: -2px;
 }
 
-.workflow-guide-icon {
-    width: 2rem;
-    height: 2rem;
-    font-weight: 600;
-}
-
 .workflow-guide-toggle {
-    border-radius: .75rem;
+    border-radius: .375rem;
     transition: background-color .2s ease;
 }
 
@@ -52,7 +42,7 @@
 }
 
 .workflow-guide-toggle:focus-visible {
-    outline: 2px solid var(--bs-success);
+    outline: 2px solid var(--bs-primary);
     outline-offset: 2px;
 }
 
@@ -84,7 +74,8 @@
 @media print {
     @page { size: A4 portrait; margin: 10mm; }
     body:has(.evaluation-results) { background: white !important; }
-    body:has(.evaluation-results) > header { display: none !important; }
+    body:has(.evaluation-results) > nav { display: none !important; }
+    .workspace-content { margin-left: 0 !important; }
     .evaluation-results { width: 100%; max-width: none; padding: 0 !important; color: #111; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     .evaluation-results > header { margin-bottom: 4mm !important; }
     .evaluation-results h1 { font-size: 18pt; margin-bottom: 1mm !important; }
@@ -93,7 +84,8 @@
     .evaluation-results .results-card { padding: 3mm !important; border: 1px solid #ddd !important; border-radius: 2mm !important; box-shadow: none !important; break-inside: avoid; }
     .evaluation-results .results-card h2 { font-size: 9pt; line-height: 1.2; margin-bottom: 2mm !important; }
     .evaluation-results .results-card > p { font-size: 7pt; margin-bottom: 1mm !important; }
-    .evaluation-results .results-pie { width: 23mm; height: 23mm; flex-basis: 23mm; }
+    .evaluation-results .results-pie { width: 21mm; height: 21mm; flex-basis: 21mm; }
+    .evaluation-results .results-card > p:last-child { margin-top: 1mm !important; }
     .evaluation-results .results-chart { gap: 2mm; }
     .evaluation-results .results-legend { font-size: 7pt; line-height: 1.15; }
     .evaluation-results .results-legend li { margin-bottom: .8mm; }
@@ -132,28 +124,36 @@
     }
 }
 
-.course-card,
-.questionnaire-card {
-    border-top: .25rem solid var(--bs-success) !important;
-}
 
-.course-card,
-.session-card,
-.questionnaire-card {
-    transition: transform .15s ease, box-shadow .15s ease;
+/* The shell is the only layout Bootstrap does not provide directly. */
+:root {
+    --bs-body-color: #263445;
+    --bs-body-bg: #fff;
+    --bs-tertiary-bg: #f5f7fa;
+    --bs-border-color: #dfe4eb;
+    --bs-border-radius: .375rem;
 }
-
-:is(.course-card, .session-card, .questionnaire-card):is(:hover, :focus-within) {
-    transform: translateY(-3px);
-    box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .12) !important;
+body { font-size: .9375rem; }
+h1, h2, h3 { letter-spacing: -.02em; }
+.app-topbar { min-height: 65px; }
+.skip-link:focus { z-index: 1100 !important; }
+.app-content > .container { max-width: 1320px; }
+.collection-list > .col-12:last-of-type > article { border-bottom: 0 !important; }
+.collection-list article:hover { background-color: var(--bs-tertiary-bg) !important; }
+.response-option { cursor: pointer; }
+.response-option:has(input:checked) { border-color: var(--bs-primary) !important; background: var(--bs-primary-bg-subtle) !important; }
+.response-option:focus-within { outline: 2px solid var(--bs-primary); outline-offset: 2px; }
+.participant-entry { min-height: calc(100dvh - 65px); }
+@media (min-width: 992px) {
+    .app-sidebar { position: fixed; inset: 0 auto 0 0; width: 232px; height: 100dvh; z-index: 1030; }
+    .app-sidebar .offcanvas-body { height: 100%; overflow-y: auto; }
+    .workspace-content, .workspace-topbar { margin-left: 232px; }
+    .workspace-content > .container { padding-left: 2rem; padding-right: 2rem; }
 }
-
-:is(.course-card, .session-card, .questionnaire-card):focus-within {
-    outline: 2px solid var(--bs-success);
-    outline-offset: 3px;
+@media (max-width: 991.98px) {
+    .app-sidebar { --bs-offcanvas-width: 280px; }
 }
-
-@media (prefers-reduced-motion: reduce) {
-    .course-card, .session-card, .questionnaire-card { transition: none; }
-    :is(.course-card, .session-card, .questionnaire-card):is(:hover, :focus-within) { transform: none; }
+@media print {
+    .app-sidebar, .app-topbar { display: none !important; }
+    .app-content { margin-left: 0 !important; }
 }

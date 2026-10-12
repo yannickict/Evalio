@@ -7,6 +7,7 @@ const { show, getOrCreateInstance } = vi.hoisted(() => {
 vi.mock('bootstrap/js/dist/modal', () => ({ default: { getOrCreateInstance } }));
 vi.mock('bootstrap/js/dist/collapse', () => ({}));
 vi.mock('bootstrap/js/dist/dropdown', () => ({}));
+vi.mock('bootstrap/js/dist/offcanvas', () => ({}));
 
 describe('overview select filters', () => {
     let course;
@@ -72,7 +73,7 @@ describe('overview detail links', () => {
         const modal = { classList: { contains: (name) => name === 'modal' } };
         vi.stubGlobal('window', { location: { search: `?${type}=12` } });
         vi.stubGlobal('document', {
-            getElementById: (id) => id === `${type}-overview` ? {} : id === `${type}-12` ? modal : null,
+            getElementById: (id) => id === `${type}-overview` ? new EventTarget() : id === `${type}-12` ? modal : null,
         });
 
         await import('../../resources/js/app.js');
@@ -88,5 +89,42 @@ describe('overview detail links', () => {
         await import('../../resources/js/app.js');
 
         expect(show).not.toHaveBeenCalled();
+    });
+
+    it('preserves the list position and filters across an evaluation status update', async () => {
+        const overview = new EventTarget();
+        const modal = { classList: { contains: (name) => name === 'modal' } };
+        const storage = new Map();
+        const course = Object.assign(new EventTarget(), { value: '3' });
+        const instructor = Object.assign(new EventTarget(), { value: '7' });
+        const rows = [{ dataset: { course: '3', instructor: '7' } }, { dataset: { course: '4', instructor: '7' } }];
+        const scrollTo = vi.fn(() => expect(show).not.toHaveBeenCalled());
+        vi.stubGlobal('sessionStorage', {
+            getItem: (key) => storage.get(key) ?? null,
+            setItem: (key, value) => storage.set(key, value),
+            removeItem: (key) => storage.delete(key),
+        });
+        const frames = [];
+        vi.stubGlobal('requestAnimationFrame', (callback) => frames.push(callback));
+        vi.stubGlobal('window', { location: { search: '' }, scrollY: 850, scrollTo });
+        vi.stubGlobal('document', {
+            getElementById: (id) => ({ 'session-overview': overview, 'session-12': modal, 'course-filter': course, 'instructor-filter': instructor })[id] ?? null,
+            querySelectorAll: () => rows,
+        });
+        await import('../../resources/js/app.js');
+        const submission = new Event('submit');
+        Object.defineProperty(submission, 'target', { value: { matches: () => true, dataset: { sessionId: '12' } } });
+        overview.dispatchEvent(submission);
+
+        vi.resetModules();
+        window.location.search = '?session=12';
+        course.value = '';
+        instructor.value = '';
+        await import('../../resources/js/app.js');
+        expect(rows.map(row => row.hidden)).toEqual([false, true]);
+        frames.forEach(callback => callback());
+        expect(scrollTo).toHaveBeenCalledWith({ top: 850, behavior: 'instant' });
+        expect(show).toHaveBeenCalledOnce();
+        expect(storage.size).toBe(0);
     });
 });

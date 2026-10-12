@@ -1,7 +1,17 @@
 import Modal from "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
+import "bootstrap/js/dist/offcanvas";
 import { initializeLanguageSwitcher } from './language-switch';
+
+const sidebar = document.getElementById('main-navigation');
+if (sidebar) {
+    for (const [event, expanded] of [['shown.bs.offcanvas', 'true'], ['hidden.bs.offcanvas', 'false']]) {
+        sidebar.addEventListener(event, () => {
+            document.querySelector('[data-bs-toggle="offcanvas"][aria-controls="main-navigation"]')?.setAttribute('aria-expanded', expanded);
+        });
+    }
+}
 
 if (document.getElementById('language-switch')) {
     initializeLanguageSwitcher(document, window);
@@ -34,6 +44,25 @@ if (profileForm) {
     });
 }
 
+const sessionOverview = document.getElementById('session-overview');
+const sessionReturnKey = 'evaluation-status-return';
+if (sessionOverview) {
+    sessionOverview.addEventListener('submit', (event) => {
+        const form = event.target;
+        if (!form.matches('[data-evaluation-status-form]')) return;
+        try {
+            sessionStorage.setItem(sessionReturnKey, JSON.stringify({
+                sessionId: form.dataset.sessionId,
+                top: window.scrollY,
+                course: document.getElementById('course-filter')?.value ?? '',
+                instructor: document.getElementById('instructor-filter')?.value ?? '',
+            }));
+        } catch {
+            // Status updates still work without browser storage.
+        }
+    });
+}
+
 for (const [overviewId, parameter] of [['session-overview', 'session'], ['course-overview', 'course']]) {
     if (!document.getElementById(overviewId)) continue;
     const selectedId = new URLSearchParams(window.location.search).get(parameter);
@@ -42,6 +71,26 @@ for (const [overviewId, parameter] of [['session-overview', 'session'], ['course
         const modal = document.getElementById(`${parameter}-${selectedId}`);
 
         if (modal?.classList.contains('modal')) {
+            if (parameter === 'session') {
+                try {
+                    const saved = sessionStorage.getItem(sessionReturnKey);
+                    sessionStorage.removeItem(sessionReturnKey);
+                    const position = saved ? JSON.parse(saved) : null;
+                    if (position?.sessionId === selectedId && Number.isFinite(position.top) && position.top >= 0) {
+                        for (const field of ['course', 'instructor']) {
+                            const filter = document.getElementById(`${field}-filter`);
+                            if (filter) filter.value = position[field] ?? '';
+                        }
+                        requestAnimationFrame(() => {
+                            window.scrollTo({ top: position.top, behavior: 'instant' });
+                            Modal.getOrCreateInstance(modal).show();
+                        });
+                        continue;
+                    }
+                } catch {
+                    // Direct links still open when stored state is unavailable or invalid.
+                }
+            }
             Modal.getOrCreateInstance(modal).show();
         }
     }

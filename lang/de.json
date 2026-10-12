@@ -19,7 +19,6 @@
     "Add sessions from a CSV file using existing courses and instructors.": "Fügen Sie Lehrgänge aus einer CSV-Datei mit vorhandenen Kursen und Dozenten hinzu.",
     "Admin": "Admin",
     "Administration": "Administration",
-    "Admin": "Admin",
     "All": "Alle",
     "All caught up": "Alles erledigt",
     "All courses": "Alle Kurse",
@@ -412,5 +411,9 @@
     "user": "Benutzer",
     "users": "Benutzer",
     "without needing an account.": "ein, ohne ein Benutzerkonto zu benötigen.",
-    "written": "schriftliche"
+    "written": "schriftliche",
+    "Menu": "Menü",
+    "Skip to content": "Zum Inhalt springen",
+    "Evaluation phase": "Bewertungsphase",
+    "Details": "Details"
 }

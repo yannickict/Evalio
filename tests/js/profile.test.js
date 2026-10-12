@@ -3,6 +3,7 @@ import { afterEach, expect, it, vi } from 'vite-plus/test';
 vi.mock('bootstrap/js/dist/modal', () => ({ default: {} }));
 vi.mock('bootstrap/js/dist/collapse', () => ({}));
 vi.mock('bootstrap/js/dist/dropdown', () => ({}));
+vi.mock('bootstrap/js/dist/offcanvas', () => ({}));
 
 afterEach(() => {
     vi.unstubAllGlobals();

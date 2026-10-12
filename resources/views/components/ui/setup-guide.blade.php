@@ -1,11 +1,10 @@
 @props(['current' => null, 'home' => false])
 
 @can('view-workflow-guide')
-<div @class(['workflow-guide text-start', 'border rounded-3 mb-4' => ! $home, 'border-top mt-4 pt-3' => $home])>
+<div @class(['workflow-guide text-start', 'border rounded-2 mb-4' => ! $home, 'border-top mt-4 pt-3' => $home])>
     <button class="workflow-guide-toggle btn w-100 d-flex align-items-center gap-3 text-start border-0 px-3 py-2"
             type="button" data-bs-toggle="collapse" data-bs-target="#workflow-guide-{{ $current ?? 'home' }}"
             aria-expanded="false" aria-controls="workflow-guide-{{ $current ?? 'home' }}">
-        <span class="workflow-guide-icon rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center flex-shrink-0" aria-hidden="true">?</span>
         <span class="flex-grow-1">
             <span class="small fw-semibold d-block">{{ $home ? __('Using Evalio for your courses?') : __('Workflow guide') }}</span>
             <span class="small text-body-secondary d-block">{{ $home ? __('A quick guide to setup and sharing feedback.') : __('Questionnaire → Course → Session') }}</span>
@@ -17,9 +16,9 @@
         @if (auth()->user()->role?->name === 'instructor')
         <h2 class="h5 fw-semibold mb-2">{{ __('Collect feedback for your sessions') }}</h2>
         <ol class="small text-body-secondary ps-3 mb-3">
-            <li class="mb-2">{{ __('Open') }} <a class="link-success" href="{{ route('sessions.index') }}">{{ __('Sessions') }}</a> {{ __('to find the sessions assigned to you.') }}</li>
+            <li class="mb-2">{{ __('Open') }} <a class="link-primary" href="{{ route('sessions.index') }}">{{ __('Sessions') }}</a> {{ __('to find the sessions assigned to you.') }}</li>
             <li class="mb-2">{{ __('Select “View details” for a session to check its evaluation status and feedback code.') }}</li>
-            <li>{{ __('When the evaluation is open, share the six-digit code with participants. They enter it on the') }} <a class="link-success" href="{{ route('home') }}">{{ __('home page') }}</a> {{ __('without needing an account.') }}</li>
+            <li>{{ __('When the evaluation is open, share the six-digit code with participants. They enter it on the') }} <a class="link-primary" href="{{ route('home') }}">{{ __('home page') }}</a> {{ __('without needing an account.') }}</li>
         </ol>
         <p class="small text-body-secondary border-top pt-3 mb-3">{{ __('Evaluations open automatically on the session start date and close 14 days after it ends. Contact an admin or editor if an evaluation needs to be opened or closed manually.') }}</p>
         <h3 class="h6 fw-semibold">{{ __('How setup works') }}</h3>
@@ -35,9 +34,9 @@
             ] as $step)
             <li @class(['col-12', 'col-lg-4' => ! $home])>
                 <a href="{{ route($step['route']) }}"
-                   @class(['d-block h-100 rounded-3 border p-3 text-decoration-none', 'border-success bg-success-subtle' => $current === $step['key'], 'border-light-subtle bg-body-tertiary' => $current !== $step['key']])
+                   @class(['d-block h-100 border-start border-2 ps-3 py-2 text-decoration-none', 'border-primary' => $current === $step['key'], 'border-secondary-subtle' => $current !== $step['key']])
                    @if ($current === $step['key']) aria-current="step" @endif>
-                    <span class="small fw-semibold text-success d-block mb-2">{{ __('Step') }} {{ $loop->iteration }}{{ $current === $step['key'] ? __(' · You are here') : '' }}</span>
+                    <span class="small fw-semibold text-primary d-block mb-2">{{ __('Step') }} {{ $loop->iteration }}{{ $current === $step['key'] ? __(' · You are here') : '' }}</span>
                     <span class="fw-semibold text-body d-block mb-1">{{ __($step['title']) }} <span aria-hidden="true">&rarr;</span></span>
                     <span class="small text-body-secondary">{{ __($step['description']) }}</span>
                 </a>

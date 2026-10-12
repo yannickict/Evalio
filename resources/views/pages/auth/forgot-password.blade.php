@@ -11,10 +11,10 @@
             <input class="form-control" id="email" type="email" name="email"
                    autocomplete="email" value="{{ old('email') }}" required>
         </div>
-        <button class="btn btn-success rounded-pill py-2" type="submit">{{ __('Send reset link') }}</button>
+        <button class="btn btn-primary rounded-pill py-2" type="submit">{{ __('Send reset link') }}</button>
     </form>
 @endsection
 
 @section('footer')
-    <a class="link-success" href="{{ route('login') }}">{{ __('Back to login') }}</a>
+    <a class="link-primary" href="{{ route('login') }}">{{ __('Back to login') }}</a>
 @endsection

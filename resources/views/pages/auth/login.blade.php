@@ -19,11 +19,11 @@
             <input class="form-check-input mt-0" type="checkbox" name="remember" value="1" @checked(old('remember'))>
             {{ __('Remember me') }}
         </label>
-        <a class="link-success small" href="{{ route('password.request') }}">{{ __('Forgot password?') }}</a>
-        <button class="btn btn-success rounded-pill py-2" type="submit">{{ __('Log in') }}</button>
+        <a class="link-primary small" href="{{ route('password.request') }}">{{ __('Forgot password?') }}</a>
+        <button class="btn btn-primary rounded-pill py-2" type="submit">{{ __('Log in') }}</button>
     </form>
 @endsection
 
 @section('footer')
-    {{ __('New here?') }} <a class="link-success fw-semibold link-offset-2" href="{{ route('register') }}">{{ __('Create an account') }}</a>
+    {{ __('New here?') }} <a class="link-primary fw-semibold link-offset-2" href="{{ route('register') }}">{{ __('Create an account') }}</a>
 @endsection

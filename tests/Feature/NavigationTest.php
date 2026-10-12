@@ -83,20 +83,20 @@ class NavigationTest extends TestCase
             $this->fail('Expected the active navigation link to be a DOM element.');
         }
         $this->assertSame($url, $link->getAttribute('href'));
-        $this->assertStringContainsString('bg-success', $link->getAttribute('class'));
+        $this->assertStringContainsString('bg-primary', $link->getAttribute('class'));
     }
 
-    public function test_navigation_has_direct_mobile_logout_and_a_desktop_profile_dropdown(): void
+    public function test_navigation_has_responsive_sidebar_and_account_controls(): void
     {
         $response = $this->actingAs(User::factory()->approved()->create())->get(route('home'))->assertOk();
         $document = new \DOMDocument;
         @$document->loadHTML($response->getContent());
         $xpath = new \DOMXPath($document);
-        $this->assertCount(1, $xpath->query('//nav//button[@data-bs-target="#main-navigation" and @aria-controls="main-navigation" and @aria-expanded="false"]'));
+        $this->assertCount(1, $xpath->query('//nav//button[@data-bs-toggle="offcanvas" and @data-bs-target="#main-navigation" and @aria-controls="main-navigation" and @aria-expanded="false"]'));
         $this->assertCount(1, $xpath->query('//nav//*[@id="main-navigation"]'));
         $logoutForm = 'form[@method="POST" and @action="'.route('logout').'"]';
-        $mobileLogout = '//*[@id="main-navigation"]//'.$logoutForm.'[contains(concat(" ", normalize-space(@class), " "), " d-md-none ")]';
-        $desktopProfile = '//*[@id="main-navigation"]/div[contains(concat(" ", normalize-space(@class), " "), " d-none ") and contains(concat(" ", normalize-space(@class), " "), " d-md-block ")]';
+        $mobileLogout = '//*[@id="main-navigation"]//'.$logoutForm;
+        $desktopProfile = '//nav//div[contains(concat(" ", normalize-space(@class), " "), " dropdown ")]';
         $desktopMenu = $desktopProfile.'/div[@aria-labelledby="profile-menu-toggle" and contains(concat(" ", normalize-space(@class), " "), " dropdown-menu ") and not(contains(concat(" ", normalize-space(@class), " "), " show "))]';
 
         $this->assertCount(2, $xpath->query('//nav//form[@action="'.route('logout').'"]'));
@@ -107,6 +107,8 @@ class NavigationTest extends TestCase
             $this->assertCount(1, $xpath->query($form.'/button[@type="submit" and normalize-space(.)="Log out"]'));
         }
         $this->assertCount(1, $xpath->query($desktopProfile.'/button[@id="profile-menu-toggle" and @type="button" and @data-bs-toggle="dropdown" and @aria-expanded="false" and @aria-label]'));
+        $this->assertCount(1, $xpath->query('//aside[@id="main-navigation" and @aria-labelledby="navigation-title"]'));
+        $this->assertCount(1, $xpath->query('//a[@href="#page-content"]'));
         $this->assertCount(1, $xpath->query('//form[@method="GET" and @action="'.route('feedback.show').'"]//input[@name="code" and @required]'));
     }
 }

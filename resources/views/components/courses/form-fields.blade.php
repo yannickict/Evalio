@@ -22,7 +22,7 @@
     </select>
     @if ($templates->isEmpty())
         <p id="questionnaire-note" class="form-text mb-0">
-            {{ __('No questionnaires available.') }} <a href="{{ route('questionnaires.create') }}" class="link-success">{{ __('Create a questionnaire') }}</a> {{ __('before adding a course.') }}
+            {{ __('No questionnaires available.') }} <a href="{{ route('questionnaires.create') }}" class="link-primary">{{ __('Create a questionnaire') }}</a> {{ __('before adding a course.') }}
         </p>
     @else
         <p id="questionnaire-note" class="form-text mb-0">{{ __('This questionnaire will be assigned to new sessions. Existing sessions keep their questionnaire.') }}</p>

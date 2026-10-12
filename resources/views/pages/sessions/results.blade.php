@@ -3,28 +3,28 @@
 @section('title', __('Evaluation results - Evalio'))
 
 @section('content')
-<main class="container py-5 evaluation-results">
+<main class="container py-4 py-lg-5 evaluation-results">
     <header class="mb-4">
         <a class="link-secondary text-decoration-none small d-inline-block mb-4 d-print-none"
             href="{{ route('sessions.index', ['session' => $courseSession->id]) }}">
             <span aria-hidden="true">&larr;</span> {{ __('Back to session') }}
         </a>
-        <p class="small text-success fw-semibold text-uppercase mb-2">{{ $courseSession->session_identifier }}</p>
-        <h1 class="h2 fw-bold mb-2">{{ __('Evaluation results') }}</h1>
+        <p class="small text-body-secondary fw-medium mb-2">{{ $courseSession->session_identifier }}</p>
+        <h1 class="h3 fw-semibold mb-2">{{ __('Evaluation results') }}</h1>
         <p class="text-body-secondary mb-0">{{ $courseSession->course->name }}</p>
         <p class="small text-body-secondary mt-1 mb-0">{{ $courseSession->start_date->locale(app()->getLocale())->translatedFormat(app()->getLocale() === 'de' ? 'd.m.Y' : 'd M Y') }} &ndash; {{ $courseSession->end_date->locale(app()->getLocale())->translatedFormat(app()->getLocale() === 'de' ? 'd.m.Y' : 'd M Y') }}</p>
-        <button class="btn btn-outline-success rounded-3 mt-3 d-print-none" type="button" onclick="window.print()">{{ __('Print / Save as PDF') }}</button>
+        <button class="btn btn-outline-primary rounded-2 mt-3 d-print-none" type="button" onclick="window.print()">{{ __('Print / Save as PDF') }}</button>
         <p class="small text-body-secondary mt-2 mb-0 d-print-none">{{ __('The print summary includes charts and response counts. Written responses and comments are shown below.') }}</p>
     </header>
 
     @if (! $hasAnswers)
-    <p class="alert alert-info">{{ __('No answers have been received for this session yet.') }}</p>
+    <p class="alert alert-info d-print-none">{{ __('No answers have been received for this session yet.') }}</p>
     @endif
 
     <div class="results-grid">
         @forelse ($results as $result)
-        <section class="card border-0 rounded-4 shadow-sm p-4 results-card">
-            <p class="small text-success fw-semibold mb-2">{{ __('Question') }} {{ $loop->iteration }}</p>
+        <section class="card border rounded-2 p-4 results-card">
+            <p class="small text-primary fw-semibold mb-2">{{ __('Question') }} {{ $loop->iteration }}</p>
             <h2 class="h5 text-break mb-3">{{ $result['question']->question_text }}</h2>
 
             @if ($result['question']->type === 'single_choice')

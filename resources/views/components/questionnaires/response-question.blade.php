@@ -1,16 +1,12 @@
 @props(['question', 'number'])
 
-<fieldset class="card border-0 rounded-4 shadow-sm p-3 px-md-4 mb-3" aria-labelledby="question-title-{{ $question->id }}">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-        <span class="text-success small fw-semibold">{{ __('Question') }} {{ $number }}</span>
-        <span class="text-body-secondary small">{{ $question->type === 'single_choice' ? __('Choose one answer') : __('In your own words') }}</span>
-    </div>
-    <h2 class="h5 fw-semibold mb-3" id="question-title-{{ $question->id }}">{{ $question->question_text }}</h2>
-
+<fieldset class="border-bottom bg-white p-3 p-md-4 mb-0" aria-labelledby="question-title-{{ $question->id }}">
+    <legend class="fs-6 fw-semibold mb-2" id="question-title-{{ $question->id }}"><span class="d-block small text-primary mb-2">{{ __('Question') }} {{ $number }}</span>{{ $question->question_text }}</legend>
+    <p class="text-body-secondary small mb-3">{{ $question->type === 'single_choice' ? __('Choose one answer') : __('In your own words') }}</p>
     @if ($question->type === 'single_choice')
     <div class="d-grid gap-2">
         @foreach ($question->options as $option)
-        <label class="d-flex align-items-center gap-2 border rounded-3 px-3 py-2 bg-body-tertiary" for="question-{{ $question->id }}-option-{{ $option->id }}">
+        <label class="response-option d-flex align-items-center gap-2 border rounded-2 px-3 py-2 bg-body-tertiary" for="question-{{ $question->id }}-option-{{ $option->id }}">
             <input class="form-check-input flex-shrink-0 mt-0" type="radio"
                 id="question-{{ $question->id }}-option-{{ $option->id }}"
                 name="answers[{{ $question->id }}]" value="{{ $option->id }}"
@@ -20,7 +16,7 @@
         @endforeach
     </div>
     @elseif ($question->type === 'free_text')
-    <textarea class="form-control bg-body-tertiary rounded-3 px-3 py-2" rows="3"
+    <textarea class="form-control bg-body-tertiary rounded-2 px-3 py-2" rows="3"
         id="answer-{{ $question->id }}" name="answers[{{ $question->id }}]"
         aria-labelledby="question-title-{{ $question->id }}"
         placeholder="{{ __('Share your thoughts…') }}">{{ old('answers.'.$question->id) }}</textarea>
@@ -30,7 +26,7 @@
         <label class="form-label small fw-semibold mb-2" for="comment-{{ $question->id }}">
             {{ __('Add a comment') }} <span class="text-body-secondary fw-normal">{{ __('(optional)') }}</span>
         </label>
-        <textarea class="form-control bg-body-tertiary rounded-3 px-3 py-2" rows="2"
+        <textarea class="form-control bg-body-tertiary rounded-2 px-3 py-2" rows="2"
             id="comment-{{ $question->id }}" name="answers_comment[{{ $question->id }}]"
             placeholder="{{ __('What worked well, or what could be improved?') }}">{{ old('answers_comment.'.$question->id) }}</textarea>
     </div>

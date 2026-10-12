@@ -89,7 +89,7 @@ class CourseSessionController extends Controller
 
         $setStatus->handle($courseSession, $data['evaluation_status']);
 
-        return redirect()->route('sessions.index')
+        return redirect()->route('sessions.index', ['session' => $courseSession->id])
             ->with('status', $data['evaluation_status'] === 'open'
                 ? __('Evaluation opened.')
                 : __('Evaluation closed.'));

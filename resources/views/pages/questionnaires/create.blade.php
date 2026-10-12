@@ -14,22 +14,22 @@ $question['options'] = $question['options'] ?? ['', ''];
 
 unset($question);
 @endphp
-<main class="container py-5">
+<main class="container py-4 py-lg-5">
     <div class="row justify-content-center">
     <div class="col-12 col-lg-9 col-xl-8">
     <header class="mb-4">
         <a href="{{ route('questionnaires.index') }}" class="link-secondary text-decoration-none small d-inline-block mb-4">
             <span aria-hidden="true">&larr;</span> {{ __('Back to questionnaires') }}
         </a>
-        <p class="text-success small fw-semibold text-uppercase mb-2">{{ __('Course evaluations') }}</p>
-        <h1 class="h2 fw-bold mb-2">{{ __('New questionnaire') }}</h1>
+        <p class="text-body-secondary small fw-medium mb-2">{{ __('Course evaluations') }}</p>
+        <h1 class="h3 fw-semibold mb-2">{{ __('New questionnaire') }}</h1>
         <p class="text-body-secondary mb-0">{{ __('Build a feedback form you can reuse across course sessions.') }}</p>
     </header>
     <x-ui.validation-errors :errors="$errors" />
     <form method="POST" action="{{ route('questionnaires.preview') }}">
         @csrf
 
-        <section class="card border-0 rounded-4 shadow-sm mb-4" aria-labelledby="questionnaire-details-heading">
+        <section class="card border rounded-2 mb-4" aria-labelledby="questionnaire-details-heading">
         <div class="card-body p-4">
             <h2 id="questionnaire-details-heading" class="h5 fw-semibold mb-1">{{ __('Questionnaire details') }}</h2>
             <p class="small text-body-secondary mb-4">{{ __('Choose a clear name so you can find this questionnaire later.') }}</p>
@@ -49,7 +49,7 @@ unset($question);
 
         <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
             <h2 class="h5 fw-semibold mb-0">{{ __('Questions') }}</h2>
-            <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
+            <span class="badge rounded-1 bg-primary-subtle text-primary-emphasis">
                 {{ count($draft['questions']) }} {{ count($draft['questions']) === 1 ? __('question') : __('questions') }}
             </span>
         </div>
@@ -64,7 +64,7 @@ unset($question);
                 name="action"
                 value="refresh"
                 id="refresh-answer-types"
-                class="btn btn-outline-secondary rounded-3">
+                class="btn btn-outline-secondary rounded-2">
                 {{ __('Update answer types') }}
             </button>
 
@@ -72,16 +72,16 @@ unset($question);
                 type="submit"
                 name="action"
                 value="add_question"
-                class="btn btn-outline-success rounded-3 py-3" @disabled(count($draft['questions']) >= 50)>
+                class="btn btn-outline-primary rounded-2 py-3" @disabled(count($draft['questions']) >= 50)>
                 {{ __('+ Add question') }}
             </button>
         </div>
         <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 border-top pt-4">
             <p class="small text-body-secondary mb-0">{{ __('Save your template when all questions are ready.') }}</p>
             <div class="d-flex gap-2">
-            <a href="{{ route('questionnaires.index') }}" class="btn btn-outline-secondary rounded-3">{{ __('Cancel') }}</a>
+            <a href="{{ route('questionnaires.index') }}" class="btn btn-outline-secondary rounded-2">{{ __('Cancel') }}</a>
             <button type="submit" formaction="{{ route('questionnaires.store') }}"
-                class="btn btn-success rounded-3">{{ __('Save questionnaire') }}</button>
+                class="btn btn-primary rounded-2">{{ __('Save questionnaire') }}</button>
             </div>
         </div>
     </form>

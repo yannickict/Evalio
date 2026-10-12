@@ -1,13 +1,13 @@
 @props(['id', 'headingId', 'title'])
 
 <section {{ $attributes->class(['accordion'])->merge(['id' => $id, 'aria-labelledby' => $headingId]) }}>
-    <div class="accordion-item border-0 shadow-sm">
+    <div class="accordion-item border rounded-2 overflow-hidden">
         <h2 class="accordion-header" id="{{ $headingId }}">
             <button class="accordion-button bg-white gap-3" type="button"
                 data-bs-toggle="collapse" data-bs-target="#{{ $id }}-content"
                 aria-expanded="true" aria-controls="{{ $id }}-content">
-                <span class="h3 fw-bold mb-0">{{ $title }}</span>
-                <span class="badge rounded-pill text-success-emphasis bg-success-subtle border border-success-subtle">{{ $count }}</span>
+                <span class="h5 fw-semibold mb-0">{{ $title }}</span>
+                <span class="badge rounded-1 text-primary-emphasis bg-primary-subtle border border-primary-subtle">{{ $count }}</span>
             </button>
         </h2>
         <div id="{{ $id }}-content" class="collapse show">

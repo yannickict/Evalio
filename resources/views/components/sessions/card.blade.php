@@ -8,47 +8,42 @@ default => __('Evaluation status not set'),
 };
 $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secondary';
 @endphp
-<div class="col-12 col-md-6 col-xl-4"
-    data-session
-    data-course="{{ $courseSession->course_id }}"
-    data-instructor="{{ $courseSession->instructor_id }}">
-    <article class="session-card card h-100 border-0 rounded-4 shadow-sm">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-                <span class="small text-body-secondary font-monospace text-break">{{ $courseSession->session_identifier }}</span>
-                <span class="badge rounded-pill bg-{{ $statusColor }}-subtle text-{{ $statusColor }}-emphasis">{{ $statusLabel }}</span>
+<div class="col-12" data-session data-course="{{ $courseSession->course_id }}" data-instructor="{{ $courseSession->instructor_id }}">
+    <article class="session-card border-bottom bg-white px-3 px-lg-4 py-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-6 col-lg-2">
+                <h2 class="h6 fw-semibold mb-1 text-break">{{ $courseSession->course->name }}</h2>
+                <span class="small text-body-secondary font-monospace">{{ $courseSession->session_identifier }}</span>
             </div>
-            <h2 class="h5 fw-semibold text-break mb-4">{{ $courseSession->course->name }}</h2>
-            <dl class="mb-0">
-                <dt class="small text-body-secondary fw-normal">{{ __('Instructor') }}</dt>
-                <dd class="fw-medium text-break mb-3">{{ $courseSession->instructor->name }}</dd>
-                <dt class="small text-body-secondary fw-normal">{{ __('Course dates') }}</dt>
-                <dd class="fw-medium mb-0">
+            <div class="col-6 col-lg-2">
+                <p class="small text-body-secondary d-lg-none mb-1">{{ __('Instructor') }}</p>
+                <p class="small text-break mb-0">{{ $courseSession->instructor->name }}</p>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <p class="small mb-1">
                     <time datetime="{{ $courseSession->start_date->toDateString() }}">{{ $courseSession->start_date->locale(app()->getLocale())->translatedFormat(app()->getLocale() === 'de' ? 'd.m.Y' : 'd M Y') }}</time>
-                    <span class="text-body-secondary">&ndash;</span>
+                    &ndash;
                     <time datetime="{{ $courseSession->end_date->toDateString() }}">{{ $courseSession->end_date->locale(app()->getLocale())->translatedFormat(app()->getLocale() === 'de' ? 'd.m.Y' : 'd M Y') }}</time>
-                </dd>
-            </dl>
-        </div>
-        <div class="card-footer bg-transparent border-top px-4 py-3">
-            <p class="small text-body-secondary mb-1">{{ __('Questionnaire') }}</p>
-            <p class="small fw-medium text-break mb-0">{{ $courseSession->questionnaireTemplate?->name ?? __('No questionnaire assigned') }}</p>
-            <button class="btn btn-link link-success text-decoration-none fw-semibold small p-0 mt-3 stretched-link"
-                type="button" data-bs-toggle="modal" data-bs-target="#session-{{ $courseSession->id }}"
-                aria-label="{{ __('View details for :value1, :value2', ['value1' => $courseSession->course->name, 'value2' => $courseSession->session_identifier]) }}">
-                {{ __('View details') }} <span aria-hidden="true">&rarr;</span>
-            </button>
+                </p>
+                <p class="small text-body-secondary text-break mb-0">{{ $courseSession->questionnaireTemplate?->name ?? __('No questionnaire assigned') }}</p>
+            </div>
+            <div class="col-8 col-sm-4 col-lg-3">
+                <span class="badge rounded-1 bg-{{ $statusColor }}-subtle text-{{ $statusColor }}-emphasis text-wrap text-start">{{ $statusLabel }}</span>
+            </div>
+            <div class="col-4 col-sm-2 col-lg-2 text-end">
+                <button class="btn btn-link btn-sm px-0 text-decoration-none" type="button" data-bs-toggle="modal" data-bs-target="#session-{{ $courseSession->id }}" aria-label="{{ __('View details for :value1, :value2', ['value1' => $courseSession->course->name, 'value2' => $courseSession->session_identifier]) }}">{{ __('View details') }}</button>
+            </div>
         </div>
     </article>
 </div>
 <x-ui.modal id="session-{{ $courseSession->id }}" labelledby="session-title-{{ $courseSession->id }}" edit-permission="edit-sessions" :edit-url="route('sessions.edit', $courseSession)" delete-permission="delete-sessions" :delete-url="route('sessions.delete', $courseSession)" :delete-confirmation="__('Permanently delete this session, its feedback form and all submitted answers? This cannot be undone.')">
     <x-slot:header>
         <div>
-            <p class="small text-success fw-semibold mb-1">{{ __('Session details') }}</p>
+            <p class="small text-primary fw-semibold mb-1">{{ __('Session details') }}</p>
             <h2 class="modal-title fs-5 text-break" id="session-title-{{ $courseSession->id }}">{{ $courseSession->course->name }}</h2>
         </div>
     </x-slot:header>
-    <span class="badge rounded-pill bg-{{ $statusColor }}-subtle text-{{ $statusColor }}-emphasis mb-4">{{ $statusLabel }}</span>
+    <span class="badge rounded-1 bg-{{ $statusColor }}-subtle text-{{ $statusColor }}-emphasis mb-4">{{ $statusLabel }}</span>
     <dl class="row g-3 mb-0">
         <div class="col-sm-6">
             <dt class="small text-body-secondary fw-normal">{{ __('Session number') }}</dt>
@@ -71,15 +66,15 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
             <dd class="text-break mb-0">{{ $courseSession->questionnaireTemplate?->name ?? __('No questionnaire assigned') }}</dd>
         </div>
     </dl>
-    <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 border-top pt-3 mt-4">
+    <div class="d-flex align-items-start align-items-sm-center flex-column flex-sm-row flex-wrap gap-3 border-top pt-3 mt-4">
         @can('view-evaluation-results', $courseSession)
-        <a class="btn btn-outline-success rounded-3" href="{{ route('sessions.results', $courseSession) }}">{{ __('View evaluation results') }}</a>
+        <a class="btn btn-link btn-sm text-decoration-none px-0" href="{{ route('sessions.results', $courseSession) }}">{{ __('View evaluation results') }}</a>
         @endcan
         @if ($courseSession->evaluation_status === 'open' && $courseSession->questionnaireTemplate && $courseSession->feedbackForm?->code !== null)
-        <a class="btn btn-success rounded-3 text-break" href="{{ route('feedback.show', ['code' => $courseSession->feedbackForm->code]) }}">{{ __('View questionnaire') }}</a>
+        <a class="btn btn-link btn-sm text-decoration-none px-0 text-break" href="{{ route('feedback.show', ['code' => $courseSession->feedbackForm->code]) }}">{{ __('View questionnaire') }}</a>
         @endif
         @can('manage-evaluations')
-        <form method="POST"
+        <form class="ms-sm-auto" method="POST" data-evaluation-status-form data-session-id="{{ $courseSession->id }}"
             action="{{ route('sessions.evaluation.update', $courseSession) }}">
             @csrf
             @method('PATCH')
@@ -87,7 +82,7 @@ $statusColor = $courseSession->evaluation_status === 'open' ? 'success' : 'secon
             <input type="hidden" name="evaluation_status"
                 value="{{ $courseSession->evaluation_status === 'open' ? 'closed' : 'open' }}">
 
-            <button type="submit" class="btn btn-outline-success rounded-3">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
                 {{ $courseSession->evaluation_status === 'open'
                 ? __('Close evaluation')
                 : __('Open evaluation') }}
