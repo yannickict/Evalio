@@ -84,6 +84,8 @@
     .evaluation-results .results-card { padding: 3mm !important; border: 1px solid #ddd !important; border-radius: 2mm !important; box-shadow: none !important; break-inside: avoid; }
     .evaluation-results .results-card h2 { font-size: 9pt; line-height: 1.2; margin-bottom: 2mm !important; }
     .evaluation-results .results-card > p { font-size: 7pt; margin-bottom: 1mm !important; }
+    .evaluation-results .results-card h3 { font-size: 8pt; line-height: 1.2; padding-top: 2mm !important; margin-top: 2mm !important; margin-bottom: 1mm; }
+    .evaluation-results .results-card > ul { font-size: 8pt; line-height: 1.3; padding-left: 4mm; }
     .evaluation-results .results-pie { width: 21mm; height: 21mm; flex-basis: 21mm; }
     .evaluation-results .results-card > p:last-child { margin-top: 1mm !important; }
     .evaluation-results .results-chart { gap: 2mm; }

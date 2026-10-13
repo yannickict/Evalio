@@ -32,6 +32,53 @@ class FeedbackResponseTest extends TestCase
         return $template;
     }
 
+    public function test_successful_submission_sets_an_anonymous_http_only_cookie(): void
+    {
+        $this->questionnaire();
+        $form = FeedbackForm::where('code', '012345')->sole();
+
+        $response = $this->post(route('feedback.store', ['code' => '012345']))
+            ->assertRedirect(route('home'))
+            ->assertCookie('feedback_submitted_'.$form->id, '1');
+
+        $cookie = $response->getCookie('feedback_submitted_'.$form->id);
+        $this->assertTrue($cookie->isHttpOnly());
+        $this->assertSame('lax', $cookie->getSameSite());
+    }
+
+    public function test_submission_cookie_blocks_viewing_and_resubmitting_with_a_translated_message(): void
+    {
+        $template = $this->questionnaire();
+        $form = FeedbackForm::where('code', '012345')->sole();
+        $question = Question::factory()->create(['type' => 'free_text']);
+        $template->questions()->attach($question, ['position' => 1]);
+        $this->withCookie('feedback_submitted_'.$form->id, '1');
+        app()->setLocale('de');
+
+        $this->get(route('feedback.show', ['code' => '012345']))
+            ->assertRedirect(route('home'))
+            ->assertSessionHas('status', 'Sie haben bereits Feedback für diesen Lehrgang abgegeben.');
+
+        $this->post(route('feedback.store', ['code' => '012345']), [
+            'answers' => [$question->id => 'Duplicate answer'],
+        ])->assertRedirect(route('home'))
+            ->assertSessionHas('status', 'Sie haben bereits Feedback für diesen Lehrgang abgegeben.');
+
+        $this->assertDatabaseCount('answers', 0);
+    }
+
+    public function test_cookie_for_another_form_does_not_block_submission(): void
+    {
+        $this->questionnaire();
+        $form = FeedbackForm::where('code', '012345')->sole();
+
+        $this->withCookie('feedback_submitted_'.($form->id + 1), '1')
+            ->get(route('feedback.show', ['code' => '012345']))->assertOk();
+        $this->post(route('feedback.store', ['code' => '012345']))
+            ->assertSessionHas('status', 'Thank you! Your feedback has been submitted.')
+            ->assertCookie('feedback_submitted_'.$form->id, '1');
+    }
+
     public function test_guests_see_only_the_selected_templates_questions_in_position_order(): void
     {
         $template = $this->questionnaire();

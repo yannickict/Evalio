@@ -42,8 +42,8 @@
             @endif
 
             @if ($result['comments']->isNotEmpty())
-            <h3 class="h6 border-top pt-3 mt-3 d-print-none">{{ __('Comments') }}</h3>
-            <ul class="mb-0 d-print-none">
+            <h3 class="h6 border-top pt-3 mt-3">{{ __('Comments') }}</h3>
+            <ul class="mb-0">
                 @foreach ($result['comments'] as $comment)
                 <li class="text-break" style="white-space: pre-wrap">{{ $comment }}</li>
                 @endforeach

@@ -330,6 +330,7 @@
     "Submit feedback": "Submit feedback",
     "Thank you for taking the time to share your feedback.": "Thank you for taking the time to share your feedback.",
     "Thank you! Your feedback has been submitted.": "Thank you! Your feedback has been submitted.",
+    "You have already submitted feedback for this session.": "You have already submitted feedback for this session.",
     "The CSV file could not be read.": "The CSV file could not be read.",
     "The CSV file is empty.": "The CSV file is empty.",
     "The SQL dump could not be created.": "The SQL dump could not be created.",

@@ -11,15 +11,29 @@ use Illuminate\View\View;
 
 class FeedbackResponseController extends Controller
 {
-    public function show(FeedbackCodeRequest $request): View
+    public function show(FeedbackCodeRequest $request): View|RedirectResponse
     {
-        return view('pages.questionnaires.respond', ['questions' => $request->template()->questions]);
+        $cookieName = 'feedback_submitted_'.$request->form()->id;
+
+        if ($request->cookie($cookieName)) {
+            return $this->alreadySubmitted();
+        }
+
+        return view('pages.questionnaires.respond', [
+            'questions' => $request->template()->questions,
+        ]);
     }
 
     public function store(StoreFeedbackResponseRequest $request): RedirectResponse
     {
-        $data = $request->validated();
         $form = $request->form();
+        $cookieName = 'feedback_submitted_'.$form->id;
+
+        if ($request->cookie($cookieName)) {
+            return $this->alreadySubmitted();
+        }
+
+        $data = $request->validated();
         $questions = $request->template()->questions->keyBy('id');
         $answers = $data['answers'] ?? [];
         $comments = $data['answers_comment'] ?? [];
@@ -45,6 +59,25 @@ class FeedbackResponseController extends Controller
             }
         });
 
-        return redirect()->route('home')->with('status', __('Thank you! Your feedback has been submitted.'));
+        return redirect()
+            ->route('home')
+            ->with('status', __('Thank you! Your feedback has been submitted.'))
+            ->cookie(cookie(
+                name: $cookieName,
+                value: '1',
+                minutes: 60 * 24 * 365,
+                path: '/',
+                secure: $request->isSecure(),
+                httpOnly: true,
+                sameSite: 'lax',
+            ));
+    }
+
+    private function alreadySubmitted(): RedirectResponse
+    {
+        return redirect()->route('home')->with(
+            'status',
+            __('You have already submitted feedback for this session.')
+        );
     }
 }

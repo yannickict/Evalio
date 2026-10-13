@@ -329,6 +329,7 @@
     "Submit feedback": "Feedback absenden",
     "Thank you for taking the time to share your feedback.": "Vielen Dank, dass Sie sich Zeit für Ihr Feedback nehmen.",
     "Thank you! Your feedback has been submitted.": "Vielen Dank! Ihr Feedback wurde übermittelt.",
+    "You have already submitted feedback for this session.": "Sie haben bereits Feedback für diesen Lehrgang abgegeben.",
     "The CSV file could not be read.": "Die CSV-Datei konnte nicht gelesen werden.",
     "The CSV file is empty.": "Die CSV-Datei ist leer.",
     "The SQL dump could not be created.": "Der SQL-Export konnte nicht erstellt werden.",
