@@ -19,10 +19,10 @@
                     onsubmit="return confirm(this.dataset.confirm)">
                     @csrf
                     @method('DELETE')
-                    <button class="btn btn-link btn-sm text-danger text-decoration-none px-0" type="submit">{{ __('Delete') }}</button>
+                    <button class="btn btn-outline-danger btn-sm" type="submit">{{ __('Delete') }}</button>
                 </form>
                 @else
-                <button class="btn btn-link btn-sm text-danger text-decoration-none px-0 me-auto" type="button">{{ __('Delete') }}</button>
+                <button class="btn btn-outline-danger btn-sm me-auto" type="button">{{ __('Delete') }}</button>
                 @endif
                 @endcan
                 @endif
