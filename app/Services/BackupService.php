@@ -14,10 +14,14 @@ class BackupService
     public function create(): string
     {
         $dumpPath = $this->dumpService->create();
-        $path = 'backups/demo-backup-'.now()->format('Y-m-d_H-i-s').'-'.Str::uuid().'.sql';
+        $path = 'backups/evalio-backup-'.now()->format('Y-m-d_H-i-s').'-'.Str::uuid().'.sql';
 
-        if (! Storage::disk('local')->put($path, File::get($dumpPath))) {
-            throw new RuntimeException('Backup could not be stored.');
+        try {
+            if (! Storage::disk('local')->put($path, File::get($dumpPath))) {
+                throw new RuntimeException('Backup could not be stored.');
+            }
+        } finally {
+            File::delete($dumpPath);
         }
 
         return $path;

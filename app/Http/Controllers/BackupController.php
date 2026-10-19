@@ -23,7 +23,7 @@ class BackupController extends Controller
 
         return redirect()->route('settings.index')->with(
             'status',
-            __('Demo backup stored. This is not a real database backup.'),
+            __('Database backup stored.'),
         );
     }
 }

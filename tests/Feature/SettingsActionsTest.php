@@ -51,9 +51,9 @@ class SettingsActionsTest extends TestCase
         $source = $this->mockDump();
         $this->signInAdmin();
         $response = $this->post(route('settings.sql-dump'))->assertOk()
-            ->assertDownload('demo-dump.sql')->assertHeader('Content-Type', 'application/sql');
+            ->assertDownload('evalio-dump.sql')->assertHeader('Content-Type', 'application/sql');
 
-        $this->assertSame($source, $response->baseResponse->getFile()->getPathname());
+        $this->assertSame(file_get_contents($source), file_get_contents($response->baseResponse->getFile()->getPathname()));
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
         $this->assertFileExists($source);
     }
@@ -92,7 +92,12 @@ class SettingsActionsTest extends TestCase
     {
         // A versioned harmless file keeps tests independent of real local dumps.
         $path = base_path('tests/Fixtures/demo-dump.sql');
-        $this->mock(SqlDumpService::class)->shouldReceive('create')->andReturn($path);
+        $this->mock(SqlDumpService::class)->shouldReceive('create')->andReturnUsing(function () use ($path) {
+            $temporary = tempnam(sys_get_temp_dir(), 'evalio-test-');
+            copy($path, $temporary);
+
+            return $temporary;
+        });
 
         return $path;
     }

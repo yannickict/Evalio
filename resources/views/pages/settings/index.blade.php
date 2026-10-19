@@ -15,7 +15,7 @@
         @foreach ([
             [
                 'title' => 'Backup',
-                'description' => 'Store a demo backup file.',
+                'description' => 'Store a database backup on the application server.',
                 'button' => 'Create backup',
                 'route' => 'settings.backup',
             ],
@@ -27,7 +27,7 @@
             ],
             [
                 'title' => 'SQL dump',
-                'description' => 'Download a demo SQL file.',
+                'description' => 'Download the current database as a SQL file.',
                 'button' => 'Export SQL dump',
                 'route' => 'settings.sql-dump',
             ],
@@ -44,7 +44,6 @@
                         @csrf
                         <button class="btn btn-outline-primary rounded-2" type="submit">{{ __($setting['button']) }}</button>
                     </form>
-                    <p class="small text-body-secondary mb-0 mt-2">{{ __('Demo file only; not a real database backup.') }}</p>
                     @else
                     <button class="btn btn-outline-primary rounded-2" type="button" disabled>{{ __($setting['button']) }}</button>
                     <p class="small text-body-secondary mb-0 mt-2">{{ __('Coming soon') }}</p>

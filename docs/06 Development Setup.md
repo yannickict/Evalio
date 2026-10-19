@@ -86,7 +86,7 @@ The second command updates records and access codes in your configured database;
 
 The GitHub Actions workflow runs `composer setup` and `composer ci:check` on pushes to `main` and pull requests. Setup builds frontend assets, but the workflow currently does not explicitly run `npm run test:js`.
 
-Current test/build results are recorded in [[07 Implementation Status|Implementation Status]]. Administrator course/session CSV imports are implemented. Settings expose demo-file backup/export actions, while real database backup/restore and a production deployment workflow remain unfinished.
+Current test/build results are recorded in [[07 Implementation Status|Implementation Status]]. Administrator course/session CSV imports are implemented. Settings now support real MySQL SQL exports and private server-side backups. Restore UI and automated deployment remain unfinished. See [[11 MySQL und Serverbetrieb]] for local Docker setup and external MySQL/production configuration, and [[MySQL Backups]] for export details.
 
 ## Existing database compatibility
 

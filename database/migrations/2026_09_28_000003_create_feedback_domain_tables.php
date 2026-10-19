@@ -50,11 +50,11 @@ return new class extends Migration
         });
 
         Schema::create('questionnaire_template_question', function (Blueprint $table) {
-            $table->foreignId('questionnaire_template_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('question_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('questionnaire_template_id')->constrained(indexName: 'template_question_template_fk')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('question_id')->constrained(indexName: 'template_question_question_fk')->cascadeOnUpdate()->restrictOnDelete();
             $table->unsignedInteger('position');
-            $table->primary(['questionnaire_template_id', 'question_id']);
-            $table->unique(['questionnaire_template_id', 'position']);
+            $table->primary(['questionnaire_template_id', 'question_id'], 'template_question_pk');
+            $table->unique(['questionnaire_template_id', 'position'], 'template_question_position_unique');
         });
 
         Schema::create('feedback_forms', function (Blueprint $table) {

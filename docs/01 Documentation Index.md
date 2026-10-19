@@ -1,7 +1,7 @@
 # Evalio Documentation
 
 Repository reviewed: `C:\Users\yanni\Documents\Evalio`  
-Documentation updated: 12 October 2026
+Documentation updated: 19 October 2026
 
 - [[02 Project Requirements|Project Requirements]] — intended functionality and priorities. Only the selected stack has been updated.
 - [[03 Programmier-Stack|Programming Stack]] — dependencies, tooling and technical choices.
@@ -13,6 +13,9 @@ Documentation updated: 12 October 2026
 - [[09 Password Reset|Password Reset]] — guest reset flow, mail configuration, logs and tests.
 - [[Todo]] — Kanban board for the main remaining work; detailed gaps are recorded in Implementation Status.
 - [[10 Localization|Localization]] — German default, language switch, original-language questionnaire content and verification.
+
+- [[11 MySQL und Serverbetrieb|MySQL und Serverbetrieb]] — lokale Einrichtung, externe Datenbank, produktive `.env`, Webserver, Scheduler und Sicherungen.
+- [[MySQL Backups]] — export drivers, private backup storage and current limitations.
 
 These notes and the board are stored in the repository's `docs` folder. Open that folder as an Obsidian vault; the root `README.md` provides standard Markdown links for repository browsing.
 

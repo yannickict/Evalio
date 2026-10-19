@@ -23,7 +23,7 @@ Reviewed against source code on 12 October 2026. [[02 Project Requirements|Proje
 | Evaluation and filtering | Authorized per-session counts, percentages, SVG pie charts, written answers/comments and course/instructor overview filters | Combined filters on actual evaluation results; submission/abstention totals |
 | A4 output | Browser printing; tested ten-question demo summary fits one A4 page | Seeded German content and long custom questionnaires need separate print review |
 | Account profile | Personal detail editing and password changes with current-password validation | No known implementation gap |
-| Backups and CSV import | Admin course/session CSV imports with row errors; explicitly labeled demo-file backup/export | Real SQL export and restore procedure; instructor/questionnaire imports |
+| Backups and CSV import | Admin course/session CSV imports with row errors; real MySQL export/download and private server-side backups using Docker or native mysqldump | Restore UI, scheduled backups and retention; instructor/questionnaire imports |
 | Deletion | Admin users/courses/sessions/template deletion with assignment guards and dependent-answer cleanup | Individual submitted feedback deletion |
 | Duplicate course detection | Unique names rejected during creation/import | Potential-duplicate warnings (Should) |
 

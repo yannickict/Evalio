@@ -21,9 +21,9 @@ class SqlDumpController extends Controller
             ]);
         }
 
-        return response()->download($path, 'demo-dump.sql', [
+        return response()->download($path, 'evalio-dump.sql', [
             'Content-Type' => 'application/sql',
             'Cache-Control' => 'private, no-store',
-        ]);
+        ])->deleteFileAfterSend(true);
     }
 }

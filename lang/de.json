@@ -416,5 +416,8 @@
     "Menu": "Menü",
     "Skip to content": "Zum Inhalt springen",
     "Evaluation phase": "Bewertungsphase",
-    "Details": "Details"
+    "Details": "Details",
+    "Database backup stored.": "Datenbanksicherung gespeichert.",
+    "Store a database backup on the application server.": "Eine Datenbanksicherung auf dem Anwendungsserver speichern.",
+    "Download the current database as a SQL file.": "Die aktuelle Datenbank als SQL-Datei herunterladen."
 }

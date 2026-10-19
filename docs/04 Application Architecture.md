@@ -91,8 +91,8 @@ Paths and handler names below match the repository.
 | POST | `/settings/courses-import` | `CourseImportController::store` | Administrator; validated CSV upload |
 | GET | `/settings/sessions-import` | `SessionImportController::create` | Administrator |
 | POST | `/settings/sessions-import` | `SessionImportController::store` | Administrator; validated CSV upload |
-| POST | `/settings/backup` | `BackupController::store` | Administrator; demo-file backup |
-| POST | `/settings/sql-dump` | `SqlDumpController::store` | Administrator; demo-file download |
+| POST | `/settings/backup` | `BackupController::store` | Administrator; private MySQL database backup |
+| POST | `/settings/sql-dump` | `SqlDumpController::store` | Administrator; live MySQL SQL download |
 
 Web forms use CSRF tokens. Shared `view-course-lists` and `manage-users` gates are applied through route middleware; the navigation uses the same user-management gate. Self-deletion remains guarded in the controller. Role names, rather than boolean role permission columns, determine authorization.
 
@@ -179,4 +179,4 @@ Guest-only routes delegate link requests and password changes to `PasswordResetC
 
 ## Backups and SQL export
 
-Admin-only settings actions call `BackupService` and `SqlDumpService`. The dump service reads the existing placeholder `storage/app/private/dumps/demo.sql`; it does not export the live database. The UI labels these as demo-file operations. Real database export and a documented restore procedure remain unfinished.
+Admin-only settings actions call `BackupService` and `SqlDumpService`. The dump service exports the configured MySQL database using `mysqldump`, either through Docker Compose or a native executable selected in `config/backups.php`. Downloads delete the temporary export after sending; backups store a uniquely named copy under `storage/app/private/backups` and remove the temporary export. No restore UI or automated retention exists. See [[11 MySQL und Serverbetrieb]] and [[MySQL Backups]] for configuration and operational limits.

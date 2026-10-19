@@ -4,7 +4,10 @@ namespace App\Providers;
 
 use App\Models\CourseSession;
 use App\Models\User;
+use App\Services\SmtpTransportFactory;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Mail::extend('smtp', fn (array $config) => app(SmtpTransportFactory::class)->create($config));
+
+        ResetPassword::createUrlUsing(fn (User $user, string $token): string => rtrim((string) config('app.url'), '/').route('password.reset', [
+            'token' => $token,
+            'email' => $user->getEmailForPasswordReset(),
+        ], false));
+
         Gate::define('manage-settings', fn (User $user): bool => $user->hasRole('admin'));
         Gate::define('view-evaluation-results', fn (User $user, CourseSession $session): bool => $user->hasRole('admin', 'editor')
             || ($user->hasRole('instructor') && (int) $user->id === (int) $session->instructor_id)

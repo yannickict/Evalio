@@ -14,6 +14,8 @@ A Laravel web application for course-session feedback, with anonymous code-based
 - [CSV imports](docs/08%20CSV%20Imports.md)
 - [Password reset](docs/09%20Password%20Reset.md)
 - [Localization](docs/10%20Localization.md)
+- [MySQL und Serverbetrieb](docs/11%20MySQL%20und%20Serverbetrieb.md)
+- [MySQL backups](docs/MySQL%20Backups.md)
 - [Todo board](docs/Todo.md)
 
 The implementation-status note distinguishes working features from unfinished requirements. Follow the development setup guide for installation, demo data and verification commands.

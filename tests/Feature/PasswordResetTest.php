@@ -35,6 +35,18 @@ class PasswordResetTest extends TestCase
             ->assertSee('name="password_confirmation"', false);
     }
 
+    public function test_reset_email_uses_the_configured_public_url(): void
+    {
+        config(['app.url' => 'https://evalio.example.com/']);
+        $user = User::factory()->create(['email' => 'owner+reset@example.com']);
+        $message = (new ResetPassword('test-token'))->toMail($user);
+
+        $this->assertStringStartsWith('https://evalio.example.com/', $message->actionUrl);
+        $this->assertStringContainsString('test-token', $message->actionUrl);
+        parse_str((string) parse_url($message->actionUrl, PHP_URL_QUERY), $parameters);
+        $this->assertSame($user->email, $parameters['email']);
+    }
+
     public function test_existing_and_unknown_emails_receive_the_same_confirmation(): void
     {
         Notification::fake();
